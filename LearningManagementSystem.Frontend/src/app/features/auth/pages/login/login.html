@@ -1,0 +1,68 @@
+<div class="auth-wrapper">
+  <div class="glass-card auth-card">
+    <div class="auth-header">
+      <h2>Welcome Back</h2>
+      <p>Log in to your EduSphere account to continue learning</p>
+    </div>
+
+    <form [formGroup]="loginForm" (submit)="onSubmit()">
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        <input 
+          id="email" 
+          type="email" 
+          formControlName="email" 
+          class="form-control" 
+          placeholder="name@example.com"
+          [class.is-invalid]="loginForm.get('email')?.touched && loginForm.get('email')?.invalid"
+        />
+        @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
+          <div class="form-error">
+            @if (loginForm.get('email')?.errors?.['required']) {
+              Email is required.
+            } @else if (loginForm.get('email')?.errors?.['email']) {
+              Please enter a valid email address.
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input 
+          id="password" 
+          type="password" 
+          formControlName="password" 
+          class="form-control" 
+          placeholder="••••••••"
+          [class.is-invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+        />
+        @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+          <div class="form-error">
+            @if (loginForm.get('password')?.errors?.['required']) {
+              Password is required.
+            } @else if (loginForm.get('password')?.errors?.['minlength']) {
+              Password must be at least 6 characters.
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Action Button -->
+      <button type="submit" class="btn btn-primary btn-block auth-btn" [disabled]="isLoading">
+        @if (isLoading) {
+          <div class="spinner"></div>
+          Signing In...
+        } @else {
+          Sign In
+        }
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Don't have an account? <a routerLink="/auth/register">Sign Up</a></p>
+    </div>
+  </div>
+</div>
