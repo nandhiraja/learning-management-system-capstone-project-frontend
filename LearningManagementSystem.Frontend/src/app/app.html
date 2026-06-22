@@ -1,0 +1,21 @@
+@if (showNavbar()) {
+  <app-navbar></app-navbar>
+}
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+
+@if (showFooter()) {
+  <app-footer></app-footer>
+}
+
+<!-- Global Toast Notification Banner -->
+<div class="toast-container">
+  @for (toast of notificationService.toasts(); track toast.id) {
+    <div class="toast-card" [class]="toast.type">
+      <span class="toast-msg">{{ toast.message }}</span>
+      <button class="toast-close" (click)="notificationService.remove(toast.id)" aria-label="Close message">&times;</button>
+    </div>
+  }
+</div>
