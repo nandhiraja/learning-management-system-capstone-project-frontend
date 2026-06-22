@@ -1,0 +1,121 @@
+<div class="auth-wrapper">
+  <div class="glass-card auth-card">
+    <div class="auth-header">
+      <h2>Create Account</h2>
+      <p>Join LearnHub today and start learning from experts</p>
+    </div>
+
+    <form [formGroup]="registerForm" (submit)="onSubmit()">
+      <!-- First Name & Last Name Grid -->
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="firstName" class="form-label">First Name</label>
+          <input 
+            id="firstName" 
+            type="text" 
+            formControlName="firstName" 
+            class="form-control" 
+            placeholder="John"
+            [class.is-invalid]="registerForm.get('firstName')?.touched && registerForm.get('firstName')?.invalid"
+          />
+          @if (registerForm.get('firstName')?.touched && registerForm.get('firstName')?.invalid) {
+            <div class="form-error">Required (min 2 chars).</div>
+          }
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="lastName" class="form-label">Last Name</label>
+          <input 
+            id="lastName" 
+            type="text" 
+            formControlName="lastName" 
+            class="form-control" 
+            placeholder="Doe"
+            [class.is-invalid]="registerForm.get('lastName')?.touched && registerForm.get('lastName')?.invalid"
+          />
+          @if (registerForm.get('lastName')?.touched && registerForm.get('lastName')?.invalid) {
+            <div class="form-error">Required.</div>
+          }
+        </div>
+      </div>
+
+      <!-- Username -->
+      <div class="form-group">
+        <label for="userName" class="form-label">Username</label>
+        <input 
+          id="userName" 
+          type="text" 
+          formControlName="userName" 
+          class="form-control" 
+          placeholder="johndoe123"
+          [class.is-invalid]="registerForm.get('userName')?.touched && registerForm.get('userName')?.invalid"
+        />
+        @if (registerForm.get('userName')?.touched && registerForm.get('userName')?.invalid) {
+          <div class="form-error">Required (min 3 chars).</div>
+        }
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        <input 
+          id="email" 
+          type="email" 
+          formControlName="email" 
+          class="form-control" 
+          placeholder="john@example.com"
+          [class.is-invalid]="registerForm.get('email')?.touched && registerForm.get('email')?.invalid"
+        />
+        @if (registerForm.get('email')?.touched && registerForm.get('email')?.invalid) {
+          <div class="form-error">Please enter a valid email.</div>
+        }
+      </div>
+
+      <!-- Phone Number -->
+      <div class="form-group">
+        <label for="phoneNo" class="form-label">Phone Number</label>
+        <input 
+          id="phoneNo" 
+          type="tel" 
+          formControlName="phoneNo" 
+          class="form-control" 
+          placeholder="+1 (555) 000-0000"
+          [class.is-invalid]="registerForm.get('phoneNo')?.touched && registerForm.get('phoneNo')?.invalid"
+        />
+        @if (registerForm.get('phoneNo')?.touched && registerForm.get('phoneNo')?.invalid) {
+          <div class="form-error">Please enter a valid phone number.</div>
+        }
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input 
+          id="password" 
+          type="password" 
+          formControlName="password" 
+          class="form-control" 
+          placeholder="••••••••"
+          [class.is-invalid]="registerForm.get('password')?.touched && registerForm.get('password')?.invalid"
+        />
+        @if (registerForm.get('password')?.touched && registerForm.get('password')?.invalid) {
+          <div class="form-error">Required (min 6 chars).</div>
+        }
+      </div>
+
+      <!-- Action Button -->
+      <button type="submit" class="btn btn-primary btn-block auth-btn" [disabled]="isLoading">
+        @if (isLoading) {
+          <div class="spinner"></div>
+          Creating Account...
+        } @else {
+          Sign Up
+        }
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Already have an account? <a routerLink="/auth/login">Login</a></p>
+    </div>
+  </div>
+</div>
