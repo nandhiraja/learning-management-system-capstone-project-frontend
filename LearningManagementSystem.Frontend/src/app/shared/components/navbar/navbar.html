@@ -1,0 +1,85 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="navbar-left">
+      <a routerLink="/" class="navbar-brand">
+        <span class="brand-gradient">LearnHub</span>
+      </a>
+
+      <!-- Search bar (Only show if not on admin) -->
+      @if (auth.currentUser()?.role !== 'Admin') {
+        <form class="navbar-search" (submit)="onSearch($event, searchInput.value)">
+          <input #searchInput type="text" placeholder="Search for courses..." class="search-input" />
+          <button type="submit" class="search-btn" aria-label="Search">
+            <i class="bi bi-search" aria-hidden="true"></i>
+          </button>
+        </form>
+      }
+    </div>
+
+    <!-- Desktop Navigation -->
+    <div class="navbar-right" [class.open]="isMobileMenuOpen">
+      <!-- Shared Nav Links -->
+      <a routerLink="/courses" routerLinkActive="active" class="nav-link">
+        <i class="bi bi-compass" aria-hidden="true"></i> Explore
+      </a>
+
+      @if (auth.currentUser(); as user) {
+        <!-- Student Role Links -->
+        @if (user.role === 'Student') {
+          <a routerLink="/learning/dashboard" routerLinkActive="active" class="nav-link">
+            <i class="bi bi-book" aria-hidden="true"></i> My Learning
+          </a>
+          <a routerLink="/cart" routerLinkActive="active" class="nav-link cart-link">
+            <i class="bi bi-cart" aria-hidden="true"></i> Cart
+          </a>
+        }
+
+        <!-- Instructor Role Links -->
+        @if (user.role === 'Instructor') {
+          <a routerLink="/instructor/dashboard" routerLinkActive="active" class="nav-link">
+            <i class="bi bi-people" aria-hidden="true"></i> Instructor Portal
+          </a>
+        }
+
+        <!-- Admin Role Links -->
+        @if (user.role === 'Admin') {
+          <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link">
+            <i class="bi bi-shield-lock" aria-hidden="true"></i> Admin Panel
+          </a>
+        }
+
+        <!-- Profile Link -->
+        <a routerLink="/profile" routerLinkActive="active" class="profile-nav-item">
+          @if (user.profilePictureUrl!=null && user.profilePictureUrl != '') {
+            <img [src]="user.profilePictureUrl" alt="Profile" class="navbar-avatar" />
+          } @else {
+            <div class="navbar-avatar-placeholder">
+              {{ user.firstName[0] }}{{ user.lastName[0] }}
+            </div>
+          }
+          <span class="profile-name">{{ user.firstName }}</span>
+        </a>
+
+        <button (click)="logout()" class="btn-logout" aria-label="Logout">
+          <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Logout
+        </button>
+      } @else {
+        <!-- Guest Links -->
+        <a routerLink="/auth/login" routerLinkActive="active" class="nav-link btn-login-nav">Login</a>
+        <a routerLink="/auth/register" routerLinkActive="active" class="btn btn-primary register-nav-btn">Sign Up</a>
+      }
+
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" (click)="theme.toggle()" [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'">
+        <i [class]="theme.isDark() ? 'bi bi-moon' : 'bi bi-sun'" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <!-- Mobile menu toggle button -->
+    <button class="mobile-toggle" (click)="toggleMobileMenu()" [class.active]="isMobileMenuOpen" aria-label="Toggle navigation menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</nav>
