@@ -1,0 +1,56 @@
+<div class="course-card card list-row">
+  <!-- Thumbnail -->
+  <div class="course-thumbnail">
+    @if (course.thumbnailUrl) {
+      <img [src]="course.thumbnailUrl" alt="{{ course.title }}" class="thumbnail-img" />
+    } @else {
+      <div class="thumbnail-placeholder">
+        <i class="bi bi-book" aria-hidden="true"></i>
+      </div>
+    }
+    
+    <div class="course-lang-tag">
+      <app-badge-chip variant="accent">{{ course.language }}</app-badge-chip>
+    </div>
+  </div>
+
+  <!-- Details Content -->
+  <div class="course-body">
+    <h3 class="card-title course-title">{{ course.title }}</h3>
+    <p class="course-instructor text-xs text-secondary">
+      By {{ course.instructor.firstName }} {{ course.instructor.lastName }}
+    </p>
+    <p class="course-desc text-sm text-secondary">
+      {{ course.description }}
+    </p>
+    
+    <!-- Rating row -->
+    <div class="course-rating-row">
+      <div class="rating-stars" [attr.aria-label]="course.rating + ' out of 5 stars'">
+        <i class="bi bi-star-fill text-warning" aria-hidden="true"></i>
+        <span class="rating-value text-sm text-secondary font-bold" style="margin-left: 4px;">
+          {{ course.rating ? course.rating.toFixed(1) : '0.0' }}
+        </span>
+      </div>
+      <div class="students-badge text-xs text-secondary">
+        <i class="bi bi-people" aria-hidden="true" style="margin-right: 2px;"></i>
+        {{ course.studentsCount }} students
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer details -->
+  <div class="course-footer">
+    <div class="course-price">
+      @if (course.price === 0) {
+        <app-badge-chip variant="success">Free</app-badge-chip>
+      } @else {
+        <span class="price-val font-bold text-md">${{ course.price.toFixed(2) }}</span>
+      }
+    </div>
+    
+    <a [routerLink]="['/courses', course.externalId]" class="btn btn-primary view-details-btn">
+      View details <i class="bi bi-arrow-right" aria-hidden="true"></i>
+    </a>
+  </div>
+</div>

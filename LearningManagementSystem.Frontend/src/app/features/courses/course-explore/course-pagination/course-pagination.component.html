@@ -1,0 +1,33 @@
+@if (totalPages > 1) {
+  <div class="pagination-footer">
+    <button 
+      (click)="onSelectPage(page - 1)" 
+      [disabled]="page === 1" 
+      class="btn btn-secondary page-arrow-btn"
+      aria-label="Previous page"
+    >
+      <i class="bi bi-chevron-left" aria-hidden="true"></i>
+    </button>
+    
+    <div class="page-numbers">
+      @for (p of pages; track p) {
+        <button 
+          (click)="onSelectPage(p)" 
+          class="page-number-btn" 
+          [class.active]="p === page"
+        >
+          {{ p }}
+        </button>
+      }
+    </div>
+
+    <button 
+      (click)="onSelectPage(page + 1)" 
+      [disabled]="page === totalPages" 
+      class="btn btn-secondary page-arrow-btn"
+      aria-label="Next page"
+    >
+      <i class="bi bi-chevron-right" aria-hidden="true"></i>
+    </button>
+  </div>
+}
