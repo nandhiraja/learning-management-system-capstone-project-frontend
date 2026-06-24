@@ -1,0 +1,95 @@
+<aside class="filters-sidebar glass-card">
+  <div class="filter-header">
+    <h2 class="card-title" style="margin: 0; font-size: 16px; font-weight: 700;">Filter options</h2>
+    <button (click)="clearFilters.emit()" class="btn-clear-filters text-sm">Clear all</button>
+  </div>
+
+  <!-- Sorting Filter -->
+  <div class="filter-section">
+    <label for="sortBySelect" class="form-label">Sort by</label>
+    <select 
+      id="sortBySelect" 
+      (change)="onSortChange($event)" 
+      [value]="sortBy" 
+      class="form-control filter-select"
+    >
+      <option value="newest">Newest first</option>
+      <option value="price-asc">Price: low to high</option>
+      <option value="price-desc">Price: high to low</option>
+      <option value="rating">Highest rated</option>
+      <option value="students">Most popular</option>
+    </select>
+  </div>
+
+  <!-- Price Radio Filters -->
+  <div class="filter-section">
+    <h3 class="form-label">Price type</h3>
+    <div class="filter-options-list">
+      <label class="radio-label">
+        <input 
+          type="radio" 
+          name="priceType" 
+          (change)="priceTypeChange.emit('all')" 
+          [checked]="priceType === 'all'" 
+        />
+        <span>All courses</span>
+      </label>
+      <label class="radio-label">
+        <input 
+          type="radio" 
+          name="priceType" 
+          (change)="priceTypeChange.emit('free')" 
+          [checked]="priceType === 'free'" 
+        />
+        <span>Free</span>
+      </label>
+      <label class="radio-label">
+        <input 
+          type="radio" 
+          name="priceType" 
+          (change)="priceTypeChange.emit('paid')" 
+          [checked]="priceType === 'paid'" 
+        />
+        <span>Paid</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Categories Checklist -->
+  <div class="filter-section">
+    <h3 class="form-label">Categories</h3>
+    <div class="filter-options-list scrollable">
+      @for (cat of categories; track cat.id) {
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [checked]="selectedCategoryId === cat.id" 
+            (change)="categoryToggle.emit(cat.id)"
+          />
+          <span>{{ cat.name }}</span>
+        </label>
+      } @empty {
+        <p class="text-sm text-secondary">No categories found.</p>
+      }
+    </div>
+  </div>
+
+  <!-- Languages Checklist -->
+  <div class="filter-section border-none">
+    <h3 class="form-label">Languages</h3>
+    <div class="filter-options-list scrollable">
+      @for (lang of languages; track lang.id) {
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [checked]="selectedLanguageName === lang.name" 
+            (change)="languageToggle.emit(lang.name)"
+          />
+          <span>{{ lang.name }}</span>
+        </label>
+      } @empty {
+        <p class="text-sm text-secondary">No languages found.</p>
+      }
+    </div>
+  </div>
+</aside>

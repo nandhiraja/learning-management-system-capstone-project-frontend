@@ -1,0 +1,46 @@
+.courses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 2rem;
+}
+
+.header-text {
+  flex: 1;
+  min-width: 280px;
+}
+
+.header-search-bar {
+  max-width: 400px;
+  width: 100%;
+}
+
+.header-search-bar form {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-2);
+  border-radius: var(--radius-sm);
+  padding: 0.25rem;
+}
+
+.search-field {
+  border: none;
+  background: transparent;
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  color: var(--color-text);
+  font-size: 13px;
+}
+
+.search-field:focus {
+  box-shadow: none;
+}
+
+.search-submit-btn {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+}

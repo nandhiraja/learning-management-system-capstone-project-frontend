@@ -1,0 +1,21 @@
+<div class="courses-header">
+  <div class="header-text">
+    <h1 class="page-title">Explore courses</h1>
+    <p class="text-secondary">Expand your knowledge with our selection of courses published by professionals</p>
+  </div>
+  
+  <div class="header-search-bar">
+    <form (submit)="onSubmit($event, catalogSearchInput.value)">
+      <input 
+        #catalogSearchInput 
+        type="text" 
+        [value]="searchQuery" 
+        placeholder="Search for courses..." 
+        class="form-control search-field"
+      />
+      <button type="submit" class="btn btn-primary search-submit-btn" aria-label="Search">
+        <i class="bi bi-search" aria-hidden="true"></i>
+      </button>
+    </form>
+  </div>
+</div>
