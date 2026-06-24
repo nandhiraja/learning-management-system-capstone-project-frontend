@@ -1,0 +1,119 @@
+<div class="landing-container">
+  
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="bi bi-lightning-charge" aria-hidden="true"></i> Next-generation learning
+      </div>
+      <h1 class="hero-title">Unlock knowledge. <br><span class="gradient-text">Shape your future.</span></h1>
+      <p class="hero-subtitle">Discover thousands of expert-led online courses in development, design, marketing, and business. Start your learning adventure today.</p>
+      
+      <!-- Interactive Search -->
+      <form class="hero-search" (submit)="onSearch($event, searchInput.value)">
+        <input #searchInput type="text" placeholder="What do you want to learn today?" class="hero-search-input" />
+        <button type="submit" class="btn btn-primary hero-search-btn">Search courses</button>
+      </form>
+
+      <div class="hero-actions">
+        <a routerLink="/courses" class="btn btn-secondary">Browse all courses</a>
+        @if (!auth.currentUser()) {
+          <a routerLink="/auth/register" class="btn btn-primary">Join for free</a>
+        }
+      </div>
+    </div>
+
+    <!-- Visual Accent Element -->
+    <div class="hero-visual">
+      <div class="glow-orb secondary"></div>
+      <div class="glow-orb primary"></div>
+      <div class="glass-card visual-card">
+        <div class="visual-card-header">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <div class="visual-card-body">
+          <p class="code-line"><span class="code-keyword">const</span> learning = <span class="code-string">"infinite"</span>;</p>
+          <p class="code-line"><span class="code-keyword">function</span> developSkills() {{ '{' }}</p>
+          <p class="code-line indent">return <span class="code-keyword">new</span> Success();</p>
+          <p class="code-line">{{ '}' }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Statistics Section -->
+  <section class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-item glass-card">
+        <h3 class="stat-value">50K+</h3>
+        <p>Active students</p>
+      </div>
+      <div class="stat-item glass-card">
+        <h3 class="stat-value">200+</h3>
+        <p>Expert instructors</p>
+      </div>
+      <div class="stat-item glass-card">
+        <h3 class="stat-value">1.2K+</h3>
+        <p>Premium courses</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section class="features-section">
+    <div class="section-header">
+      <h2>One platform, endless possibilities</h2>
+      <p>Whether you're looking to learn new skills or share your own, we've got you covered.</p>
+    </div>
+
+    <div class="features-grid">
+      <!-- Student card -->
+      <div class="feature-card glass-card">
+        <div class="feature-icon">
+          <i class="bi bi-mortarboard" aria-hidden="true"></i>
+        </div>
+        <h3 class="card-title">Learn anywhere</h3>
+        <p>Access high-quality lectures, submit interactive quizzes, and earn course certificates. Learn at your own pace.</p>
+        <a routerLink="/courses" class="feature-link">
+          Explore courses <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <!-- Instructor card -->
+      <div class="feature-card glass-card">
+        <div class="feature-icon">
+          <i class="bi bi-people" aria-hidden="true"></i>
+        </div>
+        <h3 class="card-title">Teach globally</h3>
+        <p>Build your courses, upload videos, attach PDFs, design quizzes, and manage reviews from a powerful portal.</p>
+        @if (auth.currentUser()?.role === 'Instructor') {
+          <a routerLink="/instructor/dashboard" class="feature-link">
+            Go to instructor portal <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </a>
+        } @else {
+          <a routerLink="/profile" class="feature-link">
+            Become an instructor <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </a>
+        }
+      </div>
+
+      <!-- Admin card -->
+      <div class="feature-card glass-card">
+        <div class="feature-icon">
+          <i class="bi bi-shield-lock" aria-hidden="true"></i>
+        </div>
+        <h3 class="card-title">Platform control</h3>
+        <p>Enforce quality guidelines, review pending courses, moderate platform users, and adjust taxonomic categories.</p>
+        @if (auth.currentUser()?.role === 'Admin') {
+          <a routerLink="/admin/dashboard" class="feature-link">
+            Manage platform <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </a>
+        } @else {
+          <span class="feature-link muted">Administrators only</span>
+        }
+      </div>
+    </div>
+  </section>
+</div>
