@@ -1,0 +1,106 @@
+.curriculum-sidebar-card {
+  height: 100%;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.progress-overview-area {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-2);
+}
+
+.progress-meta-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.sidebar-sections-wrapper {
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.sidebar-section-item {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sidebar-section-title {
+  padding: 14px 20px;
+  background-color: var(--color-surface-2);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.sidebar-lecture-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-lecture-item {
+  padding: 12px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+.sidebar-lecture-item:hover {
+  background-color: var(--color-surface-2);
+}
+
+.sidebar-lecture-item.active {
+  background-color: var(--color-accent-soft);
+}
+
+.lec-checkbox-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.lec-details-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lec-title-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.lec-sub-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--color-text-2);
+}
+
+.lec-sub-meta i {
+  font-size: 12px;
+}
+
+.quiz-indicator-badge {
+  font-size: 9px;
+  background-color: var(--color-warning-soft);
+  color: var(--color-warning);
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-weight: 600;
+}

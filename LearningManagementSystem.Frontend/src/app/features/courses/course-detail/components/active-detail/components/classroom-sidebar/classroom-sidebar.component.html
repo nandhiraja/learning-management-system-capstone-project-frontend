@@ -1,0 +1,62 @@
+<div class="curriculum-sidebar-card glass-card">
+  <!-- Progress overview -->
+  <div class="progress-overview-area">
+    <div class="progress-meta-details">
+      <span class="prog-title">My course progress</span>
+      <span class="prog-nums">{{ completedLectureIds.length }} / {{ totalLectures }} complete</span>
+    </div>
+    <app-progress-bar [percent]="progressPercent" color="var(--color-success)" [showLabel]="true"></app-progress-bar>
+  </div>
+
+  <!-- Curriculum sections list -->
+  <div class="sidebar-sections-wrapper">
+    @for (section of course.sections; track section.id; let sIdx = $index) {
+      <div class="sidebar-section-item">
+        <h3 class="sidebar-section-title">Section {{ sIdx + 1 }}: {{ section.title }}</h3>
+        
+        <ul class="sidebar-lecture-list">
+          @for (lec of section.lectures; track lec.id) {
+            <li 
+              class="sidebar-lecture-item"
+              [class.active]="activeLecture?.id === lec.id"
+              (click)="selectLecture(lec)"
+            >
+              <!-- Completion checkbox -->
+              <button 
+                class="lec-checkbox-btn" 
+                (click)="toggleProgress(lec.id, $event)"
+                [attr.aria-label]="isCompleted(lec.id) ? 'Mark lecture incomplete' : 'Mark lecture complete'"
+              >
+                <i 
+                  class="bi" 
+                  [class.bi-circle]="!isCompleted(lec.id)"
+                  [class.bi-check-circle-fill]="isCompleted(lec.id)"
+                  [class.text-success]="isCompleted(lec.id)"
+                  aria-hidden="true"
+                ></i>
+              </button>
+
+              <div class="lec-details-wrapper">
+                <span class="lec-title-label">{{ lec.title }}</span>
+                <div class="lec-sub-meta">
+                  <i 
+                    class="bi" 
+                    [class.bi-play-btn]="lec.contentType === 'video'"
+                    [class.bi-file-earmark-text]="lec.contentType === 'pdf'"
+                    aria-hidden="true"
+                  ></i>
+                  <span class="lec-duration-label">{{ lec.durationInMinutes }} mins</span>
+                  @if (lec.quizId) {
+                    <span class="quiz-indicator-badge">
+                      <i class="bi bi-question-circle" aria-hidden="true"></i> Quiz
+                    </span>
+                  }
+                </div>
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+</div>

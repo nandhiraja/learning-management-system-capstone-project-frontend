@@ -1,0 +1,138 @@
+<div class="active-classroom-container">
+  <!-- Top bar status -->
+  <header class="classroom-top-bar">
+    <div class="top-bar-left">
+      <a routerLink="/courses" class="back-link-catalog">
+        <i class="bi bi-chevron-left" aria-hidden="true"></i> Back
+      </a>
+      <span class="course-nav-title">{{ course.title }}</span>
+    </div>
+    <div class="top-bar-right">
+      <app-badge-chip variant="success" icon="bi-check-circle" *ngIf="progressPercent() === 100">
+        Course completed
+      </app-badge-chip>
+    </div>
+  </header>
+
+  <div class="classroom-main-grid">
+    <!-- Left column: Player area -->
+    <main class="classroom-player-column">
+      @if (activeLecture(); as lecture) {
+        <div class="active-lecture-header">
+          <h2 class="active-lecture-title">{{ lecture.title }}</h2>
+          <div class="active-lecture-meta">
+            <app-badge-chip variant="accent">
+              Type: {{ lecture.contentType }}
+            </app-badge-chip>
+            <span class="lec-duration-meta">
+              <i class="bi bi-clock" aria-hidden="true"></i> {{ lecture.durationInMinutes }} minutes
+            </span>
+          </div>
+        </div>
+
+        <!-- Video or Document Play Zone -->
+        <div class="play-zone-wrapper">
+          @if (activeTab() === 'lecture') {
+            @if (lecture.contentType === 'video') {
+              <div class="mock-video-player-container">
+                <div class="video-overlay-gradient"></div>
+                <div class="player-center-play">
+                  <i class="bi bi-play-fill" aria-hidden="true"></i>
+                </div>
+                <div class="mock-video-controls">
+                  <button aria-label="Play video"><i class="bi bi-play-fill" aria-hidden="true"></i></button>
+                  <div class="video-timeline-mock">
+                    <div class="timeline-fill" style="width: 35%;"></div>
+                  </div>
+                  <button aria-label="Volume"><i class="bi bi-volume-up-fill" aria-hidden="true"></i></button>
+                  <span class="video-time">05:12 / {{ lecture.durationInMinutes }}:00</span>
+                </div>
+              </div>
+            } @else {
+              <!-- PDF/Doc preview zone -->
+              <div class="doc-viewer-container glass-card">
+                <i class="bi bi-file-earmark-pdf-fill doc-icon" aria-hidden="true"></i>
+                <h3 class="doc-title">{{ lecture.title }} Document</h3>
+                <p class="doc-desc">This lecture contains written course material. Read and check it off as completed.</p>
+                <a [href]="lecture.contentUrl" target="_blank" download class="btn btn-secondary">
+                  <i class="bi bi-download" aria-hidden="true"></i> Download PDF resource
+                </a>
+              </div>
+            }
+          }
+
+          @if (activeTab() === 'quiz') {
+            @if (lecture.quizId) {
+              <app-classroom-quiz 
+                [quizId]="lecture.quizId" 
+                [activeLecture]="lecture"
+                (quizPassed)="onQuizPassed()"
+              ></app-classroom-quiz>
+            } @else {
+              <p class="no-quiz-found">No quiz available for this lecture.</p>
+            }
+          }
+
+          @if (activeTab() === 'discussion') {
+            <app-classroom-discussion
+              [courseExternalId]="course.externalId"
+              [lectureId]="lecture.id"
+            ></app-classroom-discussion>
+          }
+        </div>
+
+        <!-- Tab switches below player -->
+        <div class="classroom-tabs-row" role="tablist">
+          <button 
+            role="tab"
+            [attr.aria-selected]="activeTab() === 'lecture'"
+            class="classroom-tab" 
+            [class.active]="activeTab() === 'lecture'"
+            (click)="activeTab.set('lecture')"
+          >
+            <i class="bi bi-play-circle" aria-hidden="true"></i> Lecture Player
+          </button>
+          <button 
+            role="tab"
+            [attr.aria-selected]="activeTab() === 'discussion'"
+            class="classroom-tab" 
+            [class.active]="activeTab() === 'discussion'"
+            (click)="activeTab.set('discussion')"
+          >
+            <i class="bi bi-chat-left-text" aria-hidden="true"></i> Discussions Q&A
+          </button>
+          @if (lecture.quizId) {
+            <button 
+              role="tab"
+              [attr.aria-selected]="activeTab() === 'quiz'"
+              class="classroom-tab highlight" 
+              [class.active]="activeTab() === 'quiz'"
+              (click)="activeTab.set('quiz')"
+            >
+              <i class="bi bi-question-circle" aria-hidden="true"></i> Take Lecture Quiz
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="no-lecture-selected glass-card">
+          <i class="bi bi-journal-bookmark" aria-hidden="true"></i>
+          <h3>Classroom ready</h3>
+          <p>Select a lecture from the curriculum sidebar to start learning.</p>
+        </div>
+      }
+    </main>
+
+    <!-- Right column: Curriculum tracker -->
+    <aside class="classroom-curriculum-column">
+      <app-classroom-sidebar
+        [course]="course"
+        [activeLecture]="activeLecture()"
+        [completedLectureIds]="completedLectureIds()"
+        [progressPercent]="progressPercent()"
+        [totalLectures]="totalLectures()"
+        (lectureSelected)="selectLecture($event)"
+        (progressToggled)="toggleProgress($event.lectureId, $event.event)"
+      ></app-classroom-sidebar>
+    </aside>
+  </div>
+</div>
