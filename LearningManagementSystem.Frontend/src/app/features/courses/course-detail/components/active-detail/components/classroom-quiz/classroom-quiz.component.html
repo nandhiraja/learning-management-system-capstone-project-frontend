@@ -1,0 +1,68 @@
+<div class="quiz-viewer-container glass-card">
+  @if (isLoadingQuiz()) {
+    <div class="loading-quiz-state">
+      <div class="spinner"></div>
+      <p>Loading quiz questions...</p>
+    </div>
+  } @else if (activeQuiz(); as quiz) {
+    <div class="quiz-header-bar">
+      <h3>{{ quiz.title }}</h3>
+      <span class="quiz-pass-badge">Passing score: {{ quiz.passScore }}%</span>
+    </div>
+
+    @if (quizResult(); as result) {
+      <!-- Quiz completed feedback -->
+      <div class="quiz-result-card" [class.passed]="result.passed" [class.failed]="!result.passed">
+        <div class="result-icon-wrapper">
+          <i class="bi" [class]="result.passed ? 'bi-check-circle-fill' : 'bi-exclamation-octagon-fill'" aria-hidden="true"></i>
+        </div>
+        <h4>{{ result.passed ? 'Quiz passed successfully!' : 'Passing score not met' }}</h4>
+        <p class="result-score">Your Score: <strong>{{ result.score }}%</strong></p>
+        <p class="result-desc">
+          {{ result.passed ? 'Great job! You have mastered this concept.' : 'Review the lectures and try again to improve your score.' }}
+        </p>
+        <button class="btn btn-primary" (click)="resetQuiz()">
+          <i class="bi bi-arrow-clockwise" aria-hidden="true"></i> Try again
+        </button>
+      </div>
+    } @else {
+      <!-- Quiz questions list -->
+      <div class="quiz-questions-list">
+        @for (q of quiz.questions; track q.id; let qIdx = $index) {
+          <div class="quiz-question-item">
+            <p class="question-text"><strong>Q{{ qIdx + 1 }}:</strong> {{ q.questionText }}</p>
+            <div class="options-grid">
+              @for (opt of q.options; track opt.id) {
+                <button 
+                  type="button" 
+                  class="option-btn" 
+                  [class.selected]="quizAnswers()[q.id] === opt.id"
+                  (click)="selectOption(q.id, opt.id)"
+                >
+                  <span class="option-indicator"></span>
+                  {{ opt.optionText }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="quiz-submit-action">
+        <button 
+          (click)="submitQuiz()" 
+          class="btn btn-primary"
+          [disabled]="isSubmittingQuiz()"
+        >
+          @if (isSubmittingQuiz()) {
+            <div class="spinner"></div> Submitting...
+          } @else {
+            Submit answers
+          }
+        </button>
+      </div>
+    }
+  } @else {
+    <p class="no-quiz-found">Failed to load quiz details.</p>
+  }
+</div>
