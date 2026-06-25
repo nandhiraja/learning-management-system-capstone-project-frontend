@@ -1,0 +1,68 @@
+<div class="courses-page-container">
+  <!-- Page Header -->
+  <app-course-search-header 
+    [searchQuery]="searchQuery()" 
+    (search)="onSearch($event)"
+  ></app-course-search-header>
+
+  <div class="courses-layout-grid">
+    <!-- Filters Sidebar -->
+    <app-course-filter-sidebar
+      [categories]="categories()"
+      [languages]="languages()"
+      [selectedCategoryId]="selectedCategoryId()"
+      [selectedLanguageName]="selectedLanguageName()"
+      [priceType]="priceType()"
+      [sortBy]="sortBy()"
+      (categoryToggle)="onCategoryToggle($event)"
+      (languageToggle)="onLanguageToggle($event)"
+      (priceTypeChange)="onPriceTypeChange($event)"
+      (sortByChange)="onSortChange($event)"
+      (clearFilters)="clearAllFilters()"
+    ></app-course-filter-sidebar>
+
+    <!-- Courses Grid Results -->
+    <section class="results-container">
+      @if (isLoading()) {
+        <div class="catalog-loading">
+          <div class="spinner"></div>
+          <p class="text-secondary">Loading courses...</p>
+        </div>
+      } @else {
+        <!-- Active search terms summary -->
+        <div class="results-meta">
+          <p class="text-secondary text-sm">
+            Showing {{ courses().length }} of {{ totalCount() }} courses
+            @if (searchQuery()) {
+              for "{{ searchQuery() }}"
+            }
+          </p>
+        </div>
+
+        @if (courses().length > 0) {
+          <div class="courses-grid">
+            @for (course of courses(); track course.id) {
+              <app-course-card [course]="course"></app-course-card>
+            }
+          </div>
+
+          <!-- Pagination Footer -->
+          <app-course-pagination
+            [page]="page()"
+            [totalPages]="totalPages()"
+            [pages]="pages()"
+            (pageChange)="setPage($event)"
+          ></app-course-pagination>
+        } @else {
+          <!-- Empty State -->
+          <div class="empty-results glass-card">
+            <i class="bi bi-search empty-icon" aria-hidden="true"></i>
+            <h3>No courses found</h3>
+            <p class="text-secondary">We couldn't find any courses matching your search criteria. Try modifying your filters or clear them completely.</p>
+            <button (click)="clearAllFilters()" class="btn btn-primary">Reset all filters</button>
+          </div>
+        }
+      }
+    </section>
+  </div>
+</div>
