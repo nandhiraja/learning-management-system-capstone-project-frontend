@@ -1,0 +1,55 @@
+<div class="purchase-card glass-card">
+  <div class="preview-media-wrapper">
+    @if (course.thumbnailUrl) {
+      <img [src]="course.thumbnailUrl" [alt]="course.title" class="preview-thumbnail" />
+    } @else {
+      <div class="preview-thumbnail-fallback">
+        <i class="bi bi-journal-richtext" aria-hidden="true"></i>
+      </div>
+    }
+  </div>
+
+  <div class="purchase-card-body">
+    <div class="price-row">
+      <span class="price-value">{{ course.price === 0 ? 'Free' : (course.price | currency:'USD') }}</span>
+    </div>
+
+    <div class="cta-actions flex-col gap-sm">
+      <button 
+        (click)="handleBuyNow()" 
+        class="btn btn-primary btn-full btn-lg" 
+        [disabled]="isAddingToCart || isBuyingNow"
+        id="buy-now-action-btn"
+      >
+        @if (isBuyingNow) {
+          <div class="spinner"></div> Processing...
+        } @else {
+          <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i> Buy Now
+        }
+      </button>
+
+      <button 
+        (click)="handleAddToCart()" 
+        class="btn btn-secondary btn-full btn-md margin-top-sm" 
+        [disabled]="isAddingToCart || isBuyingNow"
+        id="add-to-cart-action-btn"
+      >
+        @if (isAddingToCart) {
+          <div class="spinner"></div> Adding...
+        } @else {
+          <i class="bi bi-cart-plus" aria-hidden="true"></i> Add to Cart
+        }
+      </button>
+    </div>
+
+    <div class="course-includes">
+      <h4 class="includes-title">This course includes:</h4>
+      <ul class="includes-list">
+        <li><i class="bi bi-play-btn" aria-hidden="true"></i> On-demand files</li>
+        <li><i class="bi bi-infinity" aria-hidden="true"></i> Full lifetime access</li>
+        <li><i class="bi bi-patch-check" aria-hidden="true"></i> Certificate of completion</li>
+        <li><i class="bi bi-question-circle" aria-hidden="true"></i> Discussion QA board access</li>
+      </ul>
+    </div>
+  </div>
+</div>

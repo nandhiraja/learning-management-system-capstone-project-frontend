@@ -1,0 +1,31 @@
+<div class="preview-layout-container">
+  <!-- Hero banner -->
+  <app-course-preview-hero [course]="course"></app-course-preview-hero>
+
+  <!-- Split grid content -->
+  <div class="grid-content">
+    <main class="left-main-col">
+      <!-- Curriculum content -->
+      <app-course-preview-curriculum [course]="course"></app-course-preview-curriculum>
+
+      <!-- Description details -->
+      <section class="description-section" aria-labelledby="description-heading">
+        <h2 id="description-heading" class="section-title">Course details</h2>
+        <div class="description-body glass-card">
+          <p>{{ course.description }}</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Sidebar sticky purchase card -->
+    <aside class="right-sidebar-col">
+      <app-course-preview-sidebar
+        [course]="course"
+        [isAddingToCart]="isAddingToCart()"
+        [isBuyingNow]="isBuyingNow()"
+        (addToCart)="handleAddToCart()"
+        (buyNow)="handleBuyNow()"
+      ></app-course-preview-sidebar>
+    </aside>
+  </div>
+</div>

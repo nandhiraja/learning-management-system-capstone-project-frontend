@@ -1,0 +1,56 @@
+.preview-layout-container {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg);
+  min-height: 100vh;
+}
+
+/* Split content grid */
+.grid-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 32px 24px 64px 24px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.left-main-col {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 12px;
+}
+
+/* Description Card */
+.description-body {
+  padding: 20px;
+  font-size: 13px;
+  color: var(--color-text-2);
+  line-height: 1.6;
+}
+
+/* Sticky sidebar purchase card */
+.right-sidebar-col {
+  position: sticky;
+  top: 90px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .grid-content {
+    grid-template-columns: 1fr;
+  }
+  .right-sidebar-col {
+    position: static;
+    margin-top: 20px;
+  }
+}

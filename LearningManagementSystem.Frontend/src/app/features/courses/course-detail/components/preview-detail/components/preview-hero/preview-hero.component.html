@@ -1,0 +1,31 @@
+<header class="preview-hero-banner">
+  <div class="banner-content">
+    <div class="banner-nav">
+      <a routerLink="/courses" class="back-link">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i> Back to catalog
+      </a>
+    </div>
+    <h1 class="course-title">{{ course.title }}</h1>
+    <p class="course-subtitle">{{ course.description }}</p>
+    
+    <div class="course-meta-row">
+      <div class="rating-badge">
+        <span class="rating-number">{{ course.rating | number:'1.1-1' }}</span>
+        <div class="stars">
+          <i class="bi bi-star-fill text-warning" aria-hidden="true"></i>
+        </div>
+        <span class="reviews-count">({{ course.studentsCount }} students)</span>
+      </div>
+      
+      <div class="meta-item">
+        <i class="bi bi-person-workspace" aria-hidden="true"></i>
+        Created by <span class="instructor-name">{{ course.instructor.firstName }} {{ course.instructor.lastName }}</span>
+      </div>
+
+      <div class="meta-item">
+        <i class="bi bi-translate" aria-hidden="true"></i>
+        Language: {{ course.language }}
+      </div>
+    </div>
+  </div>
+</header>
