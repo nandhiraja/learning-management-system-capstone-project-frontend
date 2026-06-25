@@ -1,0 +1,138 @@
+<div class="discussions-viewer-container glass-card">
+  @if (selectedDiscussion(); as thread) {
+    <!-- QA Detail view -->
+    <div class="discussion-thread-view">
+      <button class="btn btn-ghost btn-sm back-disc-btn" (click)="closeDiscussionThread()">
+        <i class="bi bi-chevron-left" aria-hidden="true"></i> Back to Q&A list
+      </button>
+
+      <div class="question-thread-header">
+        <div class="thread-user-avatar-placeholder">
+          {{ thread.user.firstName[0] }}{{ thread.user.lastName[0] }}
+        </div>
+        <div class="thread-header-meta">
+          <h4 class="thread-title">{{ thread.title }}</h4>
+          <p class="thread-author-details">
+            Asked by {{ thread.user.firstName }} {{ thread.user.lastName }} &bull; {{ thread.createdAt | date:'short' }}
+          </p>
+        </div>
+      </div>
+      <div class="thread-question-body">
+        {{ thread.content }}
+      </div>
+
+      <div class="thread-replies-section">
+        <h5 class="replies-count-label">Replies ({{ thread.replies.length }})</h5>
+        @if (thread.replies.length === 0) {
+          <p class="no-replies-text">No responses yet. Be the first to answer!</p>
+        } @else {
+          <div class="replies-list">
+            @for (rep of thread.replies; track rep.externalId) {
+              <div class="reply-item glass-card" [class.instructor-reply]="rep.isInstructorReply">
+                <div class="reply-header">
+                  <span class="reply-author">{{ rep.user.firstName }} {{ rep.user.lastName }}</span>
+                  @if (rep.isInstructorReply) {
+                    <app-badge-chip variant="success" icon="bi-shield-check">Instructor</app-badge-chip>
+                  }
+                  <span class="reply-date">{{ rep.createdAt | date:'short' }}</span>
+                </div>
+                <div class="reply-content">
+                  {{ rep.content }}
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Post a reply form -->
+      <div class="reply-form-wrapper">
+        <textarea 
+          #replyContentInput 
+          placeholder="Add a helpful response..." 
+          rows="3" 
+          class="form-control reply-textarea"
+        ></textarea>
+        <button 
+          (click)="postReply(replyContentInput)" 
+          class="btn btn-primary btn-sm reply-submit-btn"
+          [disabled]="isPostingReply()"
+        >
+          @if (isPostingReply()) {
+            <div class="spinner"></div> Sending...
+          } @else {
+            Post response
+          }
+        </button>
+      </div>
+    </div>
+  } @else {
+    <!-- QA List view -->
+    <div class="discussion-list-view">
+      <div class="disc-header-bar">
+        <h3>Q&A Board for this lecture</h3>
+        <p class="disc-header-sub">Ask questions and share tips with fellow students</p>
+      </div>
+
+      <!-- Post a new question form -->
+      <div class="new-question-form glass-card">
+        <h5>Ask a new question</h5>
+        <div class="form-group">
+          <input 
+            #questionTitleInput 
+            type="text" 
+            placeholder="Title of your question" 
+            class="form-control" 
+          />
+        </div>
+        <div class="form-group">
+          <textarea 
+            #questionContentInput 
+            placeholder="Detail your question..." 
+            rows="3" 
+            class="form-control"
+          ></textarea>
+        </div>
+        <button 
+          (click)="postQuestion(questionTitleInput, questionContentInput)" 
+          class="btn btn-primary btn-sm"
+          [disabled]="isPostingQuestion()"
+        >
+          @if (isPostingQuestion()) {
+            <div class="spinner"></div> Submitting...
+          } @else {
+            Post question
+          }
+        </button>
+      </div>
+
+      <!-- Discussion List -->
+      @if (isLoadingDiscussions()) {
+        <div class="loading-discussions-state">
+          <div class="spinner"></div>
+          <p>Loading questions...</p>
+        </div>
+      } @else if (discussions().length === 0) {
+        <div class="empty-discussions">
+          <i class="bi bi-chat-left-dots" aria-hidden="true"></i>
+          <p>No questions asked yet for this lecture. Feel free to start the conversation!</p>
+        </div>
+      } @else {
+        <div class="discussions-list">
+          @for (disc of discussions(); track disc.externalId) {
+            <button type="button" class="discussion-list-item glass-card" (click)="viewDiscussion(disc.externalId)">
+              <div class="disc-list-meta">
+                <span class="disc-list-author">{{ disc.user.firstName }} {{ disc.user.lastName }}</span>
+                <span class="disc-list-date">{{ disc.createdAt | date:'shortDate' }}</span>
+              </div>
+              <h4 class="disc-list-title">{{ disc.title }}</h4>
+              <span class="disc-list-replies">
+                <i class="bi bi-chat-text" aria-hidden="true"></i> {{ disc.repliesCount }} replies
+              </span>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
