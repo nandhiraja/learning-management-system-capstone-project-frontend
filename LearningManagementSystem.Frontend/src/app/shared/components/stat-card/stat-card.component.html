@@ -1,0 +1,23 @@
+<div class="stat-card">
+  <div class="stat-top">
+    <div
+      class="stat-icon"
+      [style.background]="data.iconBg"
+      [style.color]="data.iconColor"
+    >
+      <i [class]="'bi ' + data.icon" aria-hidden="true"></i>
+    </div>
+    @if (data.delta) {
+      <span
+        class="stat-delta"
+        [class.positive]="data.deltaPositive"
+        [class.negative]="!data.deltaPositive"
+      >
+        <i [class]="data.deltaPositive ? 'bi bi-graph-up-arrow' : 'bi bi-graph-down-arrow'" aria-hidden="true"></i>
+        {{ data.delta }}
+      </span>
+    }
+  </div>
+  <div class="stat-value">{{ data.value }}</div>
+  <div class="stat-label">{{ data.label }}</div>
+</div>
