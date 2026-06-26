@@ -1,0 +1,200 @@
+<div class="dashboard-container">
+  <!-- Page Header -->
+  <header class="page-header" id="dashboard-header">
+    <div>
+      <h1 class="page-title">Welcome back, {{ auth.currentUser()?.firstName }}</h1>
+      <p class="page-sub">Ready to build some new skills today? Resume where you left off.</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/courses" class="btn btn-primary" id="btn-explore-catalog">
+        <i class="bi bi-compass" aria-hidden="true"></i> Explore catalog
+      </a>
+    </div>
+  </header>
+
+  <!-- Statistics Overview Row -->
+  <section class="stats-row" aria-label="Learning Metrics">
+    @for (stat of stats(); track stat.label) {
+      <app-stat-card [data]="stat" />
+    }
+  </section>
+
+  <!-- Navigation Tabs -->
+  <div class="dashboard-tabs-container">
+    <div class="dashboard-tabs" role="tablist">
+      <button 
+        role="tab"
+        [attr.aria-selected]="activeTab() === 'courses'"
+        aria-controls="courses-tab-panel"
+        class="tab-btn" 
+        [class.active]="activeTab() === 'courses'" 
+        (click)="setTab('courses')"
+        id="tab-courses"
+      >
+        <i class="bi bi-book" aria-hidden="true"></i> My courses
+      </button>
+      <button 
+        role="tab"
+        [attr.aria-selected]="activeTab() === 'certificates'"
+        aria-controls="certificates-tab-panel"
+        class="tab-btn" 
+        [class.active]="activeTab() === 'certificates'" 
+        (click)="setTab('certificates')"
+        id="tab-certificates"
+      >
+        <i class="bi bi-patch-check" aria-hidden="true"></i> Certificates
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State Spinner -->
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner" aria-label="Loading dashboard content"></div>
+      <p class="loading-text">Loading dashboard content...</p>
+    </div>
+  } @else {
+    <!-- Courses Tab Panel -->
+    @if (activeTab() === 'courses') {
+      <div id="courses-tab-panel" role="tabpanel" aria-labelledby="tab-courses" class="tab-panel">
+        @if (enrollments().length === 0) {
+          <!-- Empty State Enrolled Courses -->
+          <div class="empty-state glass-card">
+            <div class="empty-icon-wrapper">
+              <i class="bi bi-journal-bookmark" aria-hidden="true"></i>
+            </div>
+            <h2 class="empty-title">Your learning shelf is empty</h2>
+            <p class="empty-subtitle">You are not enrolled in any courses yet. Browse our premium expert-led course selection to begin learning.</p>
+            <a routerLink="/courses" class="btn btn-primary">
+              Find a course <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+          </div>
+        } @else {
+          <!-- In Progress Courses -->
+          @if (activeCourses().length > 0) {
+            <section class="courses-section" aria-labelledby="in-progress-title">
+              <h2 class="section-title" id="in-progress-title">
+                In progress <span class="badge-count">{{ activeCourses().length }}</span>
+              </h2>
+              <div class="courses-grid">
+                @for (course of activeCourses(); track course.id) {
+                  <article class="course-card glass-card">
+                    <div class="course-media">
+                      @if (course.courseThumbnailUrl) {
+                        <img [src]="course.courseThumbnailUrl" [alt]="course.courseTitle" class="course-thumbnail" />
+                      } @else {
+                        <div class="course-thumbnail-fallback">
+                          <i class="bi bi-laptop" aria-hidden="true"></i>
+                        </div>
+                      }
+                      <app-badge-chip variant="accent" class="learning-badge">
+                        Active
+                      </app-badge-chip>
+                    </div>
+                    <div class="course-content">
+                      <p class="course-instructor">{{ course.instructorName }}</p>
+                      <h3 class="course-card-title">{{ course.courseTitle }}</h3>
+                      
+                      <div class="course-progress-section">
+                        <app-progress-bar [percent]="course.progress" color="var(--color-accent)"></app-progress-bar>
+                      </div>
+
+                      <div class="course-footer">
+                        <a [routerLink]="['/courses', course.courseExternalId]" class="btn btn-primary btn-sm btn-full">
+                          <i class="bi bi-play-circle" aria-hidden="true"></i> Resume learning
+                        </a>
+                      </div>
+                    </div>
+                  </article>
+                }
+              </div>
+            </section>
+          }
+
+          <!-- Completed Courses -->
+          @if (completedCourses().length > 0) {
+            <section class="courses-section" aria-labelledby="completed-title">
+              <h2 class="section-title" id="completed-title">
+                Completed <span class="badge-count">{{ completedCourses().length }}</span>
+              </h2>
+              <div class="courses-grid">
+                @for (course of completedCourses(); track course.id) {
+                  <article class="course-card glass-card completed">
+                    <div class="course-media">
+                      @if (course.courseThumbnailUrl) {
+                        <img [src]="course.courseThumbnailUrl" [alt]="course.courseTitle" class="course-thumbnail" />
+                      } @else {
+                        <div class="course-thumbnail-fallback completed">
+                          <i class="bi bi-award" aria-hidden="true"></i>
+                        </div>
+                      }
+                      <app-badge-chip variant="success" class="learning-badge" icon="bi-check-circle">
+                        Completed
+                      </app-badge-chip>
+                    </div>
+                    <div class="course-content">
+                      <p class="course-instructor">{{ course.instructorName }}</p>
+                      <h3 class="course-card-title">{{ course.courseTitle }}</h3>
+                      
+                      <div class="course-progress-section">
+                        <app-progress-bar [percent]="100" color="var(--color-success)"></app-progress-bar>
+                      </div>
+
+                      <div class="course-footer">
+                        <a [routerLink]="['/courses', course.courseExternalId]" class="btn btn-secondary btn-sm btn-full">
+                          View details
+                        </a>
+                      </div>
+                    </div>
+                  </article>
+                }
+              </div>
+            </section>
+          }
+        }
+      </div>
+    }
+
+    <!-- Certificates Tab Panel -->
+    @if (activeTab() === 'certificates') {
+      <div id="certificates-tab-panel" role="tabpanel" aria-labelledby="tab-certificates" class="tab-panel">
+        @if (certificates().length === 0) {
+          <!-- Empty State Certificates -->
+          <div class="empty-state glass-card">
+            <div class="empty-icon-wrapper warning">
+              <i class="bi bi-award" aria-hidden="true"></i>
+            </div>
+            <h2 class="empty-title">No certificates earned yet</h2>
+            <p class="empty-subtitle">Complete any of your active courses to 100% to earn your formal certificate of completion and share it with the world.</p>
+            <button class="btn btn-secondary" (click)="setTab('courses')">
+              View active courses
+            </button>
+          </div>
+        } @else {
+          <!-- Certificates Grid -->
+          <div class="certificates-grid">
+            @for (cert of certificates(); track cert.id) {
+              <article class="certificate-card glass-card">
+                <div class="cert-icon-area">
+                  <i class="bi bi-patch-check-fill" aria-hidden="true"></i>
+                </div>
+                <div class="cert-body">
+                  <span class="cert-date">Issued on {{ cert.issuedDate | date:'mediumDate' }}</span>
+                  <h3 class="cert-title">{{ cert.courseTitle }}</h3>
+                  <p class="cert-instructor">Instructor: {{ cert.instructorName }}</p>
+                  <p class="cert-recipient">Issued to: {{ cert.userFullName }}</p>
+                  
+                  <div class="cert-actions">
+                    <a [href]="cert.certificateUrl" target="_blank" rel="noopener" class="btn btn-primary btn-sm">
+                      <i class="bi bi-award" aria-hidden="true"></i> View certificate
+                    </a>
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

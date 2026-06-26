@@ -21,6 +21,11 @@ export const routes: Routes = [
     loadChildren: () => import('./features/courses/courses.routes').then((m) => m.coursesRoutes)
   },
   {
+    path: 'learning',
+    loadChildren: () => import('./features/learning/learning.routes').then((m) => m.learningRoutes),
+    canActivate: [authGuard]
+  },
+  {
     path: '**',
     redirectTo: ''
   }
