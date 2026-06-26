@@ -25,6 +25,13 @@ export const routes: Routes = [
     loadChildren: () => import('./features/learning/learning.routes').then((m) => m.learningRoutes),
     canActivate: [authGuard]
   },
+   {
+    path: 'cart',
+    loadComponent: () => import('./features/cart/cart.component').then((m) => m.CartComponent),
+    canActivate: [authGuard]
+  },
+
+
   {
     path: '**',
     redirectTo: ''

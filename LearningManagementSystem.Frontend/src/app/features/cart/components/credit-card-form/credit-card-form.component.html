@@ -1,0 +1,152 @@
+<div class="card-overlay" (click)="onClose()">
+  <div class="card-modal glass-card" (click)="$event.stopPropagation()">
+    <!-- Modal Close Button -->
+    <button type="button" class="btn-close" (click)="onClose()" aria-label="Close payment modal">
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
+
+    <h2 class="modal-heading">Secure Mock Payment</h2>
+    <p class="modal-subheading">Pay <strong>{{ amount | currency:'USD' }}</strong> to complete your enrollment.</p>
+
+    <!-- Visual Card Wrapper -->
+    <div class="card-wrapper">
+      <div class="credit-card" [class.flipped]="isFlipped()">
+        <!-- Card Front -->
+        <div class="card-side card-front">
+          <div class="card-header-row">
+            <i class="bi bi-cpu chip-icon" aria-hidden="true"></i>
+            <span class="card-type-label">SECURE MOCK</span>
+          </div>
+          <div class="card-number-display">
+            {{ formattedCardNumber() }}
+          </div>
+          <div class="card-footer-row">
+            <div class="card-label-block">
+              <span class="card-label">Card Holder</span>
+              <span class="card-value">{{ cardHolder() || 'YOUR NAME HERE' }}</span>
+            </div>
+            <div class="card-label-block">
+              <span class="card-label">Expires</span>
+              <span class="card-value">{{ cardExpiry() || 'MM/YY' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Back -->
+        <div class="card-side card-back">
+          <div class="magnetic-strip"></div>
+          <div class="card-signature-row">
+            <div class="signature-bar"></div>
+            <div class="cvv-display">{{ cardCvv() || '•••' }}</div>
+          </div>
+          <div class="back-details">
+            <span class="back-text">For Mock testing purposes only. Do not use real card numbers.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inputs Form -->
+    <form (ngSubmit)="onSubmit()" class="payment-form" novalidate>
+      <!-- Cardholder -->
+      <div class="form-group">
+        <label for="card-holder-input" class="form-label">Cardholder Name</label>
+        <input 
+          id="card-holder-input"
+          type="text" 
+          class="form-control"
+          placeholder="e.g. JOHN DOE"
+          [ngModel]="cardHolder()"
+          (ngModelChange)="onHolderInput($event)"
+          name="cardHolder"
+          required
+        />
+        @if (errors()['holder']) {
+          <span class="error-text">{{ errors()['holder'] }}</span>
+        }
+      </div>
+
+      <!-- Card Number -->
+      <div class="form-group">
+        <label for="card-number-input" class="form-label">Card Number</label>
+        <input 
+          id="card-number-input"
+          type="text" 
+          class="form-control"
+          placeholder="4000 1234 5678 9010"
+          [ngModel]="cardNumber()"
+          (ngModelChange)="onNumberInput($event)"
+          name="cardNumber"
+          required
+        />
+        @if (errors()['number']) {
+          <span class="error-text">{{ errors()['number'] }}</span>
+        }
+      </div>
+
+      <!-- Expiry and CVV Row -->
+      <div class="form-row">
+        <!-- Expiry -->
+        <div class="form-group">
+          <label for="card-expiry-input" class="form-label">Expiration Date</label>
+          <input 
+            id="card-expiry-input"
+            type="text" 
+            class="form-control"
+            placeholder="MM/YY"
+            [ngModel]="cardExpiry()"
+            (ngModelChange)="onExpiryInput($event)"
+            name="cardExpiry"
+            required
+          />
+          @if (errors()['expiry']) {
+            <span class="error-text">{{ errors()['expiry'] }}</span>
+          }
+        </div>
+
+        <!-- CVV -->
+        <div class="form-group">
+          <label for="card-cvv-input" class="form-label">CVV</label>
+          <input 
+            id="card-cvv-input"
+            type="password" 
+            class="form-control"
+            placeholder="123"
+            [ngModel]="cardCvv()"
+            (ngModelChange)="onCvvInput($event)"
+            (focus)="onCvvFocus()"
+            (blur)="onCvvBlur()"
+            name="cardCvv"
+            required
+          />
+          @if (errors()['cvv']) {
+            <span class="error-text">{{ errors()['cvv'] }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Submit Actions -->
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="btn btn-secondary btn-lg" 
+          (click)="onClose()"
+          [disabled]="isSubmitting"
+        >
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-lg flex-1" 
+          [disabled]="isSubmitting"
+        >
+          @if (isSubmitting) {
+            <div class="spinner"></div> Processing...
+          } @else {
+            <i class="bi bi-shield-lock-fill" aria-hidden="true"></i> Pay {{ amount | currency:'USD' }}
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
