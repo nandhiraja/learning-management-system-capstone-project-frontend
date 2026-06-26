@@ -1,0 +1,70 @@
+<div class="cart-items-container">
+  @if (items.length > 0) {
+    <!-- Select All Section -->
+    <div class="select-all-header glass-card">
+      <label class="checkbox-container">
+        <input 
+          type="checkbox" 
+          [checked]="isAllSelected()" 
+          [indeterminate]="isSomeSelected()" 
+          (change)="onToggleSelectAll()" 
+        />
+        <span class="checkmark"></span>
+      </label>
+      <span class="select-all-text" (click)="onToggleSelectAll()">
+        Select All ({{ selectedIds.size }} / {{ items.length }} selected)
+      </span>
+    </div>
+
+    <!-- Items List -->
+    <div class="items-list">
+      @for (item of items; track item.id) {
+        <div class="cart-item-row glass-card">
+          <div class="item-selection">
+            <label class="checkbox-container">
+              <input 
+                type="checkbox" 
+                [checked]="selectedIds.has(item.id)" 
+                (change)="onToggleItem(item.id)" 
+              />
+              <span class="checkmark"></span>
+            </label>
+          </div>
+
+          <div class="item-details">
+            <div class="item-icon-wrapper">
+              <i class="bi bi-journal-bookmark-fill" aria-hidden="true"></i>
+            </div>
+            <div class="item-info">
+              <h3 class="item-title">{{ item.title }}</h3>
+              <p class="item-category">Course Catalog Item</p>
+            </div>
+          </div>
+
+          <div class="item-pricing">
+            <span class="item-price">{{ item.price === 0 ? 'Free' : (item.price | currency:'USD') }}</span>
+          </div>
+
+          <div class="item-actions">
+            <button 
+              type="button" 
+              class="btn-remove" 
+              (click)="onRemoveItem(item.id)" 
+              aria-label="Remove item from cart"
+            >
+              <i class="bi bi-trash3" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="empty-cart-state glass-card">
+      <div class="empty-icon-wrapper">
+        <i class="bi bi-cart-x" aria-hidden="true"></i>
+      </div>
+      <h3 class="empty-title">Your cart is empty</h3>
+      <p class="empty-desc">Explore our catalog and find the best courses to elevate your skills!</p>
+    </div>
+  }
+</div>

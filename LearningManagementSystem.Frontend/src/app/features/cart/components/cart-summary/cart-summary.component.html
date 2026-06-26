@@ -1,0 +1,73 @@
+<div class="summary-card glass-card">
+  <h2 class="summary-title">Order Summary</h2>
+
+  <!-- Price Summary -->
+  <div class="pricing-details">
+    <div class="pricing-row">
+      <span class="label">Original Price:</span>
+      <span class="val">{{ totalPrice | currency:'USD' }}</span>
+    </div>
+    <div class="pricing-row">
+      <span class="label">Discounts:</span>
+      <span class="val success-text">$0.00</span>
+    </div>
+    <hr class="summary-divider" />
+    <div class="pricing-row total-row">
+      <span class="label">Total ({{ selectedItems.length }} {{ selectedItems.length === 1 ? 'item' : 'items' }}):</span>
+      <span class="val total-val">{{ totalPrice | currency:'USD' }}</span>
+    </div>
+  </div>
+
+  <!-- Payment Method Selector -->
+  @if (selectedItems.length > 0) {
+    <div class="payment-selection">
+      <h3 class="payment-title">Payment Method</h3>
+      <div class="method-options">
+        <!-- PayPal option -->
+        <button 
+          type="button" 
+          class="method-btn" 
+          [class.active]="selectedMethod() === 'PayPal'"
+          (click)="selectMethod('PayPal')"
+          [disabled]="isCheckingOut"
+        >
+          <i class="bi bi-paypal paypal-icon" aria-hidden="true"></i>
+          <span>PayPal Sandbox</span>
+        </button>
+
+        <!-- Credit Card option -->
+        <button 
+          type="button" 
+          class="method-btn" 
+          [class.active]="selectedMethod() === 'CreditCard'"
+          (click)="selectMethod('CreditCard')"
+          [disabled]="isCheckingOut"
+        >
+          <i class="bi bi-credit-card credit-icon" aria-hidden="true"></i>
+          <span>Credit Card Mock</span>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Action button -->
+  <div class="checkout-actions">
+    <button 
+      type="button" 
+      class="btn btn-primary btn-full btn-lg" 
+      [disabled]="selectedItems.length === 0 || isCheckingOut"
+      (click)="onCheckout()"
+    >
+      @if (isCheckingOut) {
+        <div class="spinner"></div> Initiating...
+      } @else {
+        <i class="bi bi-wallet2" aria-hidden="true"></i>
+        <span>Checkout ({{ totalPrice | currency:'USD' }})</span>
+      }
+    </button>
+  </div>
+
+  @if (selectedItems.length === 0) {
+    <p class="select-hint">Please select at least one course in your cart to proceed.</p>
+  }
+</div>

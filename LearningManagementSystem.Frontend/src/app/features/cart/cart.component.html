@@ -1,0 +1,46 @@
+<div class="cart-page-wrapper">
+  <!-- Back navigation & header -->
+  <header class="cart-header">
+    <h1 class="cart-title">Shopping Cart</h1>
+    <p class="cart-subtitle">Elevate your capabilities with courses built by expert instructors.</p>
+  </header>
+
+  @if (isLoading()) {
+    <div class="cart-loading">
+      <div class="loading-spinner"></div>
+      <p>Synchronizing cart items...</p>
+    </div>
+  } @else {
+    <div class="cart-grid">
+      <!-- Items column -->
+      <main class="cart-main-col">
+        <app-cart-item-list
+          [items]="cart()?.items || []"
+          [selectedIds]="selectedIds()"
+          (toggleSelect)="handleToggleSelect($event)"
+          (toggleSelectAll)="handleToggleSelectAll()"
+          (removeItem)="handleRemoveItem($event)"
+        ></app-cart-item-list>
+      </main>
+
+      <!-- Billing column -->
+      <aside class="cart-sidebar-col">
+        <app-cart-summary
+          [selectedItems]="selectedItems()"
+          [isCheckingOut]="isCheckingOut()"
+          (checkout)="handleCheckout($event)"
+        ></app-cart-summary>
+      </aside>
+    </div>
+  }
+
+  <!-- Mock Credit Card Payment Overlay Modal -->
+  @if (showCardForm() && activePayment()) {
+    <app-credit-card-form
+      [amount]="activePayment()!.amount"
+      [isSubmitting]="isSubmittingCard()"
+      (submitPay)="handleCardSubmit()"
+      (cancel)="handleCardCancel()"
+    ></app-credit-card-form>
+  }
+</div>
