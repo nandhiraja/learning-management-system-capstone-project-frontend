@@ -1,0 +1,176 @@
+<div class="approvals-container">
+  
+  <!-- Part 1: Pending Instructors -->
+  <section class="approvals-section glass-card">
+    <h2 class="section-title">Instructor Upgrade Requests ({{ instructors.length }})</h2>
+    
+    @if (instructors.length > 0) {
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Applicant</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th class="actions-header">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (inst of instructors; track inst.id) {
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    @if (inst.profilePictureUrl) {
+                      <img [src]="inst.profilePictureUrl" alt="Avatar" class="avatar-sm" />
+                    } @else {
+                      <div class="avatar-placeholder-sm">{{ inst.firstName[0] }}{{ inst.lastName[0] }}</div>
+                    }
+                    <span class="user-name">{{ inst.firstName }} {{ inst.lastName }}</span>
+                  </div>
+                </td>
+                <td>{{ inst.email }}</td>
+                <td>{{ inst.phoneNo || 'N/A' }}</td>
+                <td class="action-cell">
+                  <button 
+                    type="button" 
+                    class="btn btn-approve btn-sm" 
+                    (click)="onApproveInstructor(inst.externalId)"
+                  >
+                    <i class="bi bi-person-check-fill" aria-hidden="true"></i> Approve
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn btn-reject btn-sm" 
+                    (click)="onRejectInstructor(inst.externalId)"
+                  >
+                    <i class="bi bi-person-x-fill" aria-hidden="true"></i> Reject
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-queue-state">
+        <i class="bi bi-check-circle-fill text-success" aria-hidden="true"></i>
+        <p>No pending instructor upgrade requests at this time.</p>
+      </div>
+    }
+  </section>
+
+  <!-- Part 2: Pending Courses -->
+  <section class="approvals-section glass-card margin-top-lg">
+    <h2 class="section-title">Course Review Submissions ({{ courses.length }})</h2>
+
+    @if (courses.length > 0) {
+      <div class="courses-queue-list">
+        @for (course of courses; track course.id) {
+          <div class="course-queue-card">
+            <!-- Header block -->
+            <div class="course-queue-header">
+              <div class="course-meta">
+                <h3 class="course-title">{{ course.title }}</h3>
+                <span class="course-author">Submitted by: <strong>{{ course.instructor ? (course.instructor.firstName + ' ' + course.instructor.lastName) : 'Instructor' }}</strong></span>
+                <span class="course-pricing">Pricing: <strong>{{ course.price === 0 ? 'Free' : (course.price | currency:'USD') }}</strong></span>
+              </div>
+              <div class="course-header-actions">
+                <button 
+                  type="button" 
+                  class="btn btn-ghost btn-sm"
+                  (click)="toggleExpand(course.externalId)"
+                >
+                  <i [class]="expandedCourseId() === course.externalId ? 'bi bi-chevron-up' : 'bi bi-chevron-down'" aria-hidden="true"></i>
+                  {{ expandedCourseId() === course.externalId ? 'Hide Syllabus' : 'View Syllabus' }}
+                </button>
+                <button 
+                  type="button" 
+                  class="btn btn-approve btn-sm" 
+                  (click)="onApproveCourse(course.externalId)"
+                >
+                  <i class="bi bi-check2-circle" aria-hidden="true"></i> Approve
+                </button>
+                <button 
+                  type="button" 
+                  class="btn btn-reject btn-sm" 
+                  (click)="triggerRejectCourse(course.externalId)"
+                >
+                  <i class="bi bi-slash-circle" aria-hidden="true"></i> Reject
+                </button>
+              </div>
+            </div>
+
+            <!-- Description summary -->
+            <div class="course-queue-desc">
+              <p><strong>Description:</strong> {{ course.description }}</p>
+            </div>
+
+            <!-- Syllabus / Sections List (Expanded) -->
+            @if (expandedCourseId() === course.externalId) {
+              <div class="course-syllabus-expanded">
+                <h4 class="syllabus-heading">Course Syllabus</h4>
+                @if (course.sections && course.sections.length > 0) {
+                  <div class="sections-timeline">
+                    @for (sec of course.sections; track sec.id) {
+                      <div class="section-item">
+                        <h5 class="section-title-sm"><i class="bi bi-folder2-open" aria-hidden="true"></i> {{ sec.title }}</h5>
+                        
+                        <!-- Lectures List -->
+                        @if (sec.lectures && sec.lectures.length > 0) {
+                          <ul class="lectures-list-sm">
+                            @for (lec of sec.lectures; track lec.id) {
+                              <li>
+                                <i [class]="lec.contentType === 'Quiz' ? 'bi bi-question-circle' : 'bi bi-play-circle'" aria-hidden="true"></i>
+                                <span>{{ lec.title }} ({{ lec.durationInMinutes }} mins)</span>
+                              </li>
+                            }
+                          </ul>
+                        } @else {
+                          <span class="no-items-label">No lectures in this section</span>
+                        }
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="empty-syllabus">No syllabus curriculum sections created for this course.</div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-queue-state">
+        <i class="bi bi-journal-check text-success" aria-hidden="true"></i>
+        <p>No courses submitted for review at this time.</p>
+      </div>
+    }
+  </section>
+
+  <!-- Rejection Modal Overlay -->
+  @if (activeRejectionCourseId()) {
+    <div class="modal-overlay" (click)="cancelRejection()">
+      <div class="modal-card glass-card" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">Reject Course Request</h3>
+        <p class="modal-desc">Please supply feedback explaining why this course was rejected so the instructor can correct it.</p>
+        
+        <div class="form-group">
+          <label for="reject-reason-textarea" class="form-label">Feedback / Reason</label>
+          <textarea 
+            id="reject-reason-textarea"
+            class="form-control text-area" 
+            placeholder="e.g. Please add lectures in Section 2, and clean up the audio in Section 1."
+            [(ngModel)]="rejectionReason"
+            rows="4"
+          ></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelRejection()">Cancel</button>
+          <button type="button" class="btn btn-reject flex-1" (click)="submitRejection()">Submit Rejection</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

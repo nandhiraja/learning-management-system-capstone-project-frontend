@@ -1,0 +1,112 @@
+<div class="users-tab-wrapper">
+  
+  <!-- Filters Bar -->
+  <div class="filters-bar glass-card">
+    <div class="search-input-group">
+      <i class="bi bi-search search-icon" aria-hidden="true"></i>
+      <input 
+        type="text" 
+        class="form-control" 
+        placeholder="Search users by name or email..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="onSearchChange($event)"
+      />
+    </div>
+
+    <div class="role-filter-group">
+      <label for="admin-role-filter" class="filter-label">Filter Role:</label>
+      <select 
+        id="admin-role-filter"
+        class="form-control select-control" 
+        [ngModel]="selectedRole()"
+        (ngModelChange)="onRoleChange($event)"
+      >
+        <option value="ALL">All Roles</option>
+        <option value="Student">Students</option>
+        <option value="Instructor">Instructors</option>
+        <option value="Admin">Admins</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Users Table Card -->
+  <div class="users-list-card glass-card">
+    @if (filteredUsers().length > 0) {
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>User Details</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th class="actions-header">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of filteredUsers(); track user.id) {
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    @if (user.profilePictureUrl) {
+                      <img [src]="user.profilePictureUrl" alt="Avatar" class="avatar-sm" />
+                    } @else {
+                      <div class="avatar-placeholder-sm">{{ user.firstName[0] }}{{ user.lastName[0] }}</div>
+                    }
+                    <div class="user-name-group">
+                      <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
+                      <span class="user-phone">{{ user.phoneNo || 'No phone number' }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ user.email }}</td>
+                <td>
+                  <span class="badge-role" [class]="user.role.toLowerCase()">
+                    {{ user.role }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge-status" [class.active]="user.isActive" [class.blocked]="!user.isActive">
+                    {{ user.isActive ? 'Active' : 'Blocked' }}
+                  </span>
+                </td>
+                <td class="action-cell">
+                  <!-- Block / Unblock action -->
+                  @if (user.role !== 'Admin') {
+                    <button 
+                      type="button" 
+                      class="btn btn-sm"
+                      [class.btn-block-action]="user.isActive"
+                      [class.btn-unblock-action]="!user.isActive"
+                      (click)="onToggleActive(user.externalId, user.isActive)"
+                    >
+                      <i [class]="user.isActive ? 'bi bi-slash-circle-fill' : 'bi bi-check-circle-fill'" aria-hidden="true"></i>
+                      {{ user.isActive ? 'Block' : 'Unblock' }}
+                    </button>
+                  }
+
+                  <!-- Demote Instructor action -->
+                  @if (user.role === 'Instructor') {
+                    <button 
+                      type="button" 
+                      class="btn btn-demote btn-sm"
+                      (click)="onDemote(user.externalId)"
+                      title="Demote back to standard student role"
+                    >
+                      <i class="bi bi-arrow-down-circle-fill" aria-hidden="true"></i> Demote
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-results-state">
+        <i class="bi bi-people-fill" aria-hidden="true"></i>
+        <p>No users matching the filter criteria found.</p>
+      </div>
+    }
+  </div>
+</div>
