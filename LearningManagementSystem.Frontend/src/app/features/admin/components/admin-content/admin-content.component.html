@@ -1,0 +1,93 @@
+<div class="content-tab-grid">
+  
+  <!-- Categories Panel -->
+  <div class="content-panel glass-card">
+    <h2 class="panel-title"><i class="bi bi-tags-fill" aria-hidden="true"></i> Categories Management</h2>
+    <p class="panel-subtitle">Review suggested course categories submitted by instructors.</p>
+
+    @if (categories.length > 0) {
+      <div class="items-list">
+        @for (cat of categories; track cat.id) {
+          <div class="content-item-row" [class.unapproved]="!cat.isApproved">
+            <div class="item-meta">
+              <span class="item-name">{{ cat.name }}</span>
+              <span class="badge-status" [class.active]="cat.isApproved" [class.pending]="!cat.isApproved">
+                {{ cat.isApproved ? 'Approved' : 'Pending' }}
+              </span>
+            </div>
+            
+            <div class="item-actions">
+              @if (!cat.isApproved) {
+                <button 
+                  type="button" 
+                  class="btn btn-approve btn-xs"
+                  (click)="onApproveCategory(cat.id, cat.name)"
+                >
+                  Approve
+                </button>
+              }
+              <button 
+                type="button" 
+                class="btn btn-reject btn-xs"
+                (click)="onDeleteCategory(cat.id, cat.name)"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-panel-state">
+        <i class="bi bi-tag" aria-hidden="true"></i>
+        <p>No categories found in the system.</p>
+      </div>
+    }
+  </div>
+
+  <!-- Languages Panel -->
+  <div class="content-panel glass-card">
+    <h2 class="panel-title"><i class="bi bi-translate" aria-hidden="true"></i> Languages Management</h2>
+    <p class="panel-subtitle">Review suggested instruction languages submitted by instructors.</p>
+
+    @if (languages.length > 0) {
+      <div class="items-list">
+        @for (lang of languages; track lang.id) {
+          <div class="content-item-row" [class.unapproved]="!lang.isApproved">
+            <div class="item-meta">
+              <span class="item-name">{{ lang.name }}</span>
+              <span class="badge-status" [class.active]="lang.isApproved" [class.pending]="!lang.isApproved">
+                {{ lang.isApproved ? 'Approved' : 'Pending' }}
+              </span>
+            </div>
+            
+            <div class="item-actions">
+              @if (!lang.isApproved) {
+                <button 
+                  type="button" 
+                  class="btn btn-approve btn-xs"
+                  (click)="onApproveLanguage(lang.id, lang.name)"
+                >
+                  Approve
+                </button>
+              }
+              <button 
+                type="button" 
+                class="btn btn-reject btn-xs"
+                (click)="onDeleteLanguage(lang.id, lang.name)"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-panel-state">
+        <i class="bi bi-globe" aria-hidden="true"></i>
+        <p>No languages found in the system.</p>
+      </div>
+    }
+  </div>
+
+</div>

@@ -1,0 +1,73 @@
+<div class="stats-grid" *ngIf="stats">
+  <!-- Card 1: Users -->
+  <div class="stat-card glass-card">
+    <div class="card-icon-wrapper blue-icon">
+      <i class="bi bi-people-fill" aria-hidden="true"></i>
+    </div>
+    <div class="card-content">
+      <span class="card-label">Total Users</span>
+      <h3 class="card-value">{{ stats.users }}</h3>
+      <span class="card-sub">{{ stats.blockedUsersCount }} user(s) currently blocked</span>
+    </div>
+  </div>
+
+  <!-- Card 2: Instructors -->
+  <div class="stat-card glass-card">
+    <div class="card-icon-wrapper teal-icon">
+      <i class="bi bi-person-badge-fill" aria-hidden="true"></i>
+    </div>
+    <div class="card-content">
+      <span class="card-label">Instructors</span>
+      <h3 class="card-value">{{ stats.instructorsCount }}</h3>
+      <span class="card-sub">Active educators teaching courses</span>
+    </div>
+  </div>
+
+  <!-- Card 3: Students -->
+  <div class="stat-card glass-card">
+    <div class="card-icon-wrapper pink-icon">
+      <i class="bi bi-mortarboard-fill" aria-hidden="true"></i>
+    </div>
+    <div class="card-content">
+      <span class="card-label">Students / Learners</span>
+      <h3 class="card-value">{{ stats.studentsCount }}</h3>
+      <span class="card-sub">Registered learners on the platform</span>
+    </div>
+  </div>
+
+  <!-- Card 4: Courses -->
+  <div class="stat-card glass-card">
+    <div class="card-icon-wrapper purple-icon">
+      <i class="bi bi-journal-bookmark-fill" aria-hidden="true"></i>
+    </div>
+    <div class="card-content">
+      <span class="card-label">Total Courses</span>
+      <h3 class="card-value">{{ stats.courses }}</h3>
+      <span class="card-sub">{{ stats.pendingCoursesCount }} awaiting review approval</span>
+    </div>
+  </div>
+
+  <!-- Card 5: Orders -->
+  <div class="stat-card glass-card">
+    <div class="card-icon-wrapper orange-icon">
+      <i class="bi bi-cart-check-fill" aria-hidden="true"></i>
+    </div>
+    <div class="card-content">
+      <span class="card-label">Total Orders</span>
+      <h3 class="card-value">{{ stats.orders }}</h3>
+      <span class="card-sub">Successfully processed checkouts</span>
+    </div>
+  </div>
+
+  <!-- Card 6: Revenue -->
+  <div class="stat-card glass-card">
+    <div class="card-icon-wrapper green-icon">
+      <i class="bi bi-cash-stack" aria-hidden="true"></i>
+    </div>
+    <div class="card-content">
+      <span class="card-label">Total Revenue</span>
+      <h3 class="card-value">{{ stats.totalRevenue | currency:'USD' }}</h3>
+      <span class="card-sub">LMS Platform total transaction volume</span>
+    </div>
+  </div>
+</div>

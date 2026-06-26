@@ -1,0 +1,88 @@
+<div class="courses-tab-wrapper">
+  
+  <!-- Filters Bar -->
+  <div class="filters-bar glass-card">
+    <div class="search-input-group">
+      <i class="bi bi-search search-icon" aria-hidden="true"></i>
+      <input 
+        type="text" 
+        class="form-control" 
+        placeholder="Search courses by title or instructor..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="onSearchChange($event)"
+      />
+    </div>
+
+    <div class="role-filter-group">
+      <label for="admin-status-filter" class="filter-label">Filter Status:</label>
+      <select 
+        id="admin-status-filter"
+        class="form-control select-control" 
+        [ngModel]="selectedStatus()"
+        (ngModelChange)="onStatusChange($event)"
+      >
+        <option value="ALL">All Statuses</option>
+        <option value="Published">Published</option>
+        <option value="PendingReview">Pending Review</option>
+        <option value="Rejected">Rejected</option>
+        <option value="Archived">Archived</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Courses Table Card -->
+  <div class="courses-list-card glass-card">
+    @if (filteredCourses().length > 0) {
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Course Title</th>
+              <th>Instructor</th>
+              <th>Language</th>
+              <th>Price</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of filteredCourses(); track c.id) {
+              <tr>
+                <td>
+                  <div class="course-title-cell">
+                    @if (c.thumbnailUrl) {
+                      <img [src]="c.thumbnailUrl" alt="Thumbnail" class="thumbnail-sm" />
+                    } @else {
+                      <div class="thumbnail-placeholder-sm">
+                        <i class="bi bi-journal-richtext" aria-hidden="true"></i>
+                      </div>
+                    }
+                    <span class="course-name">{{ c.title }}</span>
+                  </div>
+                </td>
+                <td>{{ c.instructor ? (c.instructor.firstName + ' ' + c.instructor.lastName) : 'Instructor' }}</td>
+                <td>{{ c.language || 'English' }}</td>
+                <td class="pricing-cell">
+                  @if (c.price === 0) {
+                    <span class="free-label">Free</span>
+                  } @else {
+                    <span>{{ c.price | currency:'USD' }}</span>
+                  }
+                </td>
+                <td>
+                  <span class="badge-status" [class]="getStatusLabel(c.status).toLowerCase()">
+                    {{ getStatusLabel(c.status) }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-results-state">
+        <i class="bi bi-journal-x" aria-hidden="true"></i>
+        <p>No courses matching the filter criteria found.</p>
+      </div>
+    }
+  </div>
+</div>
