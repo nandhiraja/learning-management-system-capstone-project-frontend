@@ -1,0 +1,176 @@
+<div class="admin-dashboard-wrapper">
+  
+  <!-- Left Side Sidebar Menu -->
+  <aside class="admin-sidebar glass-card">
+    <div class="admin-branding">
+      <i class="bi bi-shield-lock-fill branding-logo" aria-hidden="true"></i>
+      <div class="branding-text">
+        <h2 class="branding-title">Admin Hub</h2>
+        <span class="branding-subtitle">LMS Platform Control</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- Overview tab -->
+      <button 
+        type="button" 
+        class="nav-tab-btn" 
+        [class.active]="activeTab() === 'overview'"
+        (click)="setTab('overview')"
+      >
+        <i class="bi bi-speedometer2" aria-hidden="true"></i>
+        <span>Overview</span>
+      </button>
+
+      <!-- Pending Reviews tab -->
+      <button 
+        type="button" 
+        class="nav-tab-btn" 
+        [class.active]="activeTab() === 'approvals'"
+        (click)="setTab('approvals')"
+      >
+        <i class="bi bi-patch-check" aria-hidden="true"></i>
+        <span>Approvals Queue</span>
+        @if (stats() && stats()!.pendingCoursesCount > 0) {
+          <span class="badge-alert">{{ stats()!.pendingCoursesCount }}</span>
+        }
+      </button>
+
+      <!-- Users tab -->
+      <button 
+        type="button" 
+        class="nav-tab-btn" 
+        [class.active]="activeTab() === 'users'"
+        (click)="setTab('users')"
+      >
+        <i class="bi bi-people" aria-hidden="true"></i>
+        <span>User Accounts</span>
+      </button>
+
+      <!-- Courses tab -->
+      <button 
+        type="button" 
+        class="nav-tab-btn" 
+        [class.active]="activeTab() === 'courses'"
+        (click)="setTab('courses')"
+      >
+        <i class="bi bi-journal-richtext" aria-hidden="true"></i>
+        <span>Courses Directory</span>
+      </button>
+
+      <!-- Content management tab -->
+      <button 
+        type="button" 
+        class="nav-tab-btn" 
+        [class.active]="activeTab() === 'content'"
+        (click)="setTab('content')"
+      >
+        <i class="bi bi-folder" aria-hidden="true"></i>
+        <span>Categories & Languages</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Right Side Main Content Panel -->
+  <main class="admin-main-content">
+    
+    @if (isStatsLoading() && activeTab() === 'overview') {
+      <div class="admin-tab-loading">
+        <div class="loading-spinner"></div>
+        <p>Syncing dashboard statistics...</p>
+      </div>
+    } @else {
+      
+      <!-- Render active subcomponent -->
+      
+      <!-- Overview stats cards -->
+      @if (activeTab() === 'overview') {
+        <h1 class="page-title">Dashboard Overview</h1>
+        <app-admin-stats [stats]="stats()"></app-admin-stats>
+        
+        <div class="overview-welcome-card glass-card">
+          <h2 class="welcome-heading">Welcome to the Administration Console</h2>
+          <p class="welcome-text">Use the left menu panels to approve pending course curriculums, promote students to instructors, activate/deactivate user accounts, or approve tag parameters (categories & languages).</p>
+        </div>
+      }
+
+      <!-- Approvals Queue tab -->
+      @if (activeTab() === 'approvals') {
+        <h1 class="page-title">Approvals & Moderation</h1>
+        
+        @if (isDataLoading()) {
+          <div class="admin-tab-loading">
+            <div class="loading-spinner"></div>
+            <p>Syncing approvals list...</p>
+          </div>
+        } @else {
+          <app-admin-approvals
+            [courses]="pendingQueue().pendingCourses"
+            [instructors]="pendingQueue().pendingInstructors"
+            (approveCourse)="handleApproveCourse($event)"
+            (rejectCourse)="handleRejectCourse($event)"
+            (approveInstructor)="handleApproveInstructor($event)"
+            (rejectInstructor)="handleRejectInstructor($event)"
+          ></app-admin-approvals>
+        }
+      }
+
+      <!-- Users management tab -->
+      @if (activeTab() === 'users') {
+        <h1 class="page-title">User Accounts Directory</h1>
+        
+        @if (isDataLoading()) {
+          <div class="admin-tab-loading">
+            <div class="loading-spinner"></div>
+            <p>Loading users profiles...</p>
+          </div>
+        } @else {
+          <app-admin-users
+            [users]="users()"
+            (toggleStatus)="handleToggleUserStatus($event)"
+            (demoteInstructor)="handleDemoteInstructor($event)"
+          ></app-admin-users>
+        }
+      }
+
+      <!-- Courses Directory tab -->
+      @if (activeTab() === 'courses') {
+        <h1 class="page-title">Courses Catalogue</h1>
+        
+        @if (isDataLoading()) {
+          <div class="admin-tab-loading">
+            <div class="loading-spinner"></div>
+            <p>Gathering courses list...</p>
+          </div>
+        } @else {
+          <app-admin-courses
+            [courses]="courses()"
+          ></app-admin-courses>
+        }
+      }
+
+      <!-- Category / Language management tab -->
+      @if (activeTab() === 'content') {
+        <h1 class="page-title">Metadata Management</h1>
+        
+        @if (isDataLoading()) {
+          <div class="admin-tab-loading">
+            <div class="loading-spinner"></div>
+            <p>Loading categories and languages...</p>
+          </div>
+        } @else {
+          <app-admin-content
+            [categories]="categories()"
+            [languages]="languages()"
+            (approveCat)="handleApproveCategory($event)"
+            (deleteCat)="handleDeleteCategory($event)"
+            (approveLang)="handleApproveLanguage($event)"
+            (deleteLang)="handleDeleteLanguage($event)"
+          ></app-admin-content>
+        }
+      }
+
+    }
+  </main>
+
+</div>
