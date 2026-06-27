@@ -1,0 +1,73 @@
+<div class="stats-grid" *ngIf="stats">
+  <!-- Card 1: Courses -->
+  <div class="stat-card glass-card">
+    <div class="card-icon-wrapper purple-icon">
+      <i class="bi bi-journals" aria-hidden="true"></i>
+    </div>
+    <div class="card-content">
+      <span class="card-label">Total Courses</span>
+      <h3 class="card-value">{{ stats.totalCourses }}</h3>
+      <span class="card-sub">Courses created by you</span>
+    </div>
+  </div>
+
+  <!-- Card 2: Students -->
+  <div class="stat-card glass-card">
+    <div class="card-icon-wrapper rose-icon">
+      <i class="bi bi-mortarboard-fill" aria-hidden="true"></i>
+    </div>
+    <div class="card-content">
+      <span class="card-label">Total Students</span>
+      <h3 class="card-value">{{ stats.totalStudents }}</h3>
+      <span class="card-sub">Learners enrolled in your courses</span>
+    </div>
+  </div>
+
+  <!-- Card 3: Revenue -->
+  <div class="stat-card glass-card">
+    <div class="card-icon-wrapper green-icon">
+      <i class="bi bi-cash-coin" aria-hidden="true"></i>
+    </div>
+    <div class="card-content">
+      <span class="card-label">Total Revenue</span>
+      <h3 class="card-value">{{ stats.totalRevenue | currency:'USD' }}</h3>
+      <span class="card-sub">Your lifetime platform earnings</span>
+    </div>
+  </div>
+
+  <!-- Card 4: Rating -->
+  <div class="stat-card glass-card">
+    <div class="card-icon-wrapper amber-icon">
+      <i class="bi bi-star-fill" aria-hidden="true"></i>
+    </div>
+    <div class="card-content">
+      <span class="card-label">Average Rating</span>
+      <h3 class="card-value">{{ stats.averageCourseRating | number:'1.1-2' }} / 5.0</h3>
+      <span class="card-sub">From student feedback ratings</span>
+    </div>
+  </div>
+
+  <!-- Card 5: Reviews -->
+  <div class="stat-card glass-card">
+    <div class="card-icon-wrapper blue-icon">
+      <i class="bi bi-chat-heart-fill" aria-hidden="true"></i>
+    </div>
+    <div class="card-content">
+      <span class="card-label">Total Reviews</span>
+      <h3 class="card-value">{{ stats.totalReviewsCount }}</h3>
+      <span class="card-sub">Reviews submitted by students</span>
+    </div>
+  </div>
+
+  <!-- Card 6: Unanswered Qs -->
+  <div class="stat-card glass-card">
+    <div class="card-icon-wrapper orange-icon">
+      <i class="bi bi-question-circle-fill" aria-hidden="true"></i>
+    </div>
+    <div class="card-content">
+      <span class="card-label">Unresolved Q&A</span>
+      <h3 class="card-value">{{ stats.unansweredDiscussionsCount }}</h3>
+      <span class="card-sub">Unanswered discussion questions</span>
+    </div>
+  </div>
+</div>

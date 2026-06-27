@@ -1,0 +1,86 @@
+<div class="courses-manager-container glass-card">
+  <div class="section-header-bar">
+    <div>
+      <h3 class="section-title">My Courses</h3>
+      <p class="section-subtitle">Manage and monitor the status of courses taught by you</p>
+    </div>
+    <button (click)="createCourse.emit()" class="btn btn-primary create-course-btn">
+      <i class="bi bi-plus-lg" aria-hidden="true"></i> Create New Course
+    </button>
+  </div>
+
+  @if (courses.length === 0) {
+    <div class="empty-courses-state">
+      <div class="empty-icon-wrapper">
+        <i class="bi bi-journal-x" aria-hidden="true"></i>
+      </div>
+      <h4>No courses created yet</h4>
+      <p>Share your knowledge with the world by creating your first online course on LearnHub.</p>
+      <button (click)="createCourse.emit()" class="btn btn-primary btn-md">
+        Create Your First Course
+      </button>
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table class="courses-table">
+        <thead>
+          <tr>
+            <th>Course Title</th>
+            <th>Language</th>
+            <th>Price</th>
+            <th>Students Enrolled</th>
+            <th>Avg Rating</th>
+            <th>Status</th>
+            <th class="actions-header">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (course of courses; track course.id) {
+            <tr class="course-row">
+              <td class="course-title-cell">
+                <div class="course-meta-wrapper">
+                  <div class="course-thumbnail-placeholder">
+                    @if (course.thumbnailUrl) {
+                      <img [src]="course.thumbnailUrl" alt="Thumbnail" />
+                    } @else {
+                      <i class="bi bi-image" aria-hidden="true"></i>
+                    }
+                  </div>
+                  <div class="course-info">
+                    <span class="course-title-text">{{ course.title }}</span>
+                    <span class="course-date">Created on {{ course.createdAt | date:'mediumDate' }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>{{ course.language }}</td>
+              <td class="price-cell">
+                @if (course.price === 0) {
+                  <span class="free-text">Free</span>
+                } @else {
+                  {{ course.price | currency:'USD' }}
+                }
+              </td>
+              <td class="numeric-cell">{{ course.studentsCount }}</td>
+              <td class="rating-cell">
+                <div class="rating-wrapper">
+                  <i class="bi bi-star-fill text-warning" aria-hidden="true"></i>
+                  <span>{{ course.rating | number:'1.1-2' }}</span>
+                </div>
+              </td>
+              <td>
+                <app-badge-chip [variant]="getStatusVariant(course.status)">
+                  {{ getStatusLabel(course.status) }}
+                </app-badge-chip>
+              </td>
+              <td class="actions-cell">
+                <a [routerLink]="['/courses', course.externalId]" class="btn btn-ghost btn-sm view-details-link">
+                  <i class="bi bi-eye" aria-hidden="true"></i> View
+                </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

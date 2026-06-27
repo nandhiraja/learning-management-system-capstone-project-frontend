@@ -7,6 +7,8 @@ export interface UserProfile {
   phoneNo: string;
   profilePictureUrl: string | null;
   role: string;
+  isActive: boolean;
+  instructorRequestPending: boolean;
 }
 
 export interface LoginResponse {

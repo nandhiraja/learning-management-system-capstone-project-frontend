@@ -1,0 +1,101 @@
+<div class="instructor-dashboard-wrapper">
+  
+  <!-- Left Side Sidebar Menu -->
+  <aside class="instructor-sidebar glass-card">
+    <div class="instructor-branding">
+      <i class="bi bi-people-fill branding-logo" aria-hidden="true"></i>
+      <div class="branding-text">
+        <h2 class="branding-title">Instructor Hub</h2>
+        <span class="branding-subtitle">Educator Workspace</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- Overview tab -->
+      <button 
+        type="button" 
+        class="nav-tab-btn" 
+        [class.active]="activeTab() === 'overview'"
+        (click)="setTab('overview')"
+      >
+        <i class="bi bi-speedometer2" aria-hidden="true"></i>
+        <span>Overview</span>
+      </button>
+
+      <!-- My Courses tab -->
+      <button 
+        type="button" 
+        class="nav-tab-btn" 
+        [class.active]="activeTab() === 'courses'"
+        (click)="setTab('courses')"
+      >
+        <i class="bi bi-journals" aria-hidden="true"></i>
+        <span>My Courses</span>
+      </button>
+
+      <!-- Q&A Forum tab -->
+      <button 
+        type="button" 
+        class="nav-tab-btn" 
+        [class.active]="activeTab() === 'discussions'"
+        (click)="setTab('discussions')"
+      >
+        <i class="bi bi-chat-left-dots" aria-hidden="true"></i>
+        <span>Q&A Forum</span>
+        @if (stats() && stats()!.unansweredDiscussionsCount > 0) {
+          <span class="badge-alert">{{ stats()!.unansweredDiscussionsCount }}</span>
+        }
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Right Side Main Content Panel -->
+  <main class="instructor-main-content">
+    
+    @if (isLoadingStats() && activeTab() === 'overview') {
+      <div class="instructor-tab-loading">
+        <div class="loading-spinner"></div>
+        <p>Syncing dashboard statistics...</p>
+      </div>
+    } @else {
+      
+      <!-- Render active subcomponent -->
+      
+      <!-- Overview Tab -->
+      @if (activeTab() === 'overview') {
+        <h1 class="page-title">Dashboard Overview</h1>
+        <app-instructor-stats [stats]="stats()"></app-instructor-stats>
+        
+        <div class="overview-welcome-card glass-card">
+          <h2 class="welcome-heading">Welcome back to your workspace!</h2>
+          <p class="welcome-text">Use the left menu panels to view course stats, manage your curricula, or review and reply to student questions directly inside the Q&A Forum dashboard.</p>
+        </div>
+      }
+
+      <!-- Courses Tab -->
+      @if (activeTab() === 'courses') {
+        <h1 class="page-title">My Course Catalog</h1>
+        
+        @if (isLoadingCourses()) {
+          <div class="instructor-tab-loading">
+            <div class="loading-spinner"></div>
+            <p>Loading course directory...</p>
+          </div>
+        } @else {
+          <app-instructor-courses
+            [courses]="courses()"
+            (createCourse)="handleCreateCourse()"
+          ></app-instructor-courses>
+        }
+      }
+
+      <!-- Discussions Q&A Tab -->
+      @if (activeTab() === 'discussions') {
+        <h1 class="page-title">Student Q&A Forum</h1>
+        <app-instructor-discussions></app-instructor-discussions>
+      }
+
+    }
+  </main>
+
+</div>

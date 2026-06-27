@@ -37,6 +37,12 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['Admin'] }
   },
+  {
+    path: 'instructor/dashboard',
+    loadComponent: () => import('./features/instructor/instructor-dashboard.component').then((m) => m.InstructorDashboardComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['Instructor'] }
+  },
 
 
   {

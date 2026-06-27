@@ -1,0 +1,191 @@
+<div class="discussions-board-container glass-card">
+  <!-- Left Side: Discussion Threads List -->
+  <div class="discussions-sidebar" [class.hidden-on-mobile]="selectedDiscussionId() !== null">
+    <div class="sidebar-header">
+      <h4 class="sidebar-title">Q&A Questions</h4>
+      
+      <!-- Filters -->
+      <div class="search-box-wrapper">
+        <i class="bi bi-search search-icon" aria-hidden="true"></i>
+        <input 
+          type="text" 
+          placeholder="Search questions or courses..." 
+          class="form-control search-input" 
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+        />
+      </div>
+
+      <div class="filter-toggles">
+        <label class="filter-checkbox-label">
+          <input 
+            type="checkbox" 
+            [checked]="unansweredOnly()" 
+            (change)="toggleUnansweredFilter()"
+          />
+          <span>Unanswered Only</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Threads List -->
+    <div class="threads-list-scroll">
+      @if (isLoadingList()) {
+        <div class="list-state-centered">
+          <div class="spinner"></div>
+          <p>Loading questions...</p>
+        </div>
+      } @else if (filteredDiscussions().length === 0) {
+        <div class="list-state-centered">
+          <i class="bi bi-chat-dots empty-icon" aria-hidden="true"></i>
+          <p>No questions match your filters.</p>
+        </div>
+      } @else {
+        <div class="threads-list">
+          @for (disc of filteredDiscussions(); track disc.discussionGuid) {
+            <button 
+              type="button" 
+              class="thread-item-btn" 
+              [class.active]="selectedDiscussionId() === disc.discussionGuid"
+              (click)="selectDiscussion(disc.discussionGuid)"
+            >
+              <div class="thread-item-header">
+                <span class="student-name">{{ disc.studentName }}</span>
+                <span class="thread-date">{{ disc.createdAt | date:'shortDate' }}</span>
+              </div>
+              <h5 class="thread-item-title">{{ disc.title }}</h5>
+              <div class="thread-item-footer">
+                <span class="course-name-tag">
+                  <i class="bi bi-book-half" aria-hidden="true"></i> {{ disc.courseTitle }}
+                </span>
+                <div class="badges-wrapper">
+                  @if (!disc.isAnswered) {
+                    <app-badge-chip variant="warning" size="sm">Unresolved</app-badge-chip>
+                  } @else {
+                    <app-badge-chip variant="success" size="sm">Answered</app-badge-chip>
+                  }
+                </div>
+              </div>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Right Side: Active Discussion Thread -->
+  <div class="discussion-content-pane" [class.visible-on-mobile]="selectedDiscussionId() !== null">
+    @if (selectedDiscussionId() === null) {
+      <div class="pane-state-centered">
+        <i class="bi bi-chat-left-text large-pane-icon" aria-hidden="true"></i>
+        <h3>Select a Discussion</h3>
+        <p>Choose a student question from the sidebar to view full thread details and write answers.</p>
+      </div>
+    } @else if (isLoadingThread()) {
+      <div class="pane-state-centered">
+        <div class="spinner large-spinner"></div>
+        <p>Fetching discussion thread...</p>
+      </div>
+    } @else if (selectedThread(); as thread) {
+      <div class="thread-view-wrapper">
+        <!-- Thread Header -->
+        <div class="thread-detail-header">
+          <button (click)="closeThreadView()" class="btn btn-ghost btn-sm back-sidebar-btn">
+            <i class="bi bi-chevron-left" aria-hidden="true"></i> Back to List
+          </button>
+          
+          <div class="thread-main-meta">
+            <h3 class="thread-main-title">{{ thread.title }}</h3>
+            <div class="thread-context-meta">
+              <span class="meta-item">
+                <i class="bi bi-person" aria-hidden="true"></i> Asked by <strong>{{ thread.user.firstName }} {{ thread.user.lastName }}</strong>
+              </span>
+              <span class="meta-item">
+                <i class="bi bi-calendar3" aria-hidden="true"></i> {{ thread.createdAt | date:'medium' }}
+              </span>
+              @if (thread.lectureTitle) {
+                <span class="meta-item">
+                  <i class="bi bi-play-circle" aria-hidden="true"></i> Lecture: <em>{{ thread.lectureTitle }}</em>
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Conversation Scroll -->
+        <div class="thread-messages-scroll">
+          <!-- Student Question -->
+          <div class="message-card student-question-card">
+            <div class="message-card-header">
+              <div class="user-avatar-circle student-avatar">
+                {{ thread.user.firstName[0] }}{{ thread.user.lastName[0] }}
+              </div>
+              <div class="author-details">
+                <span class="author-name">{{ thread.user.firstName }} {{ thread.user.lastName }}</span>
+                <span class="author-label">Student</span>
+              </div>
+            </div>
+            <div class="message-card-body">
+              {{ thread.content }}
+            </div>
+          </div>
+
+          <!-- Replies Timeline -->
+          <div class="replies-divider">
+            <span>Replies ({{ thread.replies.length }})</span>
+          </div>
+
+          <div class="replies-timeline">
+            @for (rep of thread.replies; track rep.externalId) {
+              <div class="message-card reply-card" [class.instructor-reply-card]="rep.isInstructorReply">
+                <div class="message-card-header">
+                  <div class="user-avatar-circle" [class.instructor-avatar]="rep.isInstructorReply">
+                    {{ rep.user.firstName[0] }}{{ rep.user.lastName[0] }}
+                  </div>
+                  <div class="author-details">
+                    <span class="author-name">{{ rep.user.firstName }} {{ rep.user.lastName }}</span>
+                    @if (rep.isInstructorReply) {
+                      <app-badge-chip variant="success" size="sm" icon="bi-shield-check">Instructor</app-badge-chip>
+                    } @else {
+                      <span class="author-label">Student</span>
+                    }
+                    <span class="reply-timestamp">&bull; {{ rep.createdAt | date:'short' }}</span>
+                  </div>
+                </div>
+                <div class="message-card-body">
+                  {{ rep.content }}
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Instructor Response Form -->
+        <div class="instructor-reply-form">
+          <div class="reply-textarea-wrapper">
+            <textarea 
+              #replyInput
+              placeholder="Write a clear, helpful response to assist this student..." 
+              rows="3" 
+              class="form-control reply-input-textarea"
+              [disabled]="isPostingReply()"
+            ></textarea>
+          </div>
+          <div class="reply-actions-bar">
+            <button 
+              (click)="postReply(replyInput)" 
+              class="btn btn-primary submit-reply-btn"
+              [disabled]="isPostingReply() || !replyInput.value.trim()"
+            >
+              @if (isPostingReply()) {
+                <div class="spinner"></div> Sending...
+              } @else {
+                <i class="bi bi-send" aria-hidden="true"></i> Post Response
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
