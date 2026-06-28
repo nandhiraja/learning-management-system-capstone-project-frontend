@@ -198,3 +198,15 @@
 .view-details-link:hover {
   color: var(--color-primary-hover);
 }
+
+.edit-details-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.edit-details-link:hover {
+  color: var(--color-accent-hover);
+}

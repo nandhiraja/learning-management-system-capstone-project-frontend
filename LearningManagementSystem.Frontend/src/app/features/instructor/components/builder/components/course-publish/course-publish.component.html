@@ -1,0 +1,128 @@
+<div class="publish-container glass-card">
+  <div class="publish-header">
+    <h3 class="publish-title">Publish Readiness Review</h3>
+    <p class="publish-subtitle">Check your course metadata checklist and submit the curriculum for review approval.</p>
+  </div>
+
+  <div class="publish-layout">
+    <!-- Left Panel: Course Overview Summary -->
+    <div class="summary-card glass-card" *ngIf="course">
+      <div class="summary-thumbnail">
+        @if (course.thumbnailUrl) {
+          <img [src]="course.thumbnailUrl" alt="Thumbnail Preview" />
+        } @else {
+          <div class="summary-no-thumbnail">
+            <i class="bi bi-image" aria-hidden="true"></i>
+            <span>No cover image uploaded</span>
+          </div>
+        }
+      </div>
+      
+      <div class="summary-info">
+        <app-badge-chip variant="accent">{{ course.status }}</app-badge-chip>
+        <h4 class="summary-title-text">{{ course.title }}</h4>
+        <p class="summary-price">
+          @if (course.price === 0) {
+            <span class="free-badge">Free</span>
+          } @else {
+            {{ course.price | currency:'USD' }}
+          }
+        </p>
+        <div class="summary-stats-grid">
+          <div class="summary-stat-item">
+            <span class="stat-count">{{ course.sections.length }}</span>
+            <span class="stat-name">Sections</span>
+          </div>
+          <div class="summary-stat-item">
+            <span class="stat-count">{{ totalLectures() }}</span>
+            <span class="stat-name">Lectures</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Validation Checklist -->
+    <div class="checklist-card glass-card">
+      <h4 class="checklist-title">Readiness Checklist</h4>
+      
+      <ul class="checklist-items">
+        <!-- Checklist 1: Basic details -->
+        <li class="check-item" [class.passed]="hasBasicDetails()">
+          <span class="check-indicator">
+            <i class="bi" [class.bi-check-circle-fill]="hasBasicDetails()" [class.bi-x-circle-fill]="!hasBasicDetails()" aria-hidden="true"></i>
+          </span>
+          <div class="check-text-content">
+            <span class="check-title">Course Title & Description</span>
+            <span class="check-sub">Core course information settings</span>
+          </div>
+        </li>
+
+        <!-- Checklist 2: Thumbnail -->
+        <li class="check-item" [class.passed]="hasThumbnail()" [class.warning]="!hasThumbnail()">
+          <span class="check-indicator">
+            <i class="bi" [class.bi-check-circle-fill]="hasThumbnail()" [class.bi-exclamation-triangle-fill]="!hasThumbnail()" aria-hidden="true"></i>
+          </span>
+          <div class="check-text-content">
+            <span class="check-title">Cover Cover Image</span>
+            <span class="check-sub">High-quality image increases course enrollments (Recommended)</span>
+          </div>
+        </li>
+
+        <!-- Checklist 3: Sections -->
+        <li class="check-item" [class.passed]="hasSections()">
+          <span class="check-indicator">
+            <i class="bi" [class.bi-check-circle-fill]="hasSections()" [class.bi-x-circle-fill]="!hasSections()" aria-hidden="true"></i>
+          </span>
+          <div class="check-text-content">
+            <span class="check-title">Syllabus Section</span>
+            <span class="check-sub">Needs at least 1 section in your course</span>
+          </div>
+        </li>
+
+        <!-- Checklist 4: Lectures -->
+        <li class="check-item" [class.passed]="hasLectures()">
+          <span class="check-indicator">
+            <i class="bi" [class.bi-check-circle-fill]="hasLectures()" [class.bi-x-circle-fill]="!hasLectures()" aria-hidden="true"></i>
+          </span>
+          <div class="check-text-content">
+            <span class="check-title">Lecture Resources</span>
+            <span class="check-sub">Upload video or documents to at least 1 lecture</span>
+          </div>
+        </li>
+      </ul>
+
+      <!-- Readiness Messages Banner -->
+      <div class="readiness-banner" [class.ready]="isCourseReady()" [class.not-ready]="!isCourseReady()">
+        @if (isCourseReady()) {
+          <i class="bi bi-shield-check banner-icon" aria-hidden="true"></i>
+          <div class="banner-body">
+            <span class="banner-title">Ready for Review</span>
+            <p class="banner-desc">Your curriculum meets the criteria. Submit it now for admin approval.</p>
+          </div>
+        } @else {
+          <i class="bi bi-exclamation-circle banner-icon" aria-hidden="true"></i>
+          <div class="banner-body">
+            <span class="banner-title">Checklist Incomplete</span>
+            <p class="banner-desc">Please complete all required checklist items marked in red before submitting.</p>
+          </div>
+        }
+      </div>
+
+      <!-- Action Submission Bar -->
+      <div class="publish-actions-bar">
+        <button 
+          type="button" 
+          (click)="submitReview()" 
+          class="btn btn-primary btn-md submit-review-btn"
+          [disabled]="!isCourseReady() || isSubmitting()"
+        >
+          @if (isSubmitting()) {
+            <div class="spinner"></div> Submitting course...
+          } @else {
+            <i class="bi bi-send" aria-hidden="true"></i> Submit for Admin Review
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

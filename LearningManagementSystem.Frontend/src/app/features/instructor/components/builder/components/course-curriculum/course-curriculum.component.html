@@ -1,0 +1,250 @@
+<div class="curriculum-container glass-card">
+  <div class="curriculum-header">
+    <h3 class="curriculum-title">Course Curriculum</h3>
+    <p class="curriculum-subtitle">Organize your course syllabus into sections and lectures. Drag-and-drop resources like videos and slides.</p>
+  </div>
+
+  <!-- Sections Tree List -->
+  <div class="sections-list">
+    @for (sec of course?.sections; track sec.id) {
+      <div class="section-item glass-card" [class.expanded]="isSectionExpanded(sec.id)">
+        <!-- Section Header Bar -->
+        <div class="section-header">
+          <div class="section-header-left">
+            <button type="button" class="btn-toggle-expand" (click)="toggleSection(sec.id)" aria-label="Toggle section lectures list">
+              <i class="bi" [class.bi-chevron-right]="!isSectionExpanded(sec.id)" [class.bi-chevron-down]="isSectionExpanded(sec.id)" aria-hidden="true"></i>
+            </button>
+            
+            @if (editingSectionId() === sec.id) {
+              <div class="inline-section-editor">
+                <input 
+                  type="text" 
+                  [ngModel]="editingSectionTitle()" 
+                  (ngModelChange)="editingSectionTitle.set($event)" 
+                  class="form-control inline-section-input" 
+                />
+                <button type="button" class="btn btn-primary btn-xs" (click)="updateSection(sec)" [disabled]="!editingSectionTitle().trim()">
+                  <i class="bi bi-check-lg" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="btn btn-ghost btn-xs" (click)="cancelEditSection()">
+                  <i class="bi bi-x-lg" aria-hidden="true"></i>
+                </button>
+              </div>
+            } @else {
+              <span class="section-title-label" (click)="toggleSection(sec.id)">
+                Section {{ sec.order }}: <strong>{{ sec.title }}</strong>
+              </span>
+            }
+          </div>
+
+          <div class="section-header-right" *ngIf="editingSectionId() !== sec.id">
+            <button type="button" class="btn btn-ghost btn-xs text-primary" (click)="startEditSection(sec)" title="Rename Section">
+              <i class="bi bi-pencil-fill" aria-hidden="true"></i> Rename
+            </button>
+            <button type="button" class="btn btn-ghost btn-xs text-danger" (click)="deleteSection(sec.id)" title="Delete Section">
+              <i class="bi bi-trash3-fill" aria-hidden="true"></i> Delete
+            </button>
+            <button type="button" class="btn btn-primary btn-xs btn-add-lecture" (click)="openAddLectureModal(sec.id)">
+              <i class="bi bi-plus-lg" aria-hidden="true"></i> Add Lecture
+            </button>
+          </div>
+        </div>
+
+        <!-- Section Body: Lectures Timeline -->
+        <div class="section-body" *ngIf="isSectionExpanded(sec.id)">
+          @if (!sec.lectures || sec.lectures.length === 0) {
+            <div class="empty-lectures-prompt">
+              <i class="bi bi-journal-plus" aria-hidden="true"></i>
+              <p>No lectures in this section yet. Click "Add Lecture" to upload videos or documents.</p>
+            </div>
+          } @else {
+            <div class="lectures-list">
+              @for (lec of sec.lectures; track lec.id) {
+                <div class="lecture-item glass-card">
+                  <div class="lecture-left">
+                    <i class="bi bi-grip-vertical drag-handle" aria-hidden="true"></i>
+                    <i class="bi bi-file-earmark-play-fill lecture-icon" aria-hidden="true"></i>
+                    <div class="lecture-meta">
+                      <span class="lecture-title-text">{{ lec.title }}</span>
+                      <div class="lecture-details-row">
+                        <app-badge-chip variant="purple" size="sm">{{ lec.contentType }}</app-badge-chip>
+                        <span class="lecture-duration-text">
+                          <i class="bi bi-clock" aria-hidden="true"></i> {{ lec.durationInMinutes }} mins
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="lecture-right">
+                    <button type="button" class="btn btn-ghost btn-xs text-primary" (click)="openEditLectureModal(sec.id, lec)">
+                      <i class="bi bi-pencil-fill" aria-hidden="true"></i> Edit
+                    </button>
+                    <button type="button" class="btn btn-ghost btn-xs text-danger" (click)="deleteLecture(lec.id)">
+                      <i class="bi bi-trash3-fill" aria-hidden="true"></i> Delete
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Add Section Footer Button / Form -->
+  <div class="curriculum-footer">
+    @if (isAddingSection()) {
+      <div class="section-create-panel glass-card">
+        <label for="newSectionTitle" class="form-label">New Section Title</label>
+        <div class="create-panel-actions">
+          <input 
+            id="newSectionTitle" 
+            type="text" 
+            [ngModel]="newSectionTitle()" 
+            (ngModelChange)="newSectionTitle.set($event)" 
+            placeholder="e.g. Introduction & Setup" 
+            class="form-control" 
+          />
+          <button type="button" class="btn btn-primary btn-md" (click)="saveSection()" [disabled]="!newSectionTitle().trim()">
+            Save Section
+          </button>
+          <button type="button" class="btn btn-ghost btn-md" (click)="cancelAddSection()">
+            Cancel
+          </button>
+        </div>
+      </div>
+    } @else {
+      <button type="button" class="btn btn-ghost btn-md btn-block-add-section" (click)="startAddSection()">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i> Add a Section
+      </button>
+    }
+  </div>
+
+  <!-- --- Lecture Modal Overlay Overlay Window --- -->
+  @if (isLectureModalOpen()) {
+    <div class="modal-overlay">
+      <div class="modal-content-card glass-card">
+        <div class="modal-header">
+          <h4 class="modal-title">
+            {{ editingLectureId() ? 'Edit Lecture Metadata' : 'Add New Lecture' }}
+          </h4>
+          <button type="button" class="btn-close-modal" (click)="closeLectureModal()" aria-label="Close modal dialog">
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <form [formGroup]="lectureForm" (submit)="saveLecture()" class="modal-form-body">
+          <!-- Lecture Title -->
+          <div class="form-group">
+            <label for="lecTitle" class="form-label">Lecture Title <span class="required-star">*</span></label>
+            <input 
+              id="lecTitle" 
+              type="text" 
+              formControlName="title" 
+              placeholder="e.g. Setting up the Angular environment" 
+              class="form-control"
+              [class.is-invalid]="lectureForm.get('title')?.touched && lectureForm.get('title')?.invalid"
+            />
+          </div>
+
+          <!-- Type & Duration row -->
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="lecType" class="form-label">Content Type <span class="required-star">*</span></label>
+              <select id="lecType" formControlName="contentType" class="form-control select-input">
+                <option value="Video">Video</option>
+                <option value="pdf">PDF Document</option>
+                <option value="ExternalLink">External Link</option>
+                <option value="Text">Plain Text Content</option>
+                <option value="PPT">PPT Presentation</option>
+              </select>
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="lecDuration" class="form-label">Duration (Minutes)</label>
+              <input 
+                id="lecDuration" 
+                type="number" 
+                formControlName="durationInMinutes" 
+                class="form-control" 
+              />
+            </div>
+          </div>
+
+          <!-- Uploader content url check -->
+          <div class="form-group">
+            <label class="form-label">Lecture Resource Content <span class="required-star">*</span></label>
+
+            <!-- File Upload Zone for Video and PDF -->
+            @if (lectureForm.get('contentType')?.value === 'Video' || lectureForm.get('contentType')?.value === 'pdf') {
+              <div class="lecture-resource-uploader">
+                @if (uploadedFileUrl(); as url) {
+                  <div class="upload-success-state">
+                    <i class="bi bi-check-circle-fill text-success" aria-hidden="true"></i>
+                    <div class="success-meta">
+                      <span class="success-label">File uploaded successfully!</span>
+                      <a [href]="url" target="_blank" class="file-view-link">Preview Uploaded Resource <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+                    </div>
+                    <button type="button" class="btn btn-ghost btn-xs text-danger" (click)="uploadedFileUrl.set(null)">
+                      Re-upload File
+                    </button>
+                  </div>
+                } @else {
+                  <div class="file-drag-zone" (click)="lecFileInput.click()">
+                    <input 
+                      #lecFileInput
+                      type="file" 
+                      [accept]="lectureForm.get('contentType')?.value === 'Video' ? 'video/*' : 'application/pdf'" 
+                      class="hidden-file-input"
+                      (change)="onLectureFileSelected($event)"
+                    />
+                    
+                    @if (isUploadingFile()) {
+                      <div class="upload-progress-wrapper">
+                        <div class="spinner"></div>
+                        <span>Uploading content ({{ fileUploadProgress() }}%)</span>
+                        <div class="progress-bar-bg">
+                          <div class="progress-bar-fill" [style.width.%]="fileUploadProgress()"></div>
+                        </div>
+                      </div>
+                    } @else {
+                      <i class="bi bi-cloud-arrow-up uploader-icon" aria-hidden="true"></i>
+                      <span class="uploader-prompt">
+                        Choose {{ lectureForm.get('contentType')?.value === 'Video' ? 'Video (.mp4, .mov)' : 'PDF document (.pdf)' }}
+                      </span>
+                      <span class="uploader-limit">
+                        Max Size: {{ lectureForm.get('contentType')?.value === 'Video' ? '200MB' : '20MB' }}
+                      </span>
+                    }
+                  </div>
+                }
+              </div>
+            } @else {
+              <!-- URL text field for PPT, External Links, Text -->
+              <input 
+                type="text" 
+                formControlName="contentUrl" 
+                placeholder="Enter resource URL or content link..." 
+                class="form-control"
+                [class.is-invalid]="lectureForm.get('contentUrl')?.touched && lectureForm.get('contentUrl')?.invalid"
+              />
+            }
+          </div>
+
+          <!-- Actions Footer -->
+          <div class="modal-footer-actions">
+            <button type="button" class="btn btn-ghost btn-md" (click)="closeLectureModal()">Cancel</button>
+            <button 
+              type="submit" 
+              class="btn btn-primary btn-md submit-lecture-btn"
+              [disabled]="lectureForm.invalid || isUploadingFile()"
+            >
+              {{ editingLectureId() ? 'Save Changes' : 'Add Lecture' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

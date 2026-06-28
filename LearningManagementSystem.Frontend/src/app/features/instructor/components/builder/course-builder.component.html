@@ -1,0 +1,116 @@
+<div class="course-builder-wrapper">
+  <!-- Top Navigation Header -->
+  <header class="builder-header glass-card">
+    <div class="builder-header-left">
+      <a routerLink="/instructor/dashboard" class="btn btn-ghost btn-sm back-btn">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i> Dashboard
+      </a>
+      <div class="builder-meta">
+        <h2 class="builder-title">
+          {{ isEditMode() ? 'Edit Course: ' + (course()?.title || '') : 'Create a New Course' }}
+        </h2>
+        <span class="builder-subtitle">Course Management Workspace</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Step Tracker Progress bar -->
+  <div class="builder-steps-nav glass-card">
+    <!-- Step 1: Basic Info -->
+    <button 
+      type="button" 
+      class="step-item" 
+      [class.active]="activeTab() === 'basic'"
+      [class.completed]="isEditMode()"
+      (click)="setTab('basic')"
+    >
+      <div class="step-icon">
+        @if (isEditMode()) {
+          <i class="bi bi-check-lg" aria-hidden="true"></i>
+        } @else {
+          <span>1</span>
+        }
+      </div>
+      <div class="step-label">
+        <span class="step-title">Basic Details</span>
+        <span class="step-desc">Core course settings</span>
+      </div>
+    </button>
+
+    <div class="step-line" [class.active]="isEditMode()"></div>
+
+    <!-- Step 2: Curriculum -->
+    <button 
+      type="button" 
+      class="step-item" 
+      [class.active]="activeTab() === 'curriculum'"
+      [class.disabled]="!isEditMode()"
+      [class.completed]="isEditMode() && (course()?.sections?.length || 0) > 0"
+      (click)="setTab('curriculum')"
+    >
+      <div class="step-icon">
+        @if (isEditMode() && (course()?.sections?.length || 0) > 0) {
+          <i class="bi bi-check-lg" aria-hidden="true"></i>
+        } @else {
+          <span>2</span>
+        }
+      </div>
+      <div class="step-label">
+        <span class="step-title">Curriculum Builder</span>
+        <span class="step-desc">Sections & Lectures</span>
+      </div>
+    </button>
+
+    <div class="step-line" [class.active]="isEditMode() && (course()?.sections?.length || 0) > 0"></div>
+
+    <!-- Step 3: Publish -->
+    <button 
+      type="button" 
+      class="step-item" 
+      [class.active]="activeTab() === 'publish'"
+      [class.disabled]="!isEditMode()"
+      (click)="setTab('publish')"
+    >
+      <div class="step-icon">
+        <span>3</span>
+      </div>
+      <div class="step-label">
+        <span class="step-title">Publish Setup</span>
+        <span class="step-desc">Readiness checklist</span>
+      </div>
+    </button>
+  </div>
+
+  <!-- Builder Content Area -->
+  <main class="builder-content">
+    @if (isLoading()) {
+      <div class="builder-loading-state">
+        <div class="spinner"></div>
+        <p>Syncing course builder workspace...</p>
+      </div>
+    } @else {
+      <!-- Tab 1: Basic Info -->
+      <div [class.hidden-tab]="activeTab() !== 'basic'">
+        <app-course-basic-info 
+          [course]="course()" 
+          (saved)="onCourseSaved($event)"
+        ></app-course-basic-info>
+      </div>
+
+      <!-- Tab 2: Curriculum -->
+      @if (activeTab() === 'curriculum') {
+        <app-course-curriculum 
+          [course]="course()"
+          (refresh)="loadCourseDetails(courseId()!)"
+        ></app-course-curriculum>
+      }
+
+      <!-- Tab 3: Publish Checklist -->
+      @if (activeTab() === 'publish') {
+        <app-course-publish 
+          [course]="course()"
+        ></app-course-publish>
+      }
+    }
+  </main>
+</div>

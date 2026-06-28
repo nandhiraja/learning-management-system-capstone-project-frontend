@@ -22,6 +22,7 @@ export interface Course {
   studentsCount: number;
   status: string;
   createdAt: string;
+  categoryId: number;
   instructor: {
     id?: number;
     email?: string;

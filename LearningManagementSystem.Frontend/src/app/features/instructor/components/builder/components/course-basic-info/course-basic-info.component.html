@@ -1,0 +1,184 @@
+<form [formGroup]="infoForm" (submit)="onSubmit()" class="basic-info-form glass-card">
+  <h3 class="form-title">Course Information</h3>
+  <p class="form-subtitle">Set up your course metadata. You can edit this information at any time.</p>
+
+  <div class="form-grid">
+    <!-- Left Column: Inputs -->
+    <div class="inputs-column">
+      <!-- Title -->
+      <div class="form-group">
+        <label for="title" class="form-label">Course Title <span class="required-star">*</span></label>
+        <input 
+          id="title" 
+          type="text" 
+          formControlName="title" 
+          placeholder="e.g. Learn Angular from Scratch" 
+          class="form-control"
+          [class.is-invalid]="infoForm.get('title')?.touched && infoForm.get('title')?.invalid"
+        />
+        <div class="invalid-feedback" *ngIf="infoForm.get('title')?.touched && infoForm.get('title')?.errors?.['required']">
+          Course title is required.
+        </div>
+        <div class="invalid-feedback" *ngIf="infoForm.get('title')?.touched && infoForm.get('title')?.errors?.['minlength']">
+          Title must be at least 3 characters.
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="description" class="form-label">Description <span class="required-star">*</span></label>
+        <textarea 
+          id="description" 
+          formControlName="description" 
+          placeholder="Describe what your students will learn, requirements, and targeted audiences..." 
+          rows="5" 
+          class="form-control text-area-desc"
+          [class.is-invalid]="infoForm.get('description')?.touched && infoForm.get('description')?.invalid"
+        ></textarea>
+        <div class="invalid-feedback" *ngIf="infoForm.get('description')?.touched && infoForm.get('description')?.invalid">
+          Please enter a description (maximum 2000 characters).
+        </div>
+      </div>
+
+      <!-- Category & Language Row -->
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="categoryId" class="form-label">Category <span class="required-star">*</span></label>
+          <select 
+            id="categoryId" 
+            formControlName="categoryId" 
+            class="form-control select-input"
+            [class.is-invalid]="infoForm.get('categoryId')?.touched && infoForm.get('categoryId')?.invalid"
+          >
+            <option value="" disabled selected>Select Category</option>
+            @for (cat of categories(); track cat.id) {
+              <option [value]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+          <div class="invalid-feedback" *ngIf="infoForm.get('categoryId')?.touched && infoForm.get('categoryId')?.invalid">
+            Please choose a category.
+          </div>
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="language" class="form-label">Language <span class="required-star">*</span></label>
+          <select 
+            id="language" 
+            formControlName="language" 
+            class="form-control select-input"
+            [class.is-invalid]="infoForm.get('language')?.touched && infoForm.get('language')?.invalid"
+          >
+            <option value="" disabled selected>Select Language</option>
+            <option value="English">English</option>
+            <option value="Spanish">Spanish</option>
+            <option value="French">French</option>
+            <option value="German">German</option>
+            <option value="Hindi">Hindi</option>
+            <option value="Tamil">Tamil</option>
+            @for (lang of languages(); track lang.id) {
+              <!-- Fallback to load approved custom ones from backend DB -->
+              @if (lang.name !== 'English' && lang.name !== 'Spanish' && lang.name !== 'French' && lang.name !== 'German' && lang.name !== 'Hindi' && lang.name !== 'Tamil') {
+                <option [value]="lang.name">{{ lang.name }}</option>
+              }
+            }
+          </select>
+          <div class="invalid-feedback" *ngIf="infoForm.get('language')?.touched && infoForm.get('language')?.invalid">
+            Please select an instruction language.
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing Row -->
+      <div class="form-row pricing-row">
+        <div class="form-group is-free-checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="isFree" />
+            <span>This is a free course</span>
+          </label>
+        </div>
+
+        <div class="form-group flex-1 price-input-group">
+          <label for="price" class="form-label">Price (USD)</label>
+          <div class="price-input-wrapper">
+            <span class="price-symbol">$</span>
+            <input 
+              id="price" 
+              type="number" 
+              step="0.01"
+              formControlName="price" 
+              class="form-control price-control-input"
+              [class.is-invalid]="infoForm.get('price')?.touched && infoForm.get('price')?.invalid"
+            />
+          </div>
+          <div class="invalid-feedback" *ngIf="infoForm.get('price')?.touched && infoForm.get('price')?.invalid">
+            Price must be between $0.00 and $100,000.00.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Thumbnail Uploader -->
+    <div class="uploader-column">
+      <label class="form-label">Course Thumbnail</label>
+      
+      @if (thumbnailUrl(); as thumb) {
+        <!-- Preview image -->
+        <div class="thumbnail-preview-card">
+          <img [src]="thumb" alt="Course Thumbnail Preview" />
+          <button type="button" class="btn btn-danger btn-sm remove-thumb-btn" (click)="removeThumbnail()">
+            <i class="bi bi-trash3-fill" aria-hidden="true"></i> Remove Image
+          </button>
+        </div>
+      } @else {
+        <!-- Drag and Drop uploader panel -->
+        <div 
+          class="drag-drop-zone"
+          [class.dragging]="isDragging()"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave()"
+          (drop)="onDrop($event)"
+          (click)="fileInput.click()"
+        >
+          <input 
+            #fileInput 
+            type="file" 
+            accept="image/*" 
+            class="hidden-file-input" 
+            (change)="onFileSelected($event)"
+          />
+
+          @if (isUploading()) {
+            <div class="upload-loader-state">
+              <div class="spinner"></div>
+              <span>Uploading image ({{ uploadProgress() }}%)</span>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" [style.width.%]="uploadProgress()"></div>
+              </div>
+            </div>
+          } @else {
+            <div class="zone-prompt">
+              <i class="bi bi-cloud-arrow-up cloud-icon" aria-hidden="true"></i>
+              <span class="zone-main-text">Drag & drop your course cover image</span>
+              <span class="zone-sub-text">Supports JPG, PNG or WEBP (Max 5MB)</span>
+              <span class="btn btn-ghost btn-sm select-file-btn">Choose file</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="form-actions-bar">
+    <button 
+      type="submit" 
+      class="btn btn-primary btn-md submit-info-btn"
+      [disabled]="isSubmitting() || isUploading()"
+    >
+      @if (isSubmitting()) {
+        <div class="btn-spinner"></div> Saving details...
+      } @else {
+        Save and Continue <i class="bi bi-arrow-right" aria-hidden="true"></i>
+      }
+    </button>
+  </div>
+</form>

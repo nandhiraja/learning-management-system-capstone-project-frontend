@@ -43,6 +43,12 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['Instructor'] }
   },
+  {
+    path: 'instructor/courses/builder/:id',
+    loadComponent: () => import('./features/instructor/components/builder/course-builder.component').then((m) => m.CourseBuilderComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['Instructor'] }
+  },
 
 
   {

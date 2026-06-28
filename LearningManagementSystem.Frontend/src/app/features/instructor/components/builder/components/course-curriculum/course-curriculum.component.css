@@ -1,0 +1,504 @@
+.curriculum-container {
+  padding: 32px;
+}
+
+.curriculum-header {
+  margin-bottom: 28px;
+}
+
+.curriculum-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 6px 0;
+}
+
+.curriculum-subtitle {
+  font-size: 13px;
+  color: var(--color-text-2);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Sections List */
+.sections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-item {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  transition: box-shadow 0.2s;
+}
+
+.section-item.expanded {
+  box-shadow: var(--shadow-sm);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: rgba(255, 255, 255, 0.015);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.section-item.expanded .section-header {
+  border-color: var(--color-border);
+  background-color: rgba(255, 255, 255, 0.025);
+}
+
+.section-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-toggle-expand {
+  background: transparent;
+  border: none;
+  color: var(--color-text-2);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section-title-label {
+  font-size: 14.5px;
+  color: var(--color-text-2);
+  font-weight: 500;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.section-title-label strong {
+  color: var(--color-text);
+}
+
+.inline-section-editor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.inline-section-input {
+  max-width: 320px;
+  height: 32px;
+  font-size: 13.5px;
+}
+
+.section-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-add-lecture {
+  font-weight: 600;
+}
+
+/* Section Body & Lectures */
+.section-body {
+  padding: 20px;
+  background-color: transparent;
+}
+
+.empty-lectures-prompt {
+  padding: 32px;
+  text-align: center;
+  color: var(--color-text-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.empty-lectures-prompt i {
+  font-size: 32px;
+  opacity: 0.6;
+}
+
+.empty-lectures-prompt p {
+  font-size: 13px;
+  margin: 0;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.lectures-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lecture-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  gap: 16px;
+}
+
+.lecture-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.drag-handle {
+  color: var(--color-text-3);
+  cursor: grab;
+  font-size: 16px;
+  opacity: 0.5;
+}
+
+.lecture-icon {
+  font-size: 18px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.lecture-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.lecture-title-text {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lecture-details-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lecture-duration-text {
+  font-size: 11px;
+  color: var(--color-text-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lecture-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Add Section Footer */
+.curriculum-footer {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+}
+
+.btn-block-add-section {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 600;
+  border: 1px dashed var(--color-border);
+}
+
+.btn-block-add-section:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.section-create-panel {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.create-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.create-panel-actions input {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Modal Overlay Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-content-card {
+  width: 100%;
+  max-width: 520px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: modal-show 0.25s ease-out;
+}
+
+@keyframes modal-show {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.btn-close-modal {
+  background: transparent;
+  border: none;
+  color: var(--color-text-3);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.modal-form-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.select-input {
+  cursor: pointer;
+}
+
+.required-star {
+  color: #f43f5e;
+}
+
+/* Lecture Resource Uploader */
+.lecture-resource-uploader {
+  width: 100%;
+}
+
+.file-drag-zone {
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.005);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.file-drag-zone:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.uploader-icon {
+  font-size: 28px;
+  color: var(--color-primary);
+}
+
+.uploader-prompt {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-2);
+}
+
+.uploader-limit {
+  font-size: 10.5px;
+  color: var(--color-text-3);
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+/* Upload progress */
+.upload-progress-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.upload-progress-wrapper span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-2);
+}
+
+.progress-bar-bg {
+  width: 80%;
+  height: 5px;
+  background: var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+/* Upload Success */
+.upload-success-state {
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  background-color: rgba(16, 185, 129, 0.02);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.upload-success-state i {
+  font-size: 20px;
+}
+
+.success-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.success-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.file-view-link {
+  font-size: 11px;
+  color: var(--color-primary);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.modal-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.submit-lecture-btn {
+  font-weight: 600;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.text-success {
+  color: #10b981;
+}
+
+.text-danger {
+  color: #f43f5e;
+}
+
+.text-primary {
+  color: var(--color-primary);
+}
+
+.btn-xs {
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+.btn-xs i {
+  font-size: 11px;
+}

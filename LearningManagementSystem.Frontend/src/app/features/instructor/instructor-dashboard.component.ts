@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { InstructorService } from '../../core/services/instructor.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { InstructorDashboardResponse } from '../../models/instructor.model';
@@ -25,6 +26,7 @@ import { InstructorDiscussionsComponent } from './components/instructor-discussi
 export class InstructorDashboardComponent implements OnInit {
   private instructorService = inject(InstructorService);
   private notification = inject(NotificationService);
+  private router = inject(Router);
 
   // Active Layout Tab: overview, courses, discussions
   protected activeTab = signal<string>('overview');
@@ -79,7 +81,6 @@ export class InstructorDashboardComponent implements OnInit {
   }
 
   protected handleCreateCourse() {
-    // Standard modular action placeholder
-    this.notification.info('Course Creation wizard is coming soon!');
+    this.router.navigate(['/instructor/courses/builder/new']);
   }
 }
