@@ -1,22 +1,24 @@
-import { Component, Input, OnChanges, SimpleChanges, inject, signal } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DiscussionService } from '../../../../../../../core/services/discussion.service';
+import { AuthService } from '../../../../../../../core/services/auth.service';
 import { NotificationService } from '../../../../../../../shared/services/notification.service';
 import { DiscussionResponse, DiscussionDetailResponse } from '../../../../../../../models/discussion.model';
-import { BadgeChipComponent } from '../../../../../../../shared/components/badge-chip/badge-chip.component';
 
 @Component({
   selector: 'app-classroom-discussion',
   standalone: true,
-  imports: [CommonModule, BadgeChipComponent],
+  imports: [CommonModule],
   templateUrl: './classroom-discussion.component.html',
   styleUrl: './classroom-discussion.component.css'
 })
 export class ClassroomDiscussionComponent implements OnChanges {
   @Input({ required: true }) courseExternalId!: string;
   @Input({ required: true }) lectureId!: number;
+  @Input() isInstructor = false;
 
   private discussionService = inject(DiscussionService);
+  private authService = inject(AuthService);
   private notification = inject(NotificationService);
 
   // States
@@ -25,6 +27,13 @@ export class ClassroomDiscussionComponent implements OnChanges {
   protected selectedDiscussion = signal<DiscussionDetailResponse | null>(null);
   protected isPostingQuestion = signal<boolean>(false);
   protected isPostingReply = signal<boolean>(false);
+  protected showNewQuestionForm = signal<boolean>(false);
+
+  // Roles checking
+  protected isAdmin = computed(() => {
+    const user = this.authService.currentUser();
+    return user?.role?.toLowerCase() === 'admin';
+  });
 
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['courseExternalId'] || changes['lectureId']) && this.courseExternalId && this.lectureId) {
@@ -68,6 +77,7 @@ export class ClassroomDiscussionComponent implements OnChanges {
         contentInput.value = '';
         this.fetchDiscussions(this.lectureId);
         this.isPostingQuestion.set(false);
+        this.showNewQuestionForm.set(false);
       },
       error: (err) => {
         this.notification.error('Failed to post question.');
@@ -109,6 +119,39 @@ export class ClassroomDiscussionComponent implements OnChanges {
       error: (err) => {
         this.notification.error('Failed to post reply.');
         this.isPostingReply.set(false);
+      }
+    });
+  }
+
+  likeReply(replyId: string) {
+    this.discussionService.likeReply(replyId).subscribe({
+      next: () => {
+        this.notification.success('Reply liked!');
+        const disc = this.selectedDiscussion();
+        if (disc) {
+          this.viewDiscussion(disc.externalId);
+        }
+      },
+      error: (err) => {
+        this.notification.error('Failed to like reply.');
+        console.error(err);
+      }
+    });
+  }
+
+  togglePinReply(replyId: string) {
+    this.discussionService.togglePinReply(replyId).subscribe({
+      next: (res) => {
+        const msg = res.isPinned ? 'Reply pinned to top!' : 'Reply unpinned!';
+        this.notification.success(msg);
+        const disc = this.selectedDiscussion();
+        if (disc) {
+          this.viewDiscussion(disc.externalId);
+        }
+      },
+      error: (err) => {
+        this.notification.error('Failed to toggle pin state.');
+        console.error(err);
       }
     });
   }

@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { CourseResponse, LectureResponse } from '../../../../../models/course.model';
 import { EnrollmentService } from '../../../../../core/services/enrollment.service';
+import { AuthService } from '../../../../../core/services/auth.service';
 import { NotificationService } from '../../../../../shared/services/notification.service';
 import { BadgeChipComponent } from '../../../../../shared/components/badge-chip/badge-chip.component';
 import { ClassroomSidebarComponent } from './components/classroom-sidebar/classroom-sidebar.component';
 import { ClassroomQuizComponent } from './components/classroom-quiz/classroom-quiz.component';
 import { ClassroomDiscussionComponent } from './components/classroom-discussion/classroom-discussion.component';
+import { ClassroomPlayerComponent } from './components/classroom-player/classroom-player.component';
 
 @Component({
   selector: 'app-course-active-detail',
@@ -18,7 +20,8 @@ import { ClassroomDiscussionComponent } from './components/classroom-discussion/
     BadgeChipComponent,
     ClassroomSidebarComponent,
     ClassroomQuizComponent,
-    ClassroomDiscussionComponent
+    ClassroomDiscussionComponent,
+    ClassroomPlayerComponent
   ],
   templateUrl: './course-active-detail.component.html',
   styleUrl: './course-active-detail.component.css'
@@ -28,6 +31,7 @@ export class CourseActiveDetailComponent implements OnInit {
   @Input() isInstructor = false;
 
   private enrollmentService = inject(EnrollmentService);
+  private authService = inject(AuthService);
   private notification = inject(NotificationService);
 
   // States
@@ -36,10 +40,20 @@ export class CourseActiveDetailComponent implements OnInit {
   protected completedLectureIds = signal<number[]>([]);
   protected activeTab = signal<'lecture' | 'discussion' | 'quiz'>('lecture');
   protected isLoading = signal<boolean>(true);
+  protected isSidebarOpen = signal<boolean>(true);
+  
+  // Certificate Modal States
+  protected isCertificateModalOpen = signal<boolean>(false);
+  protected activeCertificate = signal<any | null>(null);
 
   // Computed totals
   protected totalLectures = computed(() => {
     return this.course.sections.reduce((acc, curr) => acc + curr.lectures.length, 0);
+  });
+
+  protected isCourseInstructor = computed(() => {
+    const user = this.authService.currentUser();
+    return this.course?.instructor?.email === user?.email;
   });
 
   protected progressPercent = computed(() => {
@@ -82,6 +96,7 @@ export class CourseActiveDetailComponent implements OnInit {
         }
         this.selectFirstLecture();
         this.isLoading.set(false);
+        this.checkCertificateAward();
       },
       error: (err) => {
         console.error('Failed to load progress state', err);
@@ -106,7 +121,7 @@ export class CourseActiveDetailComponent implements OnInit {
     return this.completedLectureIds().includes(lectureId);
   }
 
-  toggleProgress(lectureId: number, event: Event) {
+  toggleProgress(lectureId: number, event?: Event) {
     const enrollId = this.enrollmentId();
     if (!enrollId) return;
 
@@ -122,6 +137,7 @@ export class CourseActiveDetailComponent implements OnInit {
           this.completedLectureIds.update(ids => ids.filter(id => id !== lectureId));
           this.notification.info('Lecture marked as incomplete.');
         }
+        this.checkCertificateAward();
       },
       error: (err) => {
         this.notification.error('Failed to update progress status.');
@@ -133,7 +149,61 @@ export class CourseActiveDetailComponent implements OnInit {
   onQuizPassed() {
     const lec = this.activeLecture();
     if (lec && !this.isCompleted(lec.id)) {
-      this.toggleProgress(lec.id, new MouseEvent('click'));
+      this.toggleProgress(lec.id);
     }
+  }
+
+  // Certificate workflows
+  checkCertificateAward() {
+    if (this.progressPercent() === 100) {
+      this.fetchCertificate();
+    } else {
+      this.activeCertificate.set(null);
+    }
+  }
+
+  fetchCertificate() {
+    this.enrollmentService.getCertificates().subscribe({
+      next: (certs) => {
+        const cert = certs.find(c => c.courseGuid === this.course.externalId);
+        if (cert) {
+          this.activeCertificate.set(cert);
+        } else {
+          this.generateMockCertificate();
+        }
+      },
+      error: (err) => {
+        console.error('Failed to load certificates list', err);
+        this.generateMockCertificate();
+      }
+    });
+  }
+
+  generateMockCertificate() {
+    const user = this.authService.currentUser();
+    const fullName = user ? `${user.firstName} ${user.lastName}` : 'Enrolled Student';
+    this.activeCertificate.set({
+      id: 0,
+      issuedDate: new Date().toISOString(),
+      certificateUrl: `/certificates/verify/mock-${this.course.externalId}`,
+      userGuid: user?.externalId || '',
+      userFullName: fullName,
+      courseGuid: this.course.externalId,
+      courseTitle: this.course.title,
+      instructorName: `${this.course.instructor.firstName} ${this.course.instructor.lastName}`
+    });
+  }
+
+  openCertificateModal() {
+    if (this.progressPercent() === 100) {
+      if (!this.activeCertificate()) {
+        this.fetchCertificate();
+      }
+      this.isCertificateModalOpen.set(true);
+    }
+  }
+
+  closeCertificateModal() {
+    this.isCertificateModalOpen.set(false);
   }
 }

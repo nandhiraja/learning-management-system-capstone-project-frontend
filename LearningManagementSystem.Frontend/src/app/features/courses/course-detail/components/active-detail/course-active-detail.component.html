@@ -2,86 +2,40 @@
   <!-- Top bar status -->
   <header class="classroom-top-bar">
     <div class="top-bar-left">
-      <a routerLink="/courses" class="back-link-catalog">
-        <i class="bi bi-chevron-left" aria-hidden="true"></i> Back
+      <a routerLink="/courses" class="back-link-catalog" aria-label="Back to Catalog">
+        <i class="bi bi-arrow-left-short" aria-hidden="true"></i>
       </a>
       <span class="course-nav-title">{{ course.title }}</span>
     </div>
-    <div class="top-bar-right">
-      <app-badge-chip variant="success" icon="bi-check-circle" *ngIf="progressPercent() === 100">
-        Course completed
-      </app-badge-chip>
+    <div class="top-bar-right" style="display: flex; align-items: center; gap: 12px;">
+      @if (progressPercent() === 100) {
+        <app-badge-chip variant="success" icon="bi-check-circle">
+          Course completed
+        </app-badge-chip>
+        <button 
+          class="btn btn-primary btn-sm cert-btn" 
+          (click)="openCertificateModal()"
+        >
+          <i class="bi bi-award-fill" aria-hidden="true"></i> View Certificate
+        </button>
+      }
+      <button 
+        class="btn btn-secondary btn-sm sidebar-toggle-btn" 
+        (click)="isSidebarOpen.set(!isSidebarOpen())"
+        [title]="isSidebarOpen() ? 'Hide Syllabus Sidebar' : 'Show Syllabus Sidebar'"
+      >
+        <i class="bi" [class.bi-layout-sidebar-inset]="!isSidebarOpen()" [class.bi-layout-sidebar-inset-reverse]="isSidebarOpen()" aria-hidden="true"></i>
+        {{ isSidebarOpen() ? 'Hide Syllabus' : 'Show Syllabus' }}
+      </button>
     </div>
   </header>
 
-  <div class="classroom-main-grid">
+  <div class="classroom-main-grid" [class.sidebar-closed]="!isSidebarOpen()">
     <!-- Left column: Player area -->
     <main class="classroom-player-column">
       @if (activeLecture(); as lecture) {
-        <div class="active-lecture-header">
-          <h2 class="active-lecture-title">{{ lecture.title }}</h2>
-          <div class="active-lecture-meta">
-            <app-badge-chip variant="accent">
-              Type: {{ lecture.contentType }}
-            </app-badge-chip>
-            <span class="lec-duration-meta">
-              <i class="bi bi-clock" aria-hidden="true"></i> {{ lecture.durationInMinutes }} minutes
-            </span>
-          </div>
-        </div>
-
-        <!-- Video or Document Play Zone -->
-        <div class="play-zone-wrapper">
-          @if (activeTab() === 'lecture') {
-            @if (lecture.contentType === 'video') {
-              <div class="mock-video-player-container">
-                <div class="video-overlay-gradient"></div>
-                <div class="player-center-play">
-                  <i class="bi bi-play-fill" aria-hidden="true"></i>
-                </div>
-                <div class="mock-video-controls">
-                  <button aria-label="Play video"><i class="bi bi-play-fill" aria-hidden="true"></i></button>
-                  <div class="video-timeline-mock">
-                    <div class="timeline-fill" style="width: 35%;"></div>
-                  </div>
-                  <button aria-label="Volume"><i class="bi bi-volume-up-fill" aria-hidden="true"></i></button>
-                  <span class="video-time">05:12 / {{ lecture.durationInMinutes }}:00</span>
-                </div>
-              </div>
-            } @else {
-              <!-- PDF/Doc preview zone -->
-              <div class="doc-viewer-container glass-card">
-                <i class="bi bi-file-earmark-pdf-fill doc-icon" aria-hidden="true"></i>
-                <h3 class="doc-title">{{ lecture.title }} Document</h3>
-                <p class="doc-desc">This lecture contains written course material. Read and check it off as completed.</p>
-                <a [href]="lecture.contentUrl" target="_blank" download class="btn btn-secondary">
-                  <i class="bi bi-download" aria-hidden="true"></i> Download PDF resource
-                </a>
-              </div>
-            }
-          }
-
-          @if (activeTab() === 'quiz') {
-            @if (lecture.quizId) {
-              <app-classroom-quiz 
-                [quizId]="lecture.quizId" 
-                [activeLecture]="lecture"
-                (quizPassed)="onQuizPassed()"
-              ></app-classroom-quiz>
-            } @else {
-              <p class="no-quiz-found">No quiz available for this lecture.</p>
-            }
-          }
-
-          @if (activeTab() === 'discussion') {
-            <app-classroom-discussion
-              [courseExternalId]="course.externalId"
-              [lectureId]="lecture.id"
-            ></app-classroom-discussion>
-          }
-        </div>
-
-        <!-- Tab switches below player -->
+        
+        <!-- Floating Tabs Switch at the TOP of the Workspace -->
         <div class="classroom-tabs-row" role="tablist">
           <button 
             role="tab"
@@ -113,6 +67,51 @@
             </button>
           }
         </div>
+
+        <div class="active-lecture-header">
+          <h2 class="active-lecture-title">{{ lecture.title }}</h2>
+          <div class="active-lecture-meta">
+            <app-badge-chip variant="accent">
+              Type: {{ lecture.contentType }}
+            </app-badge-chip>
+            <span class="lec-duration-meta">
+              <i class="bi bi-clock" aria-hidden="true"></i> {{ lecture.durationInMinutes }} minutes
+            </span>
+          </div>
+        </div>
+
+        <!-- Video or Document Play Zone -->
+        <div class="play-zone-wrapper">
+          @if (activeTab() === 'lecture') {
+            <!-- Dedicated media player component to keep code clean and maintainable -->
+            <app-classroom-player 
+              [lecture]="lecture" 
+              [isCompleted]="isCompleted(lecture.id)"
+              (videoEnded)="toggleProgress(lecture.id)"
+              (markComplete)="toggleProgress(lecture.id)"
+            ></app-classroom-player>
+          }
+
+          @if (activeTab() === 'quiz') {
+            @if (lecture.quizId) {
+              <app-classroom-quiz 
+                [quizId]="lecture.quizId" 
+                [activeLecture]="lecture"
+                (quizPassed)="onQuizPassed()"
+              ></app-classroom-quiz>
+            } @else {
+              <p class="no-quiz-found">No quiz available for this lecture.</p>
+            }
+          }
+
+          @if (activeTab() === 'discussion') {
+            <app-classroom-discussion
+              [courseExternalId]="course.externalId"
+              [lectureId]="lecture.id"
+              [isInstructor]="isCourseInstructor()"
+            ></app-classroom-discussion>
+          }
+        </div>
       } @else {
         <div class="no-lecture-selected glass-card">
           <i class="bi bi-journal-bookmark" aria-hidden="true"></i>
@@ -136,3 +135,47 @@
     </aside>
   </div>
 </div>
+
+<!-- Certificate Viewer Modal Overlay -->
+@if (isCertificateModalOpen() && activeCertificate(); as cert) {
+  <div class="certificate-modal-overlay" (click)="closeCertificateModal()">
+    <div class="certificate-modal-card glass-card" (click)="$event.stopPropagation()">
+      <button class="close-modal-btn" aria-label="Close Modal" (click)="closeCertificateModal()">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+      
+      <div class="certificate-border-line">
+        <div class="certificate-seal-badge">
+          <i class="bi bi-award-fill" aria-hidden="true"></i>
+        </div>
+        
+        <div class="cert-title-header">Certificate of Completion</div>
+        <p class="cert-subtitle">This document certifies that the candidate has successfully passed and finished the syllabus of:</p>
+        
+        <div class="cert-course-name">{{ cert.courseTitle }}</div>
+        
+        <p class="cert-recipient-intro">This honor is proudly awarded to:</p>
+        <div class="cert-recipient-name">{{ cert.userFullName }}</div>
+        
+        <p class="cert-award-context">
+          Who has demonstrated skill and mastery over the complete curriculum, as verified by the course author and administrator panel on the learning management system.
+        </p>
+
+        <div class="cert-footer-meta">
+          <div class="footer-meta-item">
+            <span class="meta-label">Instructor</span>
+            <span class="meta-val font-semibold">{{ cert.instructorName }}</span>
+          </div>
+          <div class="footer-meta-item">
+            <span class="meta-label">Completion Date</span>
+            <span class="meta-val font-semibold">{{ cert.issuedDate | date:'longDate' }}</span>
+          </div>
+        </div>
+
+        <div class="cert-verification-details">
+          Verification Token: <span class="token-str">{{ cert.certificateUrl.split('/').pop() }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,135 +1,241 @@
-<div class="discussions-viewer-container glass-card">
+<div class="forum-board-container">
   @if (selectedDiscussion(); as thread) {
-    <!-- QA Detail view -->
-    <div class="discussion-thread-view">
-      <button class="btn btn-ghost btn-sm back-disc-btn" (click)="closeDiscussionThread()">
-        <i class="bi bi-chevron-left" aria-hidden="true"></i> Back to Q&A list
+    <!-- Single Thread View (Social Post & Comments Section) -->
+    <div class="forum-thread-workspace">
+      <button class="btn btn-ghost btn-sm back-feed-btn" (click)="closeDiscussionThread()">
+        <i class="bi bi-arrow-left-short" aria-hidden="true"></i> Back to Discussion Feed
       </button>
 
-      <div class="question-thread-header">
-        <div class="thread-user-avatar-placeholder">
-          {{ thread.user.firstName[0] }}{{ thread.user.lastName[0] }}
-        </div>
-        <div class="thread-header-meta">
-          <h4 class="thread-title">{{ thread.title }}</h4>
-          <p class="thread-author-details">
-            Asked by {{ thread.user.firstName }} {{ thread.user.lastName }} &bull; {{ thread.createdAt | date:'short' }}
-          </p>
-        </div>
-      </div>
-      <div class="thread-question-body">
-        {{ thread.content }}
-      </div>
+      <!-- Main Post Card -->
+      <article class="forum-post-card glass-card">
+        <header class="post-header">
+          <div class="post-author-avatar">
+            {{ thread.user.firstName[0] }}{{ thread.user.lastName[0] }}
+          </div>
+          <div class="post-meta-details">
+            <span class="post-author-name">@{{ thread.user.firstName.toLowerCase() }}{{ thread.user.lastName.toLowerCase() }}</span>
+            <span class="post-timestamp">{{ thread.createdAt | date:'medium' }}</span>
+          </div>
+        </header>
 
-      <div class="thread-replies-section">
-        <h5 class="replies-count-label">Replies ({{ thread.replies.length }})</h5>
+        <div class="post-content-area">
+          <h2 class="post-title">{{ thread.title }}</h2>
+          <p class="post-body-text">{{ thread.content }}</p>
+        </div>
+
+        <footer class="post-actions-bar">
+          <button class="post-action-btn active" aria-label="Comments">
+            <i class="bi bi-chat-text"></i> <span>{{ thread.replies.length }} Comments</span>
+          </button>
+        </footer>
+      </article>
+
+      <!-- Comments Feed Section -->
+      <section class="comments-feed-section">
+        <h3 class="section-title">Comments Feed</h3>
+
+        <!-- Comment List -->
         @if (thread.replies.length === 0) {
-          <p class="no-replies-text">No responses yet. Be the first to answer!</p>
+          <div class="no-comments-box glass-card">
+            <i class="bi bi-chat-left-quote"></i>
+            <p>No comments on this post yet. Start the discussion below!</p>
+          </div>
         } @else {
-          <div class="replies-list">
+          <div class="comments-list">
             @for (rep of thread.replies; track rep.externalId) {
-              <div class="reply-item glass-card" [class.instructor-reply]="rep.isInstructorReply">
-                <div class="reply-header">
-                  <span class="reply-author">{{ rep.user.firstName }} {{ rep.user.lastName }}</span>
-                  @if (rep.isInstructorReply) {
-                    <app-badge-chip variant="success" icon="bi-shield-check">Instructor</app-badge-chip>
-                  }
-                  <span class="reply-date">{{ rep.createdAt | date:'short' }}</span>
-                </div>
-                <div class="reply-content">
+              <div class="comment-card glass-card" [class.instructor-comment]="rep.isInstructorReply" [class.comment-pinned]="rep.isPinned">
+                <!-- Pinned Header Banner -->
+                @if (rep.isPinned) {
+                  <div class="pinned-header-banner">
+                    <i class="bi bi-pin-fill" aria-hidden="true"></i> Pinned Response
+                  </div>
+                }
+
+                <header class="comment-header">
+                  <div class="comment-author-avatar">
+                    {{ rep.user.firstName[0] }}{{ rep.user.lastName[0] }}
+                  </div>
+                  <div class="comment-meta-info">
+                    <span class="comment-author-name">@{{ rep.user.firstName.toLowerCase() }}</span>
+                    @if (rep.isInstructorReply) {
+                      <span class="badge badge-success-badge"><i class="bi bi-patch-check-fill"></i> Instructor</span>
+                    }
+                    <span class="comment-time">&bull; {{ rep.createdAt | date:'shortTime' }}</span>
+                  </div>
+                </header>
+
+                <div class="comment-body">
                   {{ rep.content }}
                 </div>
+
+                <footer class="comment-actions">
+                  <!-- Likes Action -->
+                  <button 
+                    class="comment-action-btn" 
+                    [class.liked]="rep.likesCount > 0"
+                    (click)="likeReply(rep.externalId)" 
+                    aria-label="Like comment"
+                  >
+                    <i class="bi" [class.bi-heart-fill]="rep.likesCount > 0" [class.bi-heart]="rep.likesCount === 0"></i> 
+                    {{ rep.likesCount }} {{ rep.likesCount === 1 ? 'Like' : 'Likes' }}
+                  </button>
+                  
+                  <button class="comment-action-btn" aria-label="Reply to comment">
+                    <i class="bi bi-reply"></i> Reply
+                  </button>
+
+                  <!-- Pin action button (Instructors only) -->
+                  @if (isInstructor) {
+                    <button 
+                      class="comment-action-btn pin-comment-btn" 
+                      [class.pinned-active]="rep.isPinned"
+                      (click)="togglePinReply(rep.externalId)"
+                      [title]="rep.isPinned ? 'Unpin this reply' : 'Pin this reply'"
+                    >
+                      <i class="bi" [class.bi-pin-fill]="rep.isPinned" [class.bi-pin-angle]="!rep.isPinned"></i> 
+                      {{ rep.isPinned ? 'Unpin' : 'Pin' }}
+                    </button>
+                  }
+                </footer>
               </div>
             }
           </div>
         }
-      </div>
 
-      <!-- Post a reply form -->
-      <div class="reply-form-wrapper">
-        <textarea 
-          #replyContentInput 
-          placeholder="Add a helpful response..." 
-          rows="3" 
-          class="form-control reply-textarea"
-        ></textarea>
-        <button 
-          (click)="postReply(replyContentInput)" 
-          class="btn btn-primary btn-sm reply-submit-btn"
-          [disabled]="isPostingReply()"
-        >
-          @if (isPostingReply()) {
-            <div class="spinner"></div> Sending...
-          } @else {
-            Post response
-          }
-        </button>
-      </div>
+        <!-- Admin Read-Only Notice -->
+        @if (isAdmin()) {
+          <div class="read-only-notice glass-card">
+            <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+            <span>Administrator Session: QA discussion is in read-only mode. Replies are restricted.</span>
+          </div>
+        }
+
+        <!-- Add a Comment Form (Social Media Style Box - Restricted from Admins) -->
+        @if (!isAdmin()) {
+          <div class="add-comment-composer glass-card">
+            <textarea 
+              #replyContentInput 
+              placeholder="Add a comment or solution context..." 
+              rows="3" 
+              class="composer-textarea"
+            ></textarea>
+            <div class="composer-footer">
+              <span class="composer-tip">Please keep discussion details polite and helpful.</span>
+              <button 
+                (click)="postReply(replyContentInput)" 
+                class="btn btn-primary btn-sm composer-submit-btn"
+                [disabled]="isPostingReply()"
+              >
+                @if (isPostingReply()) {
+                  <div class="spinner"></div> Commenting...
+                } @else {
+                  Comment
+                }
+              </button>
+            </div>
+          </div>
+        }
+      </section>
     </div>
   } @else {
-    <!-- QA List view -->
-    <div class="discussion-list-view">
-      <div class="disc-header-bar">
-        <h3>Q&A Board for this lecture</h3>
-        <p class="disc-header-sub">Ask questions and share tips with fellow students</p>
+    <!-- Main Board Feed View -->
+    <div class="forum-feed-workspace">
+      <div class="forum-header">
+        <h3>Discussion Board</h3>
+        <p>Ask questions, post tips, and communicate with other active learners on this lecture.</p>
       </div>
 
-      <!-- Post a new question form -->
-      <div class="new-question-form glass-card">
-        <h5>Ask a new question</h5>
-        <div class="form-group">
-          <input 
-            #questionTitleInput 
-            type="text" 
-            placeholder="Title of your question" 
-            class="form-control" 
-          />
+      <!-- Admin Read-Only Notice -->
+      @if (isAdmin()) {
+        <div class="read-only-notice glass-card" style="margin-bottom: 20px;">
+          <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+          <span>Administrator Session: QA discussion is in read-only mode. Post creation is restricted.</span>
         </div>
-        <div class="form-group">
-          <textarea 
-            #questionContentInput 
-            placeholder="Detail your question..." 
-            rows="3" 
-            class="form-control"
-          ></textarea>
-        </div>
-        <button 
-          (click)="postQuestion(questionTitleInput, questionContentInput)" 
-          class="btn btn-primary btn-sm"
-          [disabled]="isPostingQuestion()"
-        >
-          @if (isPostingQuestion()) {
-            <div class="spinner"></div> Submitting...
-          } @else {
-            Post question
-          }
-        </button>
-      </div>
+      }
 
-      <!-- Discussion List -->
+      <!-- Write Post Prompt (Facebook/LinkedIn Style - Restricted from Admins) -->
+      @if (!isAdmin()) {
+        @if (!showNewQuestionForm()) {
+          <div class="write-post-prompt glass-card" (click)="showNewQuestionForm.set(true)">
+            <div class="prompt-avatar">?</div>
+            <div class="prompt-text">What is your question or feedback about this lecture?</div>
+            <button class="btn btn-primary btn-xs">Post</button>
+          </div>
+        } @else {
+          <!-- Expanded Post Creation Form -->
+          <div class="forum-create-card glass-card">
+            <h4>Create a new Discussion Post</h4>
+            <div class="form-group">
+              <input 
+                #questionTitleInput 
+                type="text" 
+                placeholder="Post title (e.g. Question on section 2 quiz...)" 
+                class="form-control" 
+              />
+            </div>
+            <div class="form-group">
+              <textarea 
+                #questionContentInput 
+                placeholder="What details or code snippets would you like to share?" 
+                rows="4" 
+                class="form-control"
+              ></textarea>
+            </div>
+            <div class="form-actions-row">
+              <button 
+                (click)="postQuestion(questionTitleInput, questionContentInput)" 
+                class="btn btn-primary btn-sm"
+                [disabled]="isPostingQuestion()"
+              >
+                @if (isPostingQuestion()) {
+                  <div class="spinner"></div> Posting...
+                } @else {
+                  Post Thread
+                }
+              </button>
+              <button class="btn btn-secondary btn-sm" (click)="showNewQuestionForm.set(false)">Cancel</button>
+            </div>
+          </div>
+        }
+      }
+
+      <!-- Feed List of Posts -->
       @if (isLoadingDiscussions()) {
-        <div class="loading-discussions-state">
+        <div class="forum-loading-state">
           <div class="spinner"></div>
-          <p>Loading questions...</p>
+          <p>Syncing discussion feed...</p>
         </div>
       } @else if (discussions().length === 0) {
-        <div class="empty-discussions">
-          <i class="bi bi-chat-left-dots" aria-hidden="true"></i>
-          <p>No questions asked yet for this lecture. Feel free to start the conversation!</p>
+        <div class="forum-empty-feed glass-card">
+          <i class="bi bi-chat-square-quote"></i>
+          <p>No discussion threads have been created for this lecture yet. Start the topic!</p>
         </div>
       } @else {
-        <div class="discussions-list">
+        <div class="forum-feed-list">
           @for (disc of discussions(); track disc.externalId) {
-            <button type="button" class="discussion-list-item glass-card" (click)="viewDiscussion(disc.externalId)">
-              <div class="disc-list-meta">
-                <span class="disc-list-author">{{ disc.user.firstName }} {{ disc.user.lastName }}</span>
-                <span class="disc-list-date">{{ disc.createdAt | date:'shortDate' }}</span>
+            <article class="feed-item-card glass-card" (click)="viewDiscussion(disc.externalId)">
+              <header class="feed-item-header">
+                <div class="feed-item-avatar">
+                  {{ disc.user.firstName[0] }}{{ disc.user.lastName[0] }}
+                </div>
+                <div class="feed-item-meta">
+                  <span class="feed-author">@{{ disc.user.firstName.toLowerCase() }}</span>
+                  <span class="feed-time">&bull; {{ disc.createdAt | date:'shortDate' }}</span>
+                </div>
+              </header>
+
+              <div class="feed-item-body">
+                <h4 class="feed-item-title">{{ disc.title }}</h4>
+                <p class="feed-item-excerpt">{{ disc.content }}</p>
               </div>
-              <h4 class="disc-list-title">{{ disc.title }}</h4>
-              <span class="disc-list-replies">
-                <i class="bi bi-chat-text" aria-hidden="true"></i> {{ disc.repliesCount }} replies
-              </span>
-            </button>
+
+              <footer class="feed-item-footer">
+                <span class="feed-stat-bubble">
+                  <i class="bi bi-chat-text-fill"></i> {{ disc.repliesCount }} Comments
+                </span>
+                <span class="feed-view-link">View Thread <i class="bi bi-arrow-right-short"></i></span>
+              </footer>
+            </article>
           }
         </div>
       }
