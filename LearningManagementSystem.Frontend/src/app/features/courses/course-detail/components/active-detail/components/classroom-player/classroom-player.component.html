@@ -1,0 +1,99 @@
+@if (lecture) {
+  <div class="player-container">
+    <div class="media-viewport">
+      
+      <!-- Video Player -->
+      @if (lecture.contentType === 'video') {
+        <video 
+          [src]="absoluteUrl" 
+          controls 
+          controlslist="nodownload"
+          disablepictureinpicture
+          oncontextmenu="return false;"
+          (ended)="onVideoEnded()" 
+          class="real-video-player"
+        ></video>
+      }
+      
+      <!-- Text / Markdown Viewer -->
+      @else if (isTextOrMarkdown) {
+        <div class="text-content-viewer glass-card">
+          @if (isFetchingText()) {
+            <div class="text-fetching-loader">
+              <div class="spinner"></div>
+              <p>Fetching syllabus materials...</p>
+            </div>
+          } @else {
+            <div class="text-inner-prose">
+              <h3>{{ lecture.title }}</h3>
+              <p class="text-muted">Reading material &bull; Complete it to check it off your progress list</p>
+              <hr class="content-divider" />
+              <div class="actual-text-body">
+                {{ fetchedTextContent() }}
+              </div>
+            </div>
+          }
+        </div>
+      }
+      
+      <!-- PDF Native Viewer (Fully supports localhost viewing) -->
+      @else if (lecture.contentType === 'pdf') {
+        <iframe 
+          [src]="safeUrl" 
+          class="document-iframe" 
+          title="PDF Document Viewer"
+          frameborder="0"
+        ></iframe>
+      }
+      
+      <!-- Office Document (PPT/Word/Excel) Viewer -->
+      @else if (isOfficeDocument) {
+        @if (isLocalhost) {
+          <!-- Local Development Fallback Helper -->
+          <div class="office-local-fallback glass-card">
+            <i class="bi bi-file-earmark-slides-fill document-large-icon" aria-hidden="true"></i>
+            <h3 class="fallback-title">{{ lecture.title }}</h3>
+            <p class="fallback-desc">
+              This lecture is an Office document. Since the server is running on <strong>localhost</strong>, external viewers like Google Docs Viewer cannot access the file.
+            </p>
+            <p class="fallback-note">Once deployed to a live server, this slide presentation will load automatically inline.</p>
+          </div>
+        } @else {
+          <!-- Live Embedded Office Document -->
+          <iframe 
+            [src]="googleDocsViewerUrl" 
+            class="document-iframe" 
+            title="Office Slide Viewer"
+            frameborder="0"
+          ></iframe>
+        }
+      }
+      
+      <!-- General Fallback embed -->
+      @else {
+        <iframe 
+          [src]="safeUrl" 
+          class="document-iframe" 
+          title="External resource link"
+          frameborder="0"
+        ></iframe>
+      }
+    </div>
+
+    <!-- Completion Action Bar below viewer -->
+    <div class="player-action-bar">
+      <button 
+        class="btn" 
+        [class.btn-success]="isCompleted"
+        [class.btn-primary]="!isCompleted"
+        (click)="handleMarkComplete()"
+      >
+        @if (isCompleted) {
+          <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Completed
+        } @else {
+          <i class="bi bi-circle" aria-hidden="true"></i> Mark as Complete
+        }
+      </button>
+    </div>
+  </div>
+}

@@ -11,11 +11,12 @@
   <!-- Curriculum sections list -->
   <div class="sidebar-sections-wrapper">
     @for (section of course.sections; track section.id; let sIdx = $index) {
-      <div class="sidebar-section-item">
-        <h3 class="sidebar-section-title">Section {{ sIdx + 1 }}: {{ section.title }}</h3>
-        
-        <ul class="sidebar-lecture-list">
-          @for (lec of section.lectures; track lec.id) {
+      @if (section.lectures && section.lectures.length > 0) {
+        <div class="sidebar-section-item">
+          <h3 class="sidebar-section-title">Section {{ sIdx + 1 }}: {{ section.title }}</h3>
+          
+          <ul class="sidebar-lecture-list">
+            @for (lec of section.lectures; track lec.id) {
             <li 
               class="sidebar-lecture-item"
               [class.active]="activeLecture?.id === lec.id"
@@ -57,6 +58,7 @@
           }
         </ul>
       </div>
+      }
     }
   </div>
 </div>
