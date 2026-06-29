@@ -1,44 +1,20 @@
 <section class="syllabus-section" aria-labelledby="curriculum-heading">
   <h2 id="curriculum-heading" class="section-title">Course curriculum</h2>
   <p class="syllabus-summary">
-    {{ course.sections.length }} sections &bull; 
-    {{ course.sections.length > 0 ? 'Curriculum preview available below' : 'No curriculum uploaded yet' }}
+    Curriculum overview containing course sections and lectures
   </p>
 
   <div class="accordion-list">
     @for (section of course.sections; track section.id; let idx = $index) {
-      <div class="accordion-item glass-card" [class.open]="openSectionIndex() === idx">
-        <button 
+      <div class="accordion-item glass-card">
+        <div 
           class="accordion-trigger" 
-          (click)="toggleSection(idx)" 
-          [attr.aria-expanded]="openSectionIndex() === idx"
+          style="cursor: default; pointer-events: none; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; width: 100%; border: none; background: transparent;"
         >
-          <div class="trigger-left">
-            <i class="bi" [class]="openSectionIndex() === idx ? 'bi-chevron-up' : 'bi-chevron-down'" aria-hidden="true"></i>
-            <span class="section-name">{{ section.title }}</span>
+          <div class="trigger-left" style="display: flex; align-items: center; gap: 4px;">
+            <span class="section-name" style="font-weight: 600; font-size: 14px; color: var(--color-text);">{{ section.title }}</span>
           </div>
-          <span class="lectures-count">{{ section.lectures.length }} lectures</span>
-        </button>
-
-        @if (openSectionIndex() === idx) {
-          <div class="accordion-panel">
-            @if (section.lectures.length === 0) {
-              <p class="no-lectures">No lectures in this section yet.</p>
-            } @else {
-              <ul class="lectures-list">
-                @for (lec of section.lectures; track lec.id) {
-                  <li class="lecture-item">
-                    <div class="lecture-left">
-                      <i class="bi bi-lock-fill text-muted" aria-hidden="true" style="margin-right: 8px;"></i>
-                      <span class="lecture-title-text">{{ lec.title }}</span>
-                    </div>
-                    <span class="lecture-duration">{{ lec.durationInMinutes }} mins</span>
-                  </li>
-                }
-              </ul>
-            }
-          </div>
-        }
+        </div>
       </div>
     }
   </div>

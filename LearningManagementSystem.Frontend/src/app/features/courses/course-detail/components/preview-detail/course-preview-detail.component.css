@@ -54,3 +54,76 @@
     margin-top: 20px;
   }
 }
+
+/* Instructor Details Card */
+.instructor-body-card {
+  padding: 24px;
+}
+
+.instructor-profile-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.instructor-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-border);
+}
+
+.instructor-avatar-fallback {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-border);
+}
+
+.instructor-profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.instructor-display-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.instructor-email {
+  margin: 0;
+}
+
+.instructor-badge-group {
+  margin-top: 4px;
+}
+
+.instructor-pill {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+  padding: 3px 8px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.instructor-bio {
+  font-size: 13px;
+  color: var(--color-text-2);
+  line-height: 1.6;
+}

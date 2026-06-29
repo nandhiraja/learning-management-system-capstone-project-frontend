@@ -15,6 +15,34 @@
           <p>{{ course.description }}</p>
         </div>
       </section>
+
+      <!-- Instructor Details Section -->
+      <section class="instructor-section" aria-labelledby="instructor-heading">
+        <h2 id="instructor-heading" class="section-title">About the instructor</h2>
+        <div class="instructor-body-card glass-card">
+          <div class="instructor-profile-wrapper">
+            @if (course.instructor.profilePictureUrl) {
+              <img [src]="course.instructor.profilePictureUrl" alt="Instructor Profile Picture" class="instructor-avatar" />
+            } @else {
+              <div class="instructor-avatar-fallback">
+                {{ course.instructor.firstName[0] }}{{ course.instructor.lastName[0] }}
+              </div>
+            }
+            <div class="instructor-profile-info">
+              <h3 class="instructor-display-name">{{ course.instructor.firstName }} {{ course.instructor.lastName }}</h3>
+              <p class="instructor-email text-sm text-secondary">{{ course.instructor.email }}</p>
+              <div class="instructor-badge-group">
+                <span class="instructor-pill"><i class="bi bi-star-fill text-warning" aria-hidden="true"></i> Expert Instructor</span>
+              </div>
+            </div>
+          </div>
+          <div class="instructor-bio">
+            <p>
+              Learn from a seasoned professional. {{ course.instructor.firstName }} is dedicated to providing high-quality content, practical examples, and engaging lectures to help you achieve your career goals.
+            </p>
+          </div>
+        </div>
+      </section>
     </main>
 
     <!-- Sidebar sticky purchase card -->
