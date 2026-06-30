@@ -121,6 +121,18 @@ export class CourseActiveDetailComponent implements OnInit {
     return this.completedLectureIds().includes(lectureId);
   }
 
+  handleUpdateProgress(watchedSeconds: number, lectureId: number) {
+    const enrollId = this.enrollmentId();
+    if (!enrollId) return;
+
+    const currentlyCompleted = this.isCompleted(lectureId);
+    
+    // Only update time; don't change completion status
+    this.enrollmentService.updateLectureProgress(enrollId, lectureId, currentlyCompleted, watchedSeconds).subscribe({
+      error: (err) => console.error('Failed to sync watch progress', err)
+    });
+  }
+
   toggleProgress(lectureId: number, event?: Event) {
     const enrollId = this.enrollmentId();
     if (!enrollId) return;

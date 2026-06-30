@@ -31,7 +31,7 @@ export class EnrollmentService {
     return this.api.get<any>(`enrollments/${enrollmentId}/progress`);
   }
 
-  updateLectureProgress(enrollmentId: number, lectureId: number, isCompleted: boolean): Observable<any> {
-    return this.api.put<any>(`enrollments/${enrollmentId}/lectures/${lectureId}/progress`, { isCompleted });
+  updateLectureProgress(enrollmentId: number, lectureId: number, isCompleted: boolean, watchedSeconds: number = 0): Observable<any> {
+    return this.api.put<any>(`enrollments/${enrollmentId}/lectures/${lectureId}/progress`, { lectureId, isCompleted, watchedSeconds });
   }
 }

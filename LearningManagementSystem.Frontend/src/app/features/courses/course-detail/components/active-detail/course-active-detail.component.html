@@ -88,6 +88,7 @@
               [lecture]="lecture" 
               [isCompleted]="isCompleted(lecture.id)"
               (videoEnded)="toggleProgress(lecture.id)"
+              (updateProgress)="handleUpdateProgress($event, lecture.id)"
               (markComplete)="toggleProgress(lecture.id)"
             ></app-classroom-player>
           }

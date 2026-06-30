@@ -3,13 +3,14 @@
     <div class="media-viewport">
       
       <!-- Video Player -->
-      @if (lecture.contentType === 'video') {
+      @if (isVideo) {
         <video 
-          [src]="absoluteUrl" 
+          [src]="mediaStreamUrl" 
           controls 
           controlslist="nodownload"
           disablepictureinpicture
           oncontextmenu="return false;"
+          (timeupdate)="onTimeUpdate($event)"
           (ended)="onVideoEnded()" 
           class="real-video-player"
         ></video>
@@ -37,7 +38,7 @@
       }
       
       <!-- PDF Native Viewer (Fully supports localhost viewing) -->
-      @else if (lecture.contentType === 'pdf') {
+      @else if (isPdf) {
         <iframe 
           [src]="safeUrl" 
           class="document-iframe" 
@@ -69,14 +70,18 @@
         }
       }
       
-      <!-- General Fallback embed -->
+      <!-- General Fallback / External Link -->
       @else {
-        <iframe 
-          [src]="safeUrl" 
-          class="document-iframe" 
-          title="External resource link"
-          frameborder="0"
-        ></iframe>
+        <div class="external-link-card glass-card">
+          <i class="bi bi-box-arrow-up-right document-large-icon" aria-hidden="true"></i>
+          <h3 class="fallback-title">{{ lecture.title }}</h3>
+          <p class="fallback-desc">
+            This lecture contains an external resource or link.
+          </p>
+          <a [href]="absoluteUrl" target="_blank" (click)="onExternalLinkClick()" class="btn btn-outline-primary mt-3">
+            Open External Resource
+          </a>
+        </div>
       }
     </div>
 
@@ -86,6 +91,7 @@
         class="btn" 
         [class.btn-success]="isCompleted"
         [class.btn-primary]="!isCompleted"
+        [disabled]="!canMarkComplete && !isCompleted"
         (click)="handleMarkComplete()"
       >
         @if (isCompleted) {

@@ -124,16 +124,35 @@ export class ClassroomDiscussionComponent implements OnChanges {
   }
 
   likeReply(replyId: string) {
+    const disc = this.selectedDiscussion();
+    if (!disc) return;
+
+    // Optimistic UI Update
+    const reply = disc.replies.find(r => r.externalId === replyId);
+    if (reply) {
+      if (reply.isLikedByCurrentUser) {
+        reply.isLikedByCurrentUser = false;
+        reply.likesCount = Math.max(0, reply.likesCount - 1);
+      } else {
+        reply.isLikedByCurrentUser = true;
+        reply.likesCount += 1;
+      }
+    }
+
     this.discussionService.likeReply(replyId).subscribe({
-      next: () => {
-        this.notification.success('Reply liked!');
-        const disc = this.selectedDiscussion();
-        if (disc) {
-          this.viewDiscussion(disc.externalId);
+      next: (res: any) => {
+        // Sync with actual count if needed
+        if (reply && typeof res?.likesCount === 'number') {
+          reply.likesCount = res.likesCount;
         }
       },
       error: (err) => {
-        this.notification.error('Failed to like reply.');
+        // Revert optimistic update
+        if (reply) {
+          reply.isLikedByCurrentUser = !reply.isLikedByCurrentUser;
+          reply.likesCount = reply.isLikedByCurrentUser ? reply.likesCount + 1 : Math.max(0, reply.likesCount - 1);
+        }
+        this.notification.error('Failed to toggle like.');
         console.error(err);
       }
     });

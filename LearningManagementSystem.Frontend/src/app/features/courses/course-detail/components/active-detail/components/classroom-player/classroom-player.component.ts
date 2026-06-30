@@ -17,6 +17,7 @@ export class ClassroomPlayerComponent implements OnChanges {
 
   @Output() videoEnded = new EventEmitter<void>();
   @Output() markComplete = new EventEmitter<void>();
+  @Output() updateProgress = new EventEmitter<number>();
 
   private sanitizer = inject(DomSanitizer);
   private http = inject(HttpClient);
@@ -24,10 +25,12 @@ export class ClassroomPlayerComponent implements OnChanges {
   // States
   protected fetchedTextContent = signal<string | null>(null);
   protected isFetchingText = signal<boolean>(false);
+  protected externalLinkClicked = signal<boolean>(false);
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['lecture'] && this.lecture) {
       this.fetchedTextContent.set(null);
+      this.externalLinkClicked.set(false);
       if (this.isTextOrMarkdown) {
         this.fetchTextContent();
       }
@@ -43,10 +46,20 @@ export class ClassroomPlayerComponent implements OnChanges {
     return url;
   }
 
+  get mediaStreamUrl(): string {
+    if (!this.lecture || !this.lecture.contentUrl) return '';
+    return `http://localhost:5159/api/Media/stream?path=${encodeURIComponent(this.lecture.contentUrl)}`;
+  }
+
+  get mediaDocumentUrl(): string {
+    if (!this.lecture || !this.lecture.contentUrl) return '';
+    return `http://localhost:5159/api/Media/document?path=${encodeURIComponent(this.lecture.contentUrl)}`;
+  }
+
   get safeUrl(): SafeResourceUrl | null {
-    let url = this.absoluteUrl;
+    let url = this.lecture?.contentType === 'pdf' ? this.mediaDocumentUrl : this.absoluteUrl;
     if (!url) return null;
-    if (url.toLowerCase().endsWith('.pdf')) {
+    if (url.toLowerCase().endsWith('.pdf') || url.includes('/api/Media/document')) {
       url += '#toolbar=0';
     }
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
@@ -54,6 +67,14 @@ export class ClassroomPlayerComponent implements OnChanges {
 
   get isLocalhost(): boolean {
     return this.absoluteUrl.includes('localhost') || this.absoluteUrl.includes('127.0.0.1');
+  }
+
+  get isVideo(): boolean {
+    return this.lecture?.contentType?.toLowerCase() === 'video';
+  }
+
+  get isPdf(): boolean {
+    return this.lecture?.contentType?.toLowerCase() === 'pdf';
   }
 
   get isTextOrMarkdown(): boolean {
@@ -98,7 +119,32 @@ export class ClassroomPlayerComponent implements OnChanges {
     this.videoEnded.emit();
   }
 
+  lastSavedTime = 0;
+
+  onTimeUpdate(event: Event) {
+    const video = event.target as HTMLVideoElement;
+    const currentTime = Math.floor(video.currentTime);
+    if (currentTime - this.lastSavedTime >= 10) {
+      this.lastSavedTime = currentTime;
+      this.updateProgress.emit(currentTime);
+    }
+  }
+
+  onExternalLinkClick() {
+    this.externalLinkClicked.set(true);
+  }
+
+  get canMarkComplete(): boolean {
+    if (this.isCompleted) return false;
+    if (!this.isVideo && !this.isPdf && !this.isTextOrMarkdown && !this.isOfficeDocument) {
+      // It's an external link
+      return this.externalLinkClicked();
+    }
+    return true; // Other types can be marked complete anytime, or handled automatically
+  }
+
   handleMarkComplete() {
+    if (!this.canMarkComplete && !this.isCompleted) return;
     this.markComplete.emit();
   }
 }

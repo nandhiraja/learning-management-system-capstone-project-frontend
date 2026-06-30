@@ -150,3 +150,53 @@ video::-webkit-media-controls-enclosure {
 .btn-success:hover {
   background-color: #15803d;
 }
+
+/* External Link Card Styling */
+.external-link-card {
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  min-height: 400px;
+}
+
+.external-link-card .document-large-icon {
+  font-size: 56px;
+  color: #3b82f6; /* Bright blue for links */
+  margin-bottom: 20px;
+  filter: drop-shadow(0 4px 6px rgba(59, 130, 246, 0.15));
+}
+
+.external-link-card .fallback-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--color-text);
+}
+
+.external-link-card .fallback-desc {
+  font-size: 14px;
+  color: var(--color-text-2);
+  max-width: 460px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.external-link-card .btn-outline-primary {
+  padding: 12px 24px;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.external-link-card .btn-outline-primary::after {
+  content: '\F135'; /* Bootstrap icon chevron-right */
+  font-family: 'bootstrap-icons';
+  font-size: 14px;
+}

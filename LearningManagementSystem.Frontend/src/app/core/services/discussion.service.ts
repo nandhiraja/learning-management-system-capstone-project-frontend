@@ -28,4 +28,12 @@ export class DiscussionService {
   createReply(discussionId: string, payload: { content: string }): Observable<DiscussionReplyResponse> {
     return this.api.post<DiscussionReplyResponse>(`discussions/${discussionId}/replies`, payload);
   }
+
+  togglePinReply(replyId: string): Observable<any> {
+    return this.api.put<any>(`discussions/replies/${replyId}/pin`, {});
+  }
+
+  likeReply(replyId: string): Observable<any> {
+    return this.api.post<any>(`discussions/replies/${replyId}/like`, {});
+  }
 }

@@ -84,18 +84,19 @@
 .write-post-prompt {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 20px;
+  gap: 16px;
+  padding: 16px 24px;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: 16px;
   cursor: pointer;
-  transition: border-color 0.15s, background-color 0.15s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
 }
 
 .write-post-prompt:hover {
-  border-color: var(--color-border-2);
-  background-color: var(--color-surface-2);
+  border-color: var(--color-accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .prompt-avatar {
@@ -163,21 +164,22 @@
 }
 
 .feed-item-card {
-  padding: 20px;
+  padding: 24px;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: 16px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  transition: all 0.2s ease;
+  gap: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .feed-item-card:hover {
   transform: translateY(-2px);
   border-color: var(--color-border-2);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
 .feed-item-header {
@@ -300,10 +302,11 @@
 
 /* Social Media Post card */
 .forum-post-card {
-  padding: 24px;
+  padding: 28px;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
   margin-bottom: 24px;
 }
 
@@ -437,13 +440,19 @@
 }
 
 .comment-card {
-  padding: 16px;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  padding: 20px;
+  background-color: var(--color-surface-2);
+  border: 1px solid transparent;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  transition: background-color 0.2s ease;
+}
+.comment-card:hover {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
 }
 
 .comment-card.instructor-comment {
@@ -534,14 +543,15 @@
 
 /* Comment Composer bar */
 .add-comment-composer {
-  padding: 16px;
+  padding: 20px;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 8px;
+  gap: 14px;
+  margin-top: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
 }
 
 .composer-textarea {

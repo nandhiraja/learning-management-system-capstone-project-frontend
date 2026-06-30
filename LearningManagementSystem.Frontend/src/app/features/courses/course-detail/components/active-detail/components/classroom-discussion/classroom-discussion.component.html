@@ -14,6 +14,9 @@
           </div>
           <div class="post-meta-details">
             <span class="post-author-name">@{{ thread.user.firstName.toLowerCase() }}{{ thread.user.lastName.toLowerCase() }}</span>
+            @if (thread.isInstructorThread) {
+              <span class="badge badge-success-badge" style="margin-left: 8px;"><i class="bi bi-patch-check-fill"></i> Instructor</span>
+            }
             <span class="post-timestamp">{{ thread.createdAt | date:'medium' }}</span>
           </div>
         </header>
@@ -72,16 +75,12 @@
                   <!-- Likes Action -->
                   <button 
                     class="comment-action-btn" 
-                    [class.liked]="rep.likesCount > 0"
+                    [class.liked]="rep.isLikedByCurrentUser"
                     (click)="likeReply(rep.externalId)" 
                     aria-label="Like comment"
                   >
-                    <i class="bi" [class.bi-heart-fill]="rep.likesCount > 0" [class.bi-heart]="rep.likesCount === 0"></i> 
+                    <i class="bi" [class.bi-heart-fill]="rep.isLikedByCurrentUser" [class.bi-heart]="!rep.isLikedByCurrentUser"></i> 
                     {{ rep.likesCount }} {{ rep.likesCount === 1 ? 'Like' : 'Likes' }}
-                  </button>
-                  
-                  <button class="comment-action-btn" aria-label="Reply to comment">
-                    <i class="bi bi-reply"></i> Reply
                   </button>
 
                   <!-- Pin action button (Instructors only) -->
@@ -220,6 +219,9 @@
                 </div>
                 <div class="feed-item-meta">
                   <span class="feed-author">@{{ disc.user.firstName.toLowerCase() }}</span>
+                  @if (disc.isInstructorThread) {
+                    <span class="badge badge-success-badge" style="margin-left: 6px;"><i class="bi bi-patch-check-fill"></i> Instructor</span>
+                  }
                   <span class="feed-time">&bull; {{ disc.createdAt | date:'shortDate' }}</span>
                 </div>
               </header>
