@@ -5,20 +5,23 @@
   </div>
 
   <!-- Sorting Filter -->
-  <div class="filter-section">
-    <label for="sortBySelect" class="form-label">Sort by</label>
-    <select 
-      id="sortBySelect" 
-      (change)="onSortChange($event)" 
-      [value]="sortBy" 
-      class="form-control filter-select"
-    >
-      <option value="newest">Newest first</option>
-      <option value="price-asc">Price: low to high</option>
-      <option value="price-desc">Price: high to low</option>
-      <option value="rating">Highest rated</option>
-      <option value="students">Most popular</option>
-    </select>
+  <div class="filter-section custom-dropdown-container">
+    <label class="form-label">Sort by</label>
+    <div class="custom-select-wrapper">
+      <button type="button" class="custom-select-trigger" (click)="toggleSortDropdown()">
+        <span>{{ sortDisplayNames[sortBy] }}</span>
+        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+      </button>
+      @if (isSortDropdownOpen()) {
+        <ul class="custom-dropdown-options glass-card">
+          <li (click)="selectSort('newest')">Newest first</li>
+          <li (click)="selectSort('price-asc')">Price: low to high</li>
+          <li (click)="selectSort('price-desc')">Price: high to low</li>
+          <li (click)="selectSort('rating')">Highest rated</li>
+          <li (click)="selectSort('students')">Most popular</li>
+        </ul>
+      }
+    </div>
   </div>
 
   <!-- Price Radio Filters -->

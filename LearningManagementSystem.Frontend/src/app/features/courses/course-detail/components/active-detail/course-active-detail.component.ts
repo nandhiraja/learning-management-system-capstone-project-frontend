@@ -10,6 +10,7 @@ import { ClassroomSidebarComponent } from './components/classroom-sidebar/classr
 import { ClassroomQuizComponent } from './components/classroom-quiz/classroom-quiz.component';
 import { ClassroomDiscussionComponent } from './components/classroom-discussion/classroom-discussion.component';
 import { ClassroomPlayerComponent } from './components/classroom-player/classroom-player.component';
+import { CertificatePreview } from '../../../../../shared/components/certificate-preview/certificate-preview';
 
 @Component({
   selector: 'app-course-active-detail',
@@ -21,7 +22,8 @@ import { ClassroomPlayerComponent } from './components/classroom-player/classroo
     ClassroomSidebarComponent,
     ClassroomQuizComponent,
     ClassroomDiscussionComponent,
-    ClassroomPlayerComponent
+    ClassroomPlayerComponent,
+    CertificatePreview
   ],
   templateUrl: './course-active-detail.component.html',
   styleUrl: './course-active-detail.component.css'

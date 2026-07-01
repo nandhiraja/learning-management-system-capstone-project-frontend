@@ -91,16 +91,14 @@
 }
 
 .badge-alert {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
+  margin-left: auto;
   background-color: #f97316;
   color: #ffffff;
   font-size: 10px;
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 10px;
+  flex-shrink: 0;
 }
 
 /* Main Content Panel */
@@ -203,8 +201,6 @@
   }
 
   .badge-alert {
-    position: static;
-    transform: none;
-    margin-left: 4px;
+    margin-left: 6px;
   }
 }

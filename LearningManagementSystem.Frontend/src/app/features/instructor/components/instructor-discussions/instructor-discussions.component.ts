@@ -29,6 +29,7 @@ export class InstructorDiscussionsComponent implements OnInit {
   protected selectedThread = signal<DiscussionDetailResponse | null>(null);
   protected isLoadingThread = signal<boolean>(false);
   protected isPostingReply = signal<boolean>(false);
+  protected replyContent = signal<string>('');
 
   // Filtered discussions list based on search query
   protected filteredDiscussions = computed(() => {
@@ -84,15 +85,15 @@ export class InstructorDiscussionsComponent implements OnInit {
     });
   }
 
-  postReply(replyTextarea: HTMLTextAreaElement) {
-    const content = replyTextarea.value.trim();
+  postReply() {
+    const content = this.replyContent().trim();
     const threadId = this.selectedDiscussionId();
     if (!content || !threadId) return;
 
     this.isPostingReply.set(true);
     this.discussionService.createReply(threadId, { content }).subscribe({
       next: () => {
-        replyTextarea.value = '';
+        this.replyContent.set('');
         this.isPostingReply.set(false);
         // Refresh details & the sidebar list to update reply counts/answered state
         this.selectDiscussion(threadId);

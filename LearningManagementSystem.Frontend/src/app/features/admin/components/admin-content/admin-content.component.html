@@ -5,6 +5,25 @@
     <h2 class="panel-title"><i class="bi bi-tags-fill" aria-hidden="true"></i> Categories Management</h2>
     <p class="panel-subtitle">Review suggested course categories submitted by instructors.</p>
 
+    <div class="add-metadata-form" style="display: flex; gap: 8px; margin-bottom: 20px;">
+      <input 
+        type="text" 
+        class="form-control text-sm" 
+        placeholder="Add category directly..." 
+        [(ngModel)]="newCategoryName" 
+        (keyup.enter)="handleAddCategory()"
+      />
+      <button 
+        type="button" 
+        class="btn btn-primary btn-sm" 
+        (click)="handleAddCategory()"
+        [disabled]="!newCategoryName.trim()"
+        style="padding: 6px 12px; font-size: 12px;"
+      >
+        Add
+      </button>
+    </div>
+
     @if (categories.length > 0) {
       <div class="items-list">
         @for (cat of categories; track cat.id) {
@@ -49,6 +68,25 @@
   <div class="content-panel glass-card">
     <h2 class="panel-title"><i class="bi bi-translate" aria-hidden="true"></i> Languages Management</h2>
     <p class="panel-subtitle">Review suggested instruction languages submitted by instructors.</p>
+
+    <div class="add-metadata-form" style="display: flex; gap: 8px; margin-bottom: 20px;">
+      <input 
+        type="text" 
+        class="form-control text-sm" 
+        placeholder="Add language directly..." 
+        [(ngModel)]="newLanguageName" 
+        (keyup.enter)="handleAddLanguage()"
+      />
+      <button 
+        type="button" 
+        class="btn btn-primary btn-sm" 
+        (click)="handleAddLanguage()"
+        [disabled]="!newLanguageName.trim()"
+        style="padding: 6px 12px; font-size: 12px;"
+      >
+        Add
+      </button>
+    </div>
 
     @if (languages.length > 0) {
       <div class="items-list">

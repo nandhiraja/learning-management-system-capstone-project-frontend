@@ -80,4 +80,14 @@ export class AdminService {
   deleteLanguage(id: number): Observable<any> {
     return this.api.delete<any>(`admin/languages/${id}`);
   }
+
+  // Create a category directly (auto-approved if Admin)
+  createCategory(name: string): Observable<any> {
+    return this.api.post<any>('categories', { name });
+  }
+
+  // Create a language directly (auto-approved if Admin)
+  createLanguage(name: string): Observable<any> {
+    return this.api.post<any>('languages', { name });
+  }
 }

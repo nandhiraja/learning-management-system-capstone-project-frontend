@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Category, Language } from '../../../../models/course.model';
 
@@ -24,8 +24,29 @@ export class CourseFilterSidebarComponent {
   @Output() sortByChange = new EventEmitter<string>();
   @Output() clearFilters = new EventEmitter<void>();
 
-  onSortChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    this.sortByChange.emit(target.value);
+  protected isSortDropdownOpen = signal<boolean>(false);
+  protected sortDisplayNames: Record<string, string> = {
+    'newest': 'Newest first',
+    'price-asc': 'Price: low to high',
+    'price-desc': 'Price: high to low',
+    'rating': 'Highest rated',
+    'students': 'Most popular'
+  };
+
+  toggleSortDropdown() {
+    this.isSortDropdownOpen.update(val => !val);
+  }
+
+  selectSort(sortVal: string) {
+    this.sortByChange.emit(sortVal);
+    this.isSortDropdownOpen.set(false);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.custom-dropdown-container')) {
+      this.isSortDropdownOpen.set(false);
+    }
   }
 }

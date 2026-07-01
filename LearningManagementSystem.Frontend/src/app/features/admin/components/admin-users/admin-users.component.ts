@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, signal, computed } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, signal, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserProfile } from '../../../../shared/models/user.model';
@@ -20,6 +20,31 @@ export class AdminUsersComponent {
   // Filter signals
   protected searchTerm = signal<string>('');
   protected selectedRole = signal<string>('ALL');
+
+  protected isRoleDropdownOpen = signal<boolean>(false);
+  protected roleDisplayNames: Record<string, string> = {
+    'ALL': 'All Roles',
+    'Student': 'Students',
+    'Instructor': 'Instructors',
+    'Admin': 'Admins'
+  };
+
+  toggleRoleDropdown() {
+    this.isRoleDropdownOpen.update(val => !val);
+  }
+
+  selectRole(role: string) {
+    this.selectedRole.set(role);
+    this.isRoleDropdownOpen.set(false);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.custom-dropdown-container')) {
+      this.isRoleDropdownOpen.set(false);
+    }
+  }
 
   // Computed filtered users list
   protected filteredUsers = computed<UserProfile[]>(() => {

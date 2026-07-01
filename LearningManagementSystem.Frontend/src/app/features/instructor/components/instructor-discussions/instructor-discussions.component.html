@@ -91,7 +91,7 @@
         <!-- Thread Header -->
         <div class="thread-detail-header">
           <button (click)="closeThreadView()" class="btn btn-ghost btn-sm back-sidebar-btn">
-            <i class="bi bi-chevron-left" aria-hidden="true"></i> Back to List
+            <i class="bi bi-arrow-left-short" aria-hidden="true"></i> Back to List
           </button>
           
           <div class="thread-main-meta">
@@ -164,7 +164,8 @@
         <div class="instructor-reply-form">
           <div class="reply-textarea-wrapper">
             <textarea 
-              #replyInput
+              [ngModel]="replyContent()"
+              (ngModelChange)="replyContent.set($event)"
               placeholder="Write a clear, helpful response to assist this student..." 
               rows="3" 
               class="form-control reply-input-textarea"
@@ -173,9 +174,9 @@
           </div>
           <div class="reply-actions-bar">
             <button 
-              (click)="postReply(replyInput)" 
+              (click)="postReply()" 
               class="btn btn-primary submit-reply-btn"
-              [disabled]="isPostingReply() || !replyInput.value.trim()"
+              [disabled]="isPostingReply() || !replyContent().trim()"
             >
               @if (isPostingReply()) {
                 <div class="spinner"></div> Sending...

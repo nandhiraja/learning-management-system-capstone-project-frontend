@@ -73,12 +73,14 @@
                 </app-badge-chip>
               </td>
               <td class="actions-cell">
-                <a [routerLink]="['/courses', course.externalId]" class="btn btn-ghost btn-sm view-details-link" style="margin-right: 8px;">
-                  <i class="bi bi-eye" aria-hidden="true"></i> View
-                </a>
-                <a [routerLink]="['/instructor/courses/builder', course.externalId]" class="btn btn-ghost btn-sm edit-details-link">
-                  <i class="bi bi-pencil" aria-hidden="true"></i> Edit
-                </a>
+                <div class="action-buttons-wrapper">
+                  <a [routerLink]="['/courses', course.externalId]" class="btn btn-ghost btn-sm view-details-link">
+                    <i class="bi bi-eye" aria-hidden="true"></i> View
+                  </a>
+                  <a [routerLink]="['/instructor/courses/builder', course.externalId]" class="btn btn-ghost btn-sm edit-details-link">
+                    <i class="bi bi-pencil" aria-hidden="true"></i> Edit
+                  </a>
+                </div>
               </td>
             </tr>
           }

@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CourseResponse } from '../../../../models/course.model';
+import { CourseResponse, CourseSectionResponse, LectureResponse } from '../../../../models/course.model';
 import { UserProfile } from '../../../../shared/models/user.model';
 
 @Component({
@@ -15,6 +15,7 @@ import { UserProfile } from '../../../../shared/models/user.model';
 export class AdminApprovalsComponent {
   @Input({ required: true }) courses: CourseResponse[] = [];
   @Input({ required: true }) instructors: UserProfile[] = [];
+  @Input() processingId: string | null = null;
 
   @Output() approveCourse = new EventEmitter<string>();
   @Output() rejectCourse = new EventEmitter<{ courseId: string; reason: string }>();
@@ -24,9 +25,39 @@ export class AdminApprovalsComponent {
   // State to manage rejection reason input overlay
   protected activeRejectionCourseId = signal<string | null>(null);
   protected rejectionReason = signal<string>('');
+  protected showRejectionValidationError = signal<boolean>(false);
+
+  // States to manage custom approval modals
+  protected activeApprovalCourseId = signal<string | null>(null);
+  protected activeApprovalInstructorId = signal<string | null>(null);
+  protected activeRejectInstructorId = signal<string | null>(null);
 
   // Track expanded syllabus/sections preview
   protected expandedCourseId = signal<string | null>(null);
+
+  isDraftUpdate(course: CourseResponse): boolean {
+    return !!course.originalCourseDetails;
+  }
+
+  isFieldModified(course: CourseResponse, fieldName: 'title' | 'description' | 'price'): boolean {
+    if (!course.originalCourseDetails) return false;
+    if (fieldName === 'title') return course.title !== course.originalCourseDetails.title;
+    if (fieldName === 'description') return course.description !== course.originalCourseDetails.description;
+    if (fieldName === 'price') return course.price !== course.originalCourseDetails.price;
+    return false;
+  }
+
+  isNewSection(course: CourseResponse, section: CourseSectionResponse): boolean {
+    if (!course.originalCourseDetails) return false;
+    return !course.originalCourseDetails.sections.some(s => s.order === section.order);
+  }
+
+  isNewLecture(course: CourseResponse, section: CourseSectionResponse, lecture: LectureResponse): boolean {
+    if (!course.originalCourseDetails) return false;
+    const originalSec = course.originalCourseDetails.sections.find(s => s.order === section.order);
+    if (!originalSec) return true;
+    return !originalSec.lectures.some(l => l.title === lecture.title);
+  }
 
   toggleExpand(courseId: string) {
     if (this.expandedCourseId() === courseId) {
@@ -37,19 +68,31 @@ export class AdminApprovalsComponent {
   }
 
   onApproveCourse(courseExternalId: string) {
-    if (confirm('Are you sure you want to approve and publish this course?')) {
-      this.approveCourse.emit(courseExternalId);
+    this.activeApprovalCourseId.set(courseExternalId);
+  }
+
+  cancelApprovalCourse() {
+    this.activeApprovalCourseId.set(null);
+  }
+
+  confirmApprovalCourse() {
+    const courseId = this.activeApprovalCourseId();
+    if (courseId) {
+      this.approveCourse.emit(courseId);
     }
+    this.activeApprovalCourseId.set(null);
   }
 
   triggerRejectCourse(courseExternalId: string) {
     this.activeRejectionCourseId.set(courseExternalId);
     this.rejectionReason.set('');
+    this.showRejectionValidationError.set(false);
   }
 
   cancelRejection() {
     this.activeRejectionCourseId.set(null);
     this.rejectionReason.set('');
+    this.showRejectionValidationError.set(false);
   }
 
   submitRejection() {
@@ -58,24 +101,45 @@ export class AdminApprovalsComponent {
     if (!courseId) return;
 
     if (!reason) {
-      alert('Please enter a rejection reason feedback.');
+      this.showRejectionValidationError.set(true);
       return;
     }
 
     this.rejectCourse.emit({ courseId, reason });
     this.activeRejectionCourseId.set(null);
     this.rejectionReason.set('');
+    this.showRejectionValidationError.set(false);
   }
 
   onApproveInstructor(userExternalId: string) {
-    if (confirm('Are you sure you want to promote this student to Instructor?')) {
-      this.approveInstructor.emit(userExternalId);
+    this.activeApprovalInstructorId.set(userExternalId);
+  }
+
+  cancelApprovalInstructor() {
+    this.activeApprovalInstructorId.set(null);
+  }
+
+  confirmApprovalInstructor() {
+    const userId = this.activeApprovalInstructorId();
+    if (userId) {
+      this.approveInstructor.emit(userId);
     }
+    this.activeApprovalInstructorId.set(null);
   }
 
   onRejectInstructor(userExternalId: string) {
-    if (confirm('Are you sure you want to reject this instructor application?')) {
-      this.rejectInstructor.emit(userExternalId);
+    this.activeRejectInstructorId.set(userExternalId);
+  }
+
+  cancelRejectInstructor() {
+    this.activeRejectInstructorId.set(null);
+  }
+
+  confirmRejectInstructor() {
+    const userId = this.activeRejectInstructorId();
+    if (userId) {
+      this.rejectInstructor.emit(userId);
     }
+    this.activeRejectInstructorId.set(null);
   }
 }

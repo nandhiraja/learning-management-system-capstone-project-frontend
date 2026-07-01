@@ -175,49 +175,77 @@
   color: #6b7280;
 }
 
-.action-cell {
-  display: flex;
+.col-user {
+  min-width: 220px;
+}
+
+.col-email {
+  min-width: 180px;
+}
+
+.col-role {
+  min-width: 100px;
+}
+
+.col-status {
+  min-width: 100px;
+}
+
+.col-actions {
+  min-width: 180px;
+  text-align: right;
+}
+
+.action-buttons-wrapper {
+  display: inline-flex;
   gap: 8px;
   justify-content: flex-end;
 }
 
-.actions-header {
-  text-align: right;
-  padding-right: 24px !important;
-}
-
 /* Action Buttons */
 .btn-block-action {
-  background-color: rgba(239, 68, 68, 0.1);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(239, 68, 68, 0.15));
   color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.05);
+  transition: all 0.2s ease;
 }
 
 .btn-block-action:hover {
-  background-color: #ef4444;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
   color: #ffffff;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+  transform: translateY(-1px);
 }
 
 .btn-unblock-action {
-  background-color: rgba(16, 185, 129, 0.1);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.15));
   color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.05);
+  transition: all 0.2s ease;
 }
 
 .btn-unblock-action:hover {
-  background-color: #10b981;
+  background: linear-gradient(135deg, #10b981, #059669);
   color: #ffffff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  transform: translateY(-1px);
 }
 
 .btn-demote {
-  background-color: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.15));
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.05);
+  transition: all 0.2s ease;
 }
 
 .btn-demote:hover {
-  background-color: #f59e0b;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
   color: #ffffff;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+  transform: translateY(-1px);
 }
 
 /* Empty State */

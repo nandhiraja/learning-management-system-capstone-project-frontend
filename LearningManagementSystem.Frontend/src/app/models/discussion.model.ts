@@ -10,6 +10,7 @@ export interface DiscussionResponse {
   repliesCount: number;
   lectureId: number;
   lectureTitle: string | null;
+  isInstructorThread: boolean;
 }
 
 export interface DiscussionDetailResponse {
@@ -21,6 +22,7 @@ export interface DiscussionDetailResponse {
   user: UserProfile;
   lectureId: number;
   lectureTitle: string | null;
+  isInstructorThread: boolean;
   replies: DiscussionReplyResponse[];
 }
 
@@ -33,4 +35,5 @@ export interface DiscussionReplyResponse {
   likesCount: number;
   isInstructorReply: boolean;
   isAuthorReply: boolean;
+  isLikedByCurrentUser: boolean;
 }

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, inject, signal, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, inject, signal, OnChanges, SimpleChanges, HostListener, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CourseResponse, Category, Language } from '../../../../../../models/course.model';
@@ -27,6 +27,27 @@ export class CourseBasicInfoComponent implements OnInit, OnChanges {
   protected infoForm!: FormGroup;
   protected categories = signal<Category[]>([]);
   protected languages = signal<Language[]>([]);
+
+  // Custom Dropdown Open States
+  protected isCategoryDropdownOpen = signal<boolean>(false);
+  protected isLanguageDropdownOpen = signal<boolean>(false);
+
+  // Selected value signals to ensure reactive computed bindings
+  protected selectedCategoryId = signal<number | null>(null);
+  protected selectedLanguage = signal<string | null>(null);
+
+  // Selected names computed from form control values
+  protected selectedCategoryName = computed(() => {
+    const id = this.selectedCategoryId();
+    if (!id) return 'Select Category';
+    const cat = this.categories().find(c => c.id == id);
+    return cat ? cat.name : 'Select Category';
+  });
+
+  protected selectedLanguageName = computed(() => {
+    const lang = this.selectedLanguage();
+    return lang ? lang : 'Select Language';
+  });
   
   // File Upload states
   protected isDragging = signal<boolean>(false);
@@ -71,6 +92,14 @@ export class CourseBasicInfoComponent implements OnInit, OnChanges {
           priceControl?.setValue(9.99);
         }
       }
+    });
+
+    // Listen to category and language changes to update display names reactively
+    this.infoForm.get('categoryId')?.valueChanges.subscribe(val => {
+      this.selectedCategoryId.set(val ? parseInt(val, 10) : null);
+    });
+    this.infoForm.get('language')?.valueChanges.subscribe(val => {
+      this.selectedLanguage.set(val);
     });
   }
 
@@ -228,6 +257,77 @@ export class CourseBasicInfoComponent implements OnInit, OnChanges {
           this.isSubmitting.set(false);
         }
       });
+    }
+  }
+
+  protected toggleCategoryDropdown() {
+    this.isCategoryDropdownOpen.update(val => !val);
+    this.isLanguageDropdownOpen.set(false);
+  }
+
+  protected selectCategory(catId: number) {
+    this.infoForm.get('categoryId')?.setValue(catId);
+    this.infoForm.get('categoryId')?.markAsTouched();
+    this.isCategoryDropdownOpen.set(false);
+  }
+
+  protected toggleLanguageDropdown() {
+    this.isLanguageDropdownOpen.update(val => !val);
+    this.isCategoryDropdownOpen.set(false);
+  }
+
+  protected selectLanguage(lang: string) {
+    this.infoForm.get('language')?.setValue(lang);
+    this.infoForm.get('language')?.markAsTouched();
+    this.isLanguageDropdownOpen.set(false);
+  }
+
+  // Suggestion Modal States
+  protected suggestType = signal<'Category' | 'Language' | null>(null);
+  protected suggestItemName = '';
+  protected isSubmittingSuggestion = signal<boolean>(false);
+
+  openSuggestModal(type: 'Category' | 'Language') {
+    this.suggestType.set(type);
+    this.suggestItemName = '';
+    this.isSubmittingSuggestion.set(false);
+  }
+
+  closeSuggestModal() {
+    this.suggestType.set(null);
+    this.suggestItemName = '';
+    this.isSubmittingSuggestion.set(false);
+  }
+
+  submitSuggestion() {
+    const name = this.suggestItemName.trim();
+    const type = this.suggestType();
+    if (!name || !type) return;
+
+    this.isSubmittingSuggestion.set(true);
+    const apiCall = type === 'Category' 
+      ? this.courseService.createCategory(name) 
+      : this.courseService.createLanguage(name);
+
+    apiCall.subscribe({
+      next: () => {
+        this.notification.success(`${type} suggestion submitted for Admin approval.`);
+        this.closeSuggestModal();
+        this.loadMetadata(); // reload list
+      },
+      error: (err) => {
+        this.notification.error(err.error?.message || `Failed to submit ${type.toLowerCase()} suggestion.`);
+        this.isSubmittingSuggestion.set(false);
+      }
+    });
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.custom-dropdown-container') && !target.closest('.modal-overlay')) {
+      this.isCategoryDropdownOpen.set(false);
+      this.isLanguageDropdownOpen.set(false);
     }
   }
 }

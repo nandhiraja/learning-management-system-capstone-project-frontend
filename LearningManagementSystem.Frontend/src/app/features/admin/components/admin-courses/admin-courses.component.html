@@ -13,20 +13,23 @@
       />
     </div>
 
-    <div class="role-filter-group">
-      <label for="admin-status-filter" class="filter-label">Filter Status:</label>
-      <select 
-        id="admin-status-filter"
-        class="form-control select-control" 
-        [ngModel]="selectedStatus()"
-        (ngModelChange)="onStatusChange($event)"
-      >
-        <option value="ALL">All Statuses</option>
-        <option value="Published">Published</option>
-        <option value="PendingReview">Pending Review</option>
-        <option value="Rejected">Rejected</option>
-        <option value="Archived">Archived</option>
-      </select>
+    <div class="role-filter-group custom-dropdown-container">
+      <label class="filter-label">Filter Status:</label>
+      <div class="custom-select-wrapper" style="min-width: 160px;">
+        <button type="button" class="custom-select-trigger" (click)="toggleStatusDropdown()">
+          <span>{{ statusDisplayNames[selectedStatus()] }}</span>
+          <i class="bi bi-chevron-down" aria-hidden="true"></i>
+        </button>
+        @if (isStatusDropdownOpen()) {
+          <ul class="custom-dropdown-options glass-card">
+            <li (click)="selectStatus('ALL')">All Statuses</li>
+            <li (click)="selectStatus('Published')">Published</li>
+            <li (click)="selectStatus('PendingReview')">Pending Review</li>
+            <li (click)="selectStatus('Rejected')">Rejected</li>
+            <li (click)="selectStatus('Archived')">Archived</li>
+          </ul>
+        }
+      </div>
     </div>
   </div>
 

@@ -96,8 +96,14 @@
 }
 
 .action-cell {
-  display: flex;
+  text-align: right;
+  padding-right: 24px !important;
+}
+
+.action-buttons-wrapper {
+  display: inline-flex;
   gap: 8px;
+  justify-content: flex-end;
 }
 
 .actions-header {
@@ -105,31 +111,35 @@
   padding-right: 24px !important;
 }
 
-.action-cell {
-  justify-content: flex-end;
-}
-
 /* Buttons */
 .btn-approve {
-  background-color: rgba(16, 185, 129, 0.1);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.15));
   color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.05);
+  transition: all 0.2s ease;
 }
 
-.btn-approve:hover {
-  background-color: #10b981;
+.btn-approve:hover:not(:disabled) {
+  background: linear-gradient(135deg, #10b981, #059669);
   color: #ffffff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  transform: translateY(-1px);
 }
 
 .btn-reject {
-  background-color: rgba(239, 68, 68, 0.1);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(239, 68, 68, 0.15));
   color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.05);
+  transition: all 0.2s ease;
 }
 
-.btn-reject:hover {
-  background-color: #ef4444;
+.btn-reject:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
   color: #ffffff;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+  transform: translateY(-1px);
 }
 
 /* Course review card */
@@ -357,4 +367,82 @@
 
 .margin-top-lg {
   margin-top: 32px;
+}
+
+/* Draft Comparison Badges and Diff Styling */
+.badge-modified {
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #f59e0b; /* Amber */
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.pricing-old-text {
+  font-size: 11px;
+  color: var(--color-text-3);
+  margin-left: 6px;
+  text-decoration: line-through;
+  font-weight: normal;
+}
+
+.desc-modified-indicator {
+  display: block;
+  font-size: 11px;
+  color: #f59e0b;
+  font-style: italic;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.badge-new {
+  font-size: 9px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #10b981; /* Emerald */
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.new-section-item::before {
+  background-color: #10b981 !important; /* Emerald node marker */
+}
+
+.new-section-item .section-title-sm {
+  color: #10b981;
+}
+
+.new-lecture-item {
+  background: rgba(16, 185, 129, 0.05);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.new-lecture-item span {
+  color: #10b981;
+  font-weight: 500;
+}
+
+.new-lecture-item i {
+  color: #10b981 !important;
+}
+
+.lecture-new-badge {
+  font-size: 9px;
+  font-weight: 700;
+  color: #10b981;
+  text-transform: uppercase;
+  margin-left: 6px;
+  background: rgba(16, 185, 129, 0.2);
+  padding: 1px 4px;
+  border-radius: 3px;
 }

@@ -70,4 +70,12 @@ export class CourseService {
   addToCart(courseId: number): Observable<any> {
     return this.api.post<any>('cart', { courseId });
   }
+
+  createCategory(name: string): Observable<any> {
+    return this.api.post<any>('categories', { name });
+  }
+
+  createLanguage(name: string): Observable<any> {
+    return this.api.post<any>('languages', { name });
+  }
 }

@@ -86,10 +86,16 @@ export class CourseBuilderComponent implements OnInit {
 
   // Handle course saved (both new and update)
   protected onCourseSaved(savedCourse: CourseResponse) {
+    const currentId = this.courseId();
     this.course.set(savedCourse);
     if (!this.isEditMode()) {
       this.notification.success('Course created! Now let\'s build the curriculum.');
       // Navigate to the editor route for this course guid
+      this.router.navigate(['/instructor/courses/builder', savedCourse.externalId]).then(() => {
+        this.activeTab.set('curriculum');
+      });
+    } else if (currentId !== savedCourse.externalId) {
+      this.notification.success('Basic course details saved. Editing in draft version.');
       this.router.navigate(['/instructor/courses/builder', savedCourse.externalId]).then(() => {
         this.activeTab.set('curriculum');
       });

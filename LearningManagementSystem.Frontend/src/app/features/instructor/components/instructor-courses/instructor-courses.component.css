@@ -185,28 +185,33 @@
 
 .actions-cell {
   text-align: right;
+  min-width: 180px;
+}
+
+.action-buttons-wrapper {
+  display: inline-flex;
+  gap: 8px;
+  justify-content: flex-end;
 }
 
 .view-details-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--color-primary);
-  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 .view-details-link:hover {
-  color: var(--color-primary-hover);
+  background: var(--color-accent-soft) !important;
+  color: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+  transform: translateY(-1px);
 }
 
 .edit-details-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--color-accent);
-  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 .edit-details-link:hover {
-  color: var(--color-accent-hover);
+  background: rgba(139, 92, 246, 0.1) !important;
+  color: #8b5cf6 !important;
+  border-color: rgba(139, 92, 246, 0.3) !important;
+  transform: translateY(-1px);
 }

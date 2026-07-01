@@ -31,20 +31,28 @@
                 <td>{{ inst.email }}</td>
                 <td>{{ inst.phoneNo || 'N/A' }}</td>
                 <td class="action-cell">
-                  <button 
-                    type="button" 
-                    class="btn btn-approve btn-sm" 
-                    (click)="onApproveInstructor(inst.externalId)"
-                  >
-                    <i class="bi bi-person-check-fill" aria-hidden="true"></i> Approve
-                  </button>
-                  <button 
-                    type="button" 
-                    class="btn btn-reject btn-sm" 
-                    (click)="onRejectInstructor(inst.externalId)"
-                  >
-                    <i class="bi bi-person-x-fill" aria-hidden="true"></i> Reject
-                  </button>
+                  <div class="action-buttons-wrapper">
+                    <button 
+                      type="button" 
+                      class="btn btn-approve btn-sm" 
+                      [disabled]="processingId !== null"
+                      (click)="onApproveInstructor(inst.externalId)"
+                    >
+                      @if (processingId === inst.externalId) {
+                        <span class="btn-spinner"></span>
+                      } @else {
+                        <i class="bi bi-person-check-fill" aria-hidden="true"></i> Approve
+                      }
+                    </button>
+                    <button 
+                      type="button" 
+                      class="btn btn-reject btn-sm" 
+                      [disabled]="processingId !== null"
+                      (click)="onRejectInstructor(inst.externalId)"
+                    >
+                      <i class="bi bi-person-x-fill" aria-hidden="true"></i> Reject
+                    </button>
+                  </div>
                 </td>
               </tr>
             }
@@ -70,9 +78,19 @@
             <!-- Header block -->
             <div class="course-queue-header">
               <div class="course-meta">
-                <h3 class="course-title">{{ course.title }}</h3>
+                <h3 class="course-title">
+                  {{ course.title }}
+                  @if (isFieldModified(course, 'title')) {
+                    <span class="badge badge-modified" title="Original: {{ course.originalCourseDetails?.title }}">Modified Title</span>
+                  }
+                </h3>
                 <span class="course-author">Submitted by: <strong>{{ course.instructor ? (course.instructor.firstName + ' ' + course.instructor.lastName) : 'Instructor' }}</strong></span>
-                <span class="course-pricing">Pricing: <strong>{{ course.price === 0 ? 'Free' : (course.price | currency:'USD') }}</strong></span>
+                <span class="course-pricing">
+                  Pricing: <strong>{{ course.price === 0 ? 'Free' : (course.price | currency:'USD') }}</strong>
+                  @if (isFieldModified(course, 'price')) {
+                    <span class="pricing-old-text">(was: {{ course.originalCourseDetails?.price === 0 ? 'Free' : (course.originalCourseDetails?.price | currency:'USD') }})</span>
+                  }
+                </span>
               </div>
               <div class="course-header-actions">
                 <button 
@@ -86,13 +104,19 @@
                 <button 
                   type="button" 
                   class="btn btn-approve btn-sm" 
+                  [disabled]="processingId !== null"
                   (click)="onApproveCourse(course.externalId)"
                 >
-                  <i class="bi bi-check2-circle" aria-hidden="true"></i> Approve
+                  @if (processingId === course.externalId) {
+                    <span class="btn-spinner"></span> Publishing...
+                  } @else {
+                    <i class="bi bi-check2-circle" aria-hidden="true"></i> Approve
+                  }
                 </button>
                 <button 
                   type="button" 
                   class="btn btn-reject btn-sm" 
+                  [disabled]="processingId !== null"
                   (click)="triggerRejectCourse(course.externalId)"
                 >
                   <i class="bi bi-slash-circle" aria-hidden="true"></i> Reject
@@ -102,26 +126,41 @@
 
             <!-- Description summary -->
             <div class="course-queue-desc">
-              <p><strong>Description:</strong> {{ course.description }}</p>
+              <p>
+                <strong>Description:</strong> {{ course.description }}
+                @if (isFieldModified(course, 'description')) {
+                  <span class="desc-modified-indicator">(Description updated)</span>
+                }
+              </p>
             </div>
 
             <!-- Syllabus / Sections List (Expanded) -->
             @if (expandedCourseId() === course.externalId) {
               <div class="course-syllabus-expanded">
-                <h4 class="syllabus-heading">Course Syllabus</h4>
+                <h4 class="syllabus-heading">Course Syllabus @if (isDraftUpdate(course)) { <span style="font-size: 11px; text-transform: none; color: var(--color-text-3); font-weight: normal; margin-left: 8px;">(Syllabus compared with live version)</span> }</h4>
                 @if (course.sections && course.sections.length > 0) {
                   <div class="sections-timeline">
                     @for (sec of course.sections; track sec.id) {
-                      <div class="section-item">
-                        <h5 class="section-title-sm"><i class="bi bi-folder2-open" aria-hidden="true"></i> {{ sec.title }}</h5>
+                      <div class="section-item" [class.new-section-item]="isNewSection(course, sec)">
+                        <h5 class="section-title-sm">
+                          <i class="bi bi-folder2-open" aria-hidden="true"></i> {{ sec.title }}
+                          @if (isNewSection(course, sec)) {
+                            <span class="badge badge-new">New Section</span>
+                          }
+                        </h5>
                         
                         <!-- Lectures List -->
                         @if (sec.lectures && sec.lectures.length > 0) {
                           <ul class="lectures-list-sm">
                             @for (lec of sec.lectures; track lec.id) {
-                              <li>
+                              <li [class.new-lecture-item]="isNewLecture(course, sec, lec)">
                                 <i [class]="lec.contentType === 'Quiz' ? 'bi bi-question-circle' : 'bi bi-play-circle'" aria-hidden="true"></i>
-                                <span>{{ lec.title }} ({{ lec.durationInMinutes }} mins)</span>
+                                <span>
+                                  {{ lec.title }} ({{ lec.durationInMinutes }} mins)
+                                  @if (isNewLecture(course, sec, lec)) {
+                                    <span class="lecture-new-badge">New</span>
+                                  }
+                                </span>
                               </li>
                             }
                           </ul>
@@ -163,11 +202,58 @@
             [(ngModel)]="rejectionReason"
             rows="4"
           ></textarea>
+          @if (showRejectionValidationError()) {
+            <span class="validation-error-text text-danger" style="font-size: 11.5px; margin-top: 4px; display: block; color: #f43f5e; font-weight: 500;">
+              Rejection feedback is required.
+            </span>
+          }
         </div>
 
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary" (click)="cancelRejection()">Cancel</button>
           <button type="button" class="btn btn-reject flex-1" (click)="submitRejection()">Submit Rejection</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Course Approval Confirmation Modal Card -->
+  @if (activeApprovalCourseId()) {
+    <div class="modal-overlay" (click)="cancelApprovalCourse()">
+      <div class="modal-card glass-card" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">Approve Course</h3>
+        <p class="modal-desc">Are you sure you want to approve and publish this course? It will immediately become live in the explore directory.</p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelApprovalCourse()">Cancel</button>
+          <button type="button" class="btn btn-approve flex-1" (click)="confirmApprovalCourse()">Approve and Publish</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Instructor Approve Confirmation Modal Card -->
+  @if (activeApprovalInstructorId()) {
+    <div class="modal-overlay" (click)="cancelApprovalInstructor()">
+      <div class="modal-card glass-card" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">Approve Instructor Upgrade</h3>
+        <p class="modal-desc">Are you sure you want to promote this student to Instructor? They will gain access to instructor dashboard, course creation, and revenue dashboards.</p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelApprovalInstructor()">Cancel</button>
+          <button type="button" class="btn btn-approve flex-1" (click)="confirmApprovalInstructor()">Approve Application</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Instructor Reject Confirmation Modal Card -->
+  @if (activeRejectInstructorId()) {
+    <div class="modal-overlay" (click)="cancelRejectInstructor()">
+      <div class="modal-card glass-card" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">Reject Instructor Application</h3>
+        <p class="modal-desc">Are you sure you want to reject this instructor application? An email notification will be sent to the applicant.</p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelRejectInstructor()">Cancel</button>
+          <button type="button" class="btn btn-reject flex-1" (click)="confirmRejectInstructor()">Reject Application</button>
         </div>
       </div>
     </div>

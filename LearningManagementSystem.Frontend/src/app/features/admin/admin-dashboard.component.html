@@ -67,6 +67,9 @@
       >
         <i class="bi bi-folder" aria-hidden="true"></i>
         <span>Categories & Languages</span>
+        @if (pendingContentCount() > 0) {
+          <span class="badge-alert">{{ pendingContentCount() }}</span>
+        }
       </button>
     </nav>
   </aside>
@@ -107,6 +110,7 @@
           <app-admin-approvals
             [courses]="pendingQueue().pendingCourses"
             [instructors]="pendingQueue().pendingInstructors"
+            [processingId]="processingId()"
             (approveCourse)="handleApproveCourse($event)"
             (rejectCourse)="handleRejectCourse($event)"
             (approveInstructor)="handleApproveInstructor($event)"
@@ -166,6 +170,8 @@
             (deleteCat)="handleDeleteCategory($event)"
             (approveLang)="handleApproveLanguage($event)"
             (deleteLang)="handleDeleteLanguage($event)"
+            (createCat)="handleCreateCategory($event)"
+            (createLang)="handleCreateLanguage($event)"
           ></app-admin-content>
         }
       }

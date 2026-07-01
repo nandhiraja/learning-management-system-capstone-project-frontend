@@ -34,6 +34,8 @@ export interface Course {
 
 export interface CourseResponse extends Course {
   sections: CourseSectionResponse[];
+  originalCourseExternalId?: string;
+  originalCourseDetails?: CourseResponse;
 }
 
 export interface CourseSectionResponse {

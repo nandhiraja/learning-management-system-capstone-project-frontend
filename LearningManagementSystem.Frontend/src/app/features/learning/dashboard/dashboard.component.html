@@ -66,7 +66,7 @@
             <h2 class="empty-title">Your learning shelf is empty</h2>
             <p class="empty-subtitle">You are not enrolled in any courses yet. Browse our premium expert-led course selection to begin learning.</p>
             <a routerLink="/courses" class="btn btn-primary">
-              Find a course <i class="bi bi-arrow-right" aria-hidden="true"></i>
+              Find a course <i class="bi bi-arrow-right-short" aria-hidden="true"></i>
             </a>
           </div>
         } @else {
@@ -185,9 +185,9 @@
                   <p class="cert-recipient">Issued to: {{ cert.userFullName }}</p>
                   
                   <div class="cert-actions">
-                    <a [href]="cert.certificateUrl" target="_blank" rel="noopener" class="btn btn-primary btn-sm">
+                    <button class="btn btn-primary btn-sm" (click)="openCertificate(cert)">
                       <i class="bi bi-award" aria-hidden="true"></i> View certificate
-                    </a>
+                    </button>
                   </div>
                 </div>
               </article>
@@ -198,3 +198,8 @@
     }
   }
 </div>
+
+<!-- Certificate Preview Modal -->
+@if (selectedCertificate(); as cert) {
+  <app-certificate-preview [cert]="cert" (close)="closeCertificate()"></app-certificate-preview>
+}

@@ -139,44 +139,5 @@
 
 <!-- Certificate Viewer Modal Overlay -->
 @if (isCertificateModalOpen() && activeCertificate(); as cert) {
-  <div class="certificate-modal-overlay" (click)="closeCertificateModal()">
-    <div class="certificate-modal-card glass-card" (click)="$event.stopPropagation()">
-      <button class="close-modal-btn" aria-label="Close Modal" (click)="closeCertificateModal()">
-        <i class="bi bi-x-lg" aria-hidden="true"></i>
-      </button>
-      
-      <div class="certificate-border-line">
-        <div class="certificate-seal-badge">
-          <i class="bi bi-award-fill" aria-hidden="true"></i>
-        </div>
-        
-        <div class="cert-title-header">Certificate of Completion</div>
-        <p class="cert-subtitle">This document certifies that the candidate has successfully passed and finished the syllabus of:</p>
-        
-        <div class="cert-course-name">{{ cert.courseTitle }}</div>
-        
-        <p class="cert-recipient-intro">This honor is proudly awarded to:</p>
-        <div class="cert-recipient-name">{{ cert.userFullName }}</div>
-        
-        <p class="cert-award-context">
-          Who has demonstrated skill and mastery over the complete curriculum, as verified by the course author and administrator panel on the learning management system.
-        </p>
-
-        <div class="cert-footer-meta">
-          <div class="footer-meta-item">
-            <span class="meta-label">Instructor</span>
-            <span class="meta-val font-semibold">{{ cert.instructorName }}</span>
-          </div>
-          <div class="footer-meta-item">
-            <span class="meta-label">Completion Date</span>
-            <span class="meta-val font-semibold">{{ cert.issuedDate | date:'longDate' }}</span>
-          </div>
-        </div>
-
-        <div class="cert-verification-details">
-          Verification Token: <span class="token-str">{{ cert.certificateUrl.split('/').pop() }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
+  <app-certificate-preview [cert]="cert" (close)="closeCertificateModal()"></app-certificate-preview>
 }

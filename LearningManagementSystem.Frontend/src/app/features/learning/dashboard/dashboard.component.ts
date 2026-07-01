@@ -7,6 +7,7 @@ import { EnrollmentService } from '../../../core/services/enrollment.service';
 import { StatCardComponent, StatCardData } from '../../../shared/components/stat-card/stat-card.component';
 import { ProgressBarComponent } from '../../../shared/components/progress-bar/progress-bar.component';
 import { BadgeChipComponent } from '../../../shared/components/badge-chip/badge-chip.component';
+import { CertificatePreview } from '../../../shared/components/certificate-preview/certificate-preview';
 import { EnrollmentResponse, CertificateResponse } from '../../../models/enrollment.model';
 
 @Component({
@@ -17,7 +18,8 @@ import { EnrollmentResponse, CertificateResponse } from '../../../models/enrollm
     RouterLink,
     StatCardComponent,
     ProgressBarComponent,
-    BadgeChipComponent
+    BadgeChipComponent,
+    CertificatePreview
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
@@ -103,5 +105,16 @@ export class DashboardComponent implements OnInit {
 
   setTab(tab: 'courses' | 'certificates'): void {
     this.activeTab.set(tab);
+  }
+
+  // Certificate Modal State
+  protected selectedCertificate = signal<CertificateResponse | null>(null);
+
+  openCertificate(cert: CertificateResponse) {
+    this.selectedCertificate.set(cert);
+  }
+
+  closeCertificate() {
+    this.selectedCertificate.set(null);
   }
 }

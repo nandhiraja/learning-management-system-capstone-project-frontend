@@ -13,19 +13,22 @@
       />
     </div>
 
-    <div class="role-filter-group">
-      <label for="admin-role-filter" class="filter-label">Filter Role:</label>
-      <select 
-        id="admin-role-filter"
-        class="form-control select-control" 
-        [ngModel]="selectedRole()"
-        (ngModelChange)="onRoleChange($event)"
-      >
-        <option value="ALL">All Roles</option>
-        <option value="Student">Students</option>
-        <option value="Instructor">Instructors</option>
-        <option value="Admin">Admins</option>
-      </select>
+    <div class="role-filter-group custom-dropdown-container">
+      <label class="filter-label">Filter Role:</label>
+      <div class="custom-select-wrapper" style="min-width: 150px;">
+        <button type="button" class="custom-select-trigger" (click)="toggleRoleDropdown()">
+          <span>{{ roleDisplayNames[selectedRole()] }}</span>
+          <i class="bi bi-chevron-down" aria-hidden="true"></i>
+        </button>
+        @if (isRoleDropdownOpen()) {
+          <ul class="custom-dropdown-options glass-card">
+            <li (click)="selectRole('ALL')">All Roles</li>
+            <li (click)="selectRole('Student')">Students</li>
+            <li (click)="selectRole('Instructor')">Instructors</li>
+            <li (click)="selectRole('Admin')">Admins</li>
+          </ul>
+        }
+      </div>
     </div>
   </div>
 
@@ -36,17 +39,17 @@
         <table class="admin-table">
           <thead>
             <tr>
-              <th>User Details</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th class="actions-header">Actions</th>
+              <th class="col-user">User Details</th>
+              <th class="col-email">Email</th>
+              <th class="col-role">Role</th>
+              <th class="col-status">Status</th>
+              <th class="col-actions">Actions</th>
             </tr>
           </thead>
           <tbody>
             @for (user of filteredUsers(); track user.id) {
               <tr>
-                <td>
+                <td class="col-user">
                   <div class="user-cell">
                     @if (user.profilePictureUrl) {
                       <img [src]="user.profilePictureUrl" alt="Avatar" class="avatar-sm" />
@@ -59,43 +62,45 @@
                     </div>
                   </div>
                 </td>
-                <td>{{ user.email }}</td>
-                <td>
+                <td class="col-email">{{ user.email }}</td>
+                <td class="col-role">
                   <span class="badge-role" [class]="user.role.toLowerCase()">
                     {{ user.role }}
                   </span>
                 </td>
-                <td>
+                <td class="col-status">
                   <span class="badge-status" [class.active]="user.isActive" [class.blocked]="!user.isActive">
                     {{ user.isActive ? 'Active' : 'Blocked' }}
                   </span>
                 </td>
-                <td class="action-cell">
-                  <!-- Block / Unblock action -->
-                  @if (user.role !== 'Admin') {
-                    <button 
-                      type="button" 
-                      class="btn btn-sm"
-                      [class.btn-block-action]="user.isActive"
-                      [class.btn-unblock-action]="!user.isActive"
-                      (click)="onToggleActive(user.externalId, user.isActive)"
-                    >
-                      <i [class]="user.isActive ? 'bi bi-slash-circle-fill' : 'bi bi-check-circle-fill'" aria-hidden="true"></i>
-                      {{ user.isActive ? 'Block' : 'Unblock' }}
-                    </button>
-                  }
+                <td class="col-actions">
+                  <div class="action-buttons-wrapper">
+                    <!-- Block / Unblock action -->
+                    @if (user.role !== 'Admin') {
+                      <button 
+                        type="button" 
+                        class="btn btn-sm"
+                        [class.btn-block-action]="user.isActive"
+                        [class.btn-unblock-action]="!user.isActive"
+                        (click)="onToggleActive(user.externalId, user.isActive)"
+                      >
+                        <i [class]="user.isActive ? 'bi bi-slash-circle-fill' : 'bi bi-check-circle-fill'" aria-hidden="true"></i>
+                        {{ user.isActive ? 'Block' : 'Unblock' }}
+                      </button>
+                    }
 
-                  <!-- Demote Instructor action -->
-                  @if (user.role === 'Instructor') {
-                    <button 
-                      type="button" 
-                      class="btn btn-demote btn-sm"
-                      (click)="onDemote(user.externalId)"
-                      title="Demote back to standard student role"
-                    >
-                      <i class="bi bi-arrow-down-circle-fill" aria-hidden="true"></i> Demote
-                    </button>
-                  }
+                    <!-- Demote Instructor action -->
+                    @if (user.role === 'Instructor') {
+                      <button 
+                        type="button" 
+                        class="btn btn-demote btn-sm"
+                        (click)="onDemote(user.externalId)"
+                        title="Demote back to standard student role"
+                      >
+                        <i class="bi bi-arrow-down-circle-fill" aria-hidden="true"></i> Demote
+                      </button>
+                    }
+                  </div>
                 </td>
               </tr>
             }

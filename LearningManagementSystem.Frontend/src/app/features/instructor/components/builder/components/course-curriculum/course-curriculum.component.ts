@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, signal, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CourseResponse, CourseSectionResponse, LectureResponse } from '../../../../../../models/course.model';
@@ -12,7 +12,8 @@ import { HttpEventType } from '@angular/common/http';
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, BadgeChipComponent],
   templateUrl: './course-curriculum.component.html',
-  styleUrl: './course-curriculum.component.css'
+  styleUrl: './course-curriculum.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CourseCurriculumComponent {
   private fb = inject(FormBuilder);
@@ -275,6 +276,32 @@ export class CourseCurriculumComponent {
         },
         error: (err) => this.notification.error(err.error || 'Failed to delete lecture.')
       });
+    }
+  }
+
+  protected isLecTypeDropdownOpen = signal<boolean>(false);
+  protected lecTypeDisplayNames: Record<string, string> = {
+    'Video': 'Video',
+    'pdf': 'PDF Document',
+    'ExternalLink': 'External Link',
+    'Text': 'Plain Text Content',
+    'PPT': 'PPT Presentation'
+  };
+
+  toggleLecTypeDropdown() {
+    this.isLecTypeDropdownOpen.update(val => !val);
+  }
+
+  selectLecType(typeVal: string) {
+    this.lectureForm.get('contentType')?.setValue(typeVal);
+    this.isLecTypeDropdownOpen.set(false);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.custom-dropdown-container')) {
+      this.isLecTypeDropdownOpen.set(false);
     }
   }
 }

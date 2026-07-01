@@ -42,6 +42,7 @@ export class AdminDashboardComponent implements OnInit {
   // Loading indicator states
   protected isStatsLoading = signal<boolean>(true);
   protected isDataLoading = signal<boolean>(false);
+  protected processingId = signal<string | null>(null);
 
   // Dashboard Data Signals
   protected stats = signal<AdminDashboardResponse | null>(null);
@@ -50,11 +51,27 @@ export class AdminDashboardComponent implements OnInit {
   protected courses = signal<CourseResponse[]>([]);
   protected categories = signal<AdminCategoryResponse[]>([]);
   protected languages = signal<AdminLanguageResponse[]>([]);
+  protected pendingContentCount = signal<number>(0);
 
   ngOnInit() {
     this.loadStats();
     // Default load corresponding to tab
     this.loadTabData('overview');
+    this.refreshPendingContentCount();
+  }
+
+  private refreshPendingContentCount() {
+    this.adminService.getCategories().subscribe({
+      next: (cats) => {
+        const pendingCats = cats.filter(c => !c.isApproved).length;
+        this.adminService.getLanguages().subscribe({
+          next: (langs) => {
+            const pendingLangs = langs.filter(l => !l.isApproved).length;
+            this.pendingContentCount.set(pendingCats + pendingLangs);
+          }
+        });
+      }
+    });
   }
 
   protected setTab(tabName: string) {
@@ -142,54 +159,86 @@ export class AdminDashboardComponent implements OnInit {
 
   // --- Course Review Approvals ---
   protected handleApproveCourse(courseId: string) {
+    this.processingId.set(courseId);
     this.adminService.reviewCourse(courseId, 'Approved').subscribe({
       next: () => {
         this.notification.success('Course published successfully!');
-        this.loadTabData('approvals');
         this.loadStats();
+        this.adminService.getPendingQueue().subscribe({
+          next: (res) => {
+            this.pendingQueue.set(res);
+            this.processingId.set(null);
+          },
+          error: () => this.processingId.set(null)
+        });
       },
       error: () => {
         this.notification.error('Failed to publish course.');
+        this.processingId.set(null);
       }
     });
   }
 
   protected handleRejectCourse(event: { courseId: string; reason: string }) {
+    this.processingId.set(event.courseId);
     this.adminService.reviewCourse(event.courseId, 'Rejected', event.reason).subscribe({
       next: () => {
         this.notification.success('Course rejection processed.');
-        this.loadTabData('approvals');
         this.loadStats();
+        this.adminService.getPendingQueue().subscribe({
+          next: (res) => {
+            this.pendingQueue.set(res);
+            this.processingId.set(null);
+          },
+          error: () => this.processingId.set(null)
+        });
       },
       error: () => {
         this.notification.error('Failed to reject course review request.');
+        this.processingId.set(null);
       }
     });
   }
 
   // --- Instructor Promotion Requests ---
   protected handleApproveInstructor(userGuid: string) {
+    this.processingId.set(userGuid);
     this.adminService.updateUserRole(userGuid, 'ApproveInstructor').subscribe({
       next: () => {
         this.notification.success('Instructor request approved!');
-        this.loadTabData('approvals');
         this.loadStats();
+        this.adminService.getPendingQueue().subscribe({
+          next: (res) => {
+            this.pendingQueue.set(res);
+            this.processingId.set(null);
+          },
+          error: () => this.processingId.set(null)
+        });
       },
       error: () => {
         this.notification.error('Failed to approve instructor promotion.');
+        this.processingId.set(null);
       }
     });
   }
 
   protected handleRejectInstructor(userGuid: string) {
+    this.processingId.set(userGuid);
     this.adminService.updateUserRole(userGuid, 'RejectInstructor').subscribe({
       next: () => {
         this.notification.success('Instructor request rejected.');
-        this.loadTabData('approvals');
         this.loadStats();
+        this.adminService.getPendingQueue().subscribe({
+          next: (res) => {
+            this.pendingQueue.set(res);
+            this.processingId.set(null);
+          },
+          error: () => this.processingId.set(null)
+        });
       },
       error: () => {
         this.notification.error('Failed to reject instructor request.');
+        this.processingId.set(null);
       }
     });
   }
@@ -227,6 +276,7 @@ export class AdminDashboardComponent implements OnInit {
       next: () => {
         this.notification.success('Category approved!');
         this.loadTabData('content');
+        this.refreshPendingContentCount();
       },
       error: () => {
         this.notification.error('Failed to approve category.');
@@ -239,6 +289,7 @@ export class AdminDashboardComponent implements OnInit {
       next: () => {
         this.notification.success('Category deleted.');
         this.loadTabData('content');
+        this.refreshPendingContentCount();
       },
       error: () => {
         this.notification.error('Failed to delete category.');
@@ -252,6 +303,7 @@ export class AdminDashboardComponent implements OnInit {
       next: () => {
         this.notification.success('Language approved!');
         this.loadTabData('content');
+        this.refreshPendingContentCount();
       },
       error: () => {
         this.notification.error('Failed to approve language.');
@@ -264,9 +316,37 @@ export class AdminDashboardComponent implements OnInit {
       next: () => {
         this.notification.success('Language deleted.');
         this.loadTabData('content');
+        this.refreshPendingContentCount();
       },
       error: () => {
         this.notification.error('Failed to delete language.');
+      }
+    });
+  }
+
+  // --- Category & Language direct creation ---
+  protected handleCreateCategory(name: string) {
+    this.adminService.createCategory(name).subscribe({
+      next: () => {
+        this.notification.success('Category created successfully!');
+        this.loadTabData('content');
+        this.refreshPendingContentCount();
+      },
+      error: (err) => {
+        this.notification.error(err.error?.message || 'Failed to create category.');
+      }
+    });
+  }
+
+  protected handleCreateLanguage(name: string) {
+    this.adminService.createLanguage(name).subscribe({
+      next: () => {
+        this.notification.success('Language created successfully!');
+        this.loadTabData('content');
+        this.refreshPendingContentCount();
+      },
+      error: (err) => {
+        this.notification.error(err.error?.message || 'Failed to create language.');
       }
     });
   }

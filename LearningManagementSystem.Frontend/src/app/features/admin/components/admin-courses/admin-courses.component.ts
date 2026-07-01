@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy, signal, computed } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy, signal, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CourseResponse } from '../../../../models/course.model';
@@ -17,6 +17,32 @@ export class AdminCoursesComponent {
   // Filter signals
   protected searchTerm = signal<string>('');
   protected selectedStatus = signal<string>('ALL');
+
+  protected isStatusDropdownOpen = signal<boolean>(false);
+  protected statusDisplayNames: Record<string, string> = {
+    'ALL': 'All Statuses',
+    'Published': 'Published',
+    'PendingReview': 'Pending Review',
+    'Rejected': 'Rejected',
+    'Archived': 'Archived'
+  };
+
+  toggleStatusDropdown() {
+    this.isStatusDropdownOpen.update(val => !val);
+  }
+
+  selectStatus(status: string) {
+    this.selectedStatus.set(status);
+    this.isStatusDropdownOpen.set(false);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.custom-dropdown-container')) {
+      this.isStatusDropdownOpen.set(false);
+    }
+  }
 
   // Filtered courses
   protected filteredCourses = computed<CourseResponse[]>(() => {

@@ -150,15 +150,23 @@
 
           <!-- Type & Duration row -->
           <div class="form-row">
-            <div class="form-group flex-1">
-              <label for="lecType" class="form-label">Content Type <span class="required-star">*</span></label>
-              <select id="lecType" formControlName="contentType" class="form-control select-input">
-                <option value="Video">Video</option>
-                <option value="pdf">PDF Document</option>
-                <option value="ExternalLink">External Link</option>
-                <option value="Text">Plain Text Content</option>
-                <option value="PPT">PPT Presentation</option>
-              </select>
+            <div class="form-group flex-1 custom-dropdown-container">
+              <label class="form-label">Content Type <span class="required-star">*</span></label>
+              <div class="custom-select-wrapper">
+                <button type="button" class="custom-select-trigger" (click)="toggleLecTypeDropdown()">
+                  <span>{{ lecTypeDisplayNames[lectureForm.get('contentType')?.value || 'Video'] }}</span>
+                  <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                </button>
+                @if (isLecTypeDropdownOpen()) {
+                  <ul class="custom-dropdown-options glass-card">
+                    <li (click)="selectLecType('Video')">Video</li>
+                    <li (click)="selectLecType('pdf')">PDF Document</li>
+                    <li (click)="selectLecType('ExternalLink')">External Link</li>
+                    <li (click)="selectLecType('Text')">Plain Text Content</li>
+                    <li (click)="selectLecType('PPT')">PPT Presentation</li>
+                  </ul>
+                }
+              </div>
             </div>
 
             <div class="form-group flex-1">
