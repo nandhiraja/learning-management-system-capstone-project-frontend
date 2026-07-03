@@ -53,3 +53,17 @@ export interface LectureResponse {
   contentType: string;
   quizId: number | null;
 }
+
+export interface ReviewRequest {
+  rating: number;
+  comment?: string;
+}
+
+export interface ReviewResponse {
+  id: number;
+  userName: string;
+  userFullName: string;
+  profilePictureUrl?: string | null;
+  rating: number;
+  comment?: string;
+}

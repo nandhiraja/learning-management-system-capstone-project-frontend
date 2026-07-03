@@ -11,6 +11,7 @@ import { ClassroomQuizComponent } from './components/classroom-quiz/classroom-qu
 import { ClassroomDiscussionComponent } from './components/classroom-discussion/classroom-discussion.component';
 import { ClassroomPlayerComponent } from './components/classroom-player/classroom-player.component';
 import { CertificatePreview } from '../../../../../shared/components/certificate-preview/certificate-preview';
+import { CourseReviewsComponent } from '../../../../../shared/components/course-reviews/course-reviews.component';
 
 @Component({
   selector: 'app-course-active-detail',
@@ -23,7 +24,8 @@ import { CertificatePreview } from '../../../../../shared/components/certificate
     ClassroomQuizComponent,
     ClassroomDiscussionComponent,
     ClassroomPlayerComponent,
-    CertificatePreview
+    CertificatePreview,
+    CourseReviewsComponent
   ],
   templateUrl: './course-active-detail.component.html',
   styleUrl: './course-active-detail.component.css'
@@ -40,7 +42,7 @@ export class CourseActiveDetailComponent implements OnInit {
   protected activeLecture = signal<LectureResponse | null>(null);
   protected enrollmentId = signal<number | null>(null);
   protected completedLectureIds = signal<number[]>([]);
-  protected activeTab = signal<'lecture' | 'discussion' | 'quiz'>('lecture');
+  protected activeTab = signal<'lecture' | 'discussion' | 'quiz' | 'reviews'>('lecture');
   protected isLoading = signal<boolean>(true);
   protected isSidebarOpen = signal<boolean>(true);
   

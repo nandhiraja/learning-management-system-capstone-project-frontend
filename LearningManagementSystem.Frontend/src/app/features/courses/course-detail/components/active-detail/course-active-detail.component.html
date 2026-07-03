@@ -66,6 +66,15 @@
               <i class="bi bi-question-circle" aria-hidden="true"></i> Take Lecture Quiz
             </button>
           }
+          <button 
+            role="tab"
+            [attr.aria-selected]="activeTab() === 'reviews'"
+            class="classroom-tab" 
+            [class.active]="activeTab() === 'reviews'"
+            (click)="activeTab.set('reviews')"
+          >
+            <i class="bi bi-star" aria-hidden="true"></i> Course Reviews
+          </button>
         </div>
 
         <div class="active-lecture-header">
@@ -111,6 +120,13 @@
               [lectureId]="lecture.id"
               [isInstructor]="isCourseInstructor()"
             ></app-classroom-discussion>
+          }
+
+          @if (activeTab() === 'reviews') {
+            <app-course-reviews
+              [courseExternalId]="course.externalId"
+              [isEnrolled]="true"
+            ></app-course-reviews>
           }
         </div>
       } @else {

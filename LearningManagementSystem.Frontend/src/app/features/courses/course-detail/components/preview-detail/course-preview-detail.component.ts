@@ -9,6 +9,7 @@ import { AuthService } from '../../../../../core/services/auth.service';
 import { CoursePreviewHeroComponent } from './components/preview-hero/preview-hero.component';
 import { CoursePreviewCurriculumComponent } from './components/preview-curriculum/preview-curriculum.component';
 import { CoursePreviewSidebarComponent } from './components/preview-sidebar/preview-sidebar.component';
+import { CourseReviewsComponent } from '../../../../../shared/components/course-reviews/course-reviews.component';
 
 @Component({
   selector: 'app-course-preview-detail',
@@ -17,7 +18,8 @@ import { CoursePreviewSidebarComponent } from './components/preview-sidebar/prev
     CommonModule,
     CoursePreviewHeroComponent,
     CoursePreviewCurriculumComponent,
-    CoursePreviewSidebarComponent
+    CoursePreviewSidebarComponent,
+    CourseReviewsComponent
   ],
   templateUrl: './course-preview-detail.component.html',
   styleUrl: './course-preview-detail.component.css',

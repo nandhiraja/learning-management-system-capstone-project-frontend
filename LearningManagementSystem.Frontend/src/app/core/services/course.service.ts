@@ -78,4 +78,16 @@ export class CourseService {
   createLanguage(name: string): Observable<any> {
     return this.api.post<any>('languages', { name });
   }
+
+  getCourseReviews(courseId: string, page: number = 1, pageSize: number = 10): Observable<{ items: any[]; totalCount: number }> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('pageSize', pageSize.toString());
+    return this.api.get<{ items: any[]; totalCount: number }>(`courses/${courseId}/reviews?${params.toString()}`);
+  }
+
+  addCourseReview(courseId: string, rating: number, comment?: string): Observable<any> {
+    const request = { rating, comment };
+    return this.api.post<any>(`courses/${courseId}/reviews`, request);
+  }
 }
