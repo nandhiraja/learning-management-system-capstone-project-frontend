@@ -82,6 +82,10 @@
   border-collapse: collapse;
   text-align: left;
 }
+table th:first-child,
+table td:first-child {
+  width: 40%;
+}
 
 .courses-table th {
   padding: 14px 16px;

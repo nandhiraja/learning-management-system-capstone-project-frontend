@@ -14,6 +14,7 @@ export interface QuizQuestionResponse {
 export interface QuizOptionResponse {
   id: number;
   optionText: string;
+  isCorrect?: boolean;
 }
 
 export interface QuizSubmitRequest {

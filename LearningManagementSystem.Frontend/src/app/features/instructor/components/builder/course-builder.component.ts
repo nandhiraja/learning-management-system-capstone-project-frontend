@@ -56,17 +56,23 @@ export class CourseBuilderComponent implements OnInit {
     });
   }
 
-  loadCourseDetails(id: string) {
-    this.isLoading.set(true);
+  loadCourseDetails(id: string, silent = false) {
+    if (!silent) {
+      this.isLoading.set(true);
+    }
     this.courseService.getCourseById(id).subscribe({
       next: (data) => {
         // cast Course to CourseResponse
         this.course.set(data as CourseResponse);
-        this.isLoading.set(false);
+        if (!silent) {
+          this.isLoading.set(false);
+        }
       },
       error: (err) => {
         this.notification.error('Failed to load course details.');
-        this.isLoading.set(false);
+        if (!silent) {
+          this.isLoading.set(false);
+        }
         this.router.navigate(['/instructor/dashboard']);
       }
     });

@@ -101,7 +101,7 @@
       @if (activeTab() === 'curriculum') {
         <app-course-curriculum 
           [course]="course()"
-          (refresh)="loadCourseDetails(courseId()!)"
+          (refresh)="loadCourseDetails(courseId()!, true)"
         ></app-course-curriculum>
       }
 
