@@ -1,0 +1,102 @@
+<div class="quiz-builder-container">
+  <form [formGroup]="quizForm" (ngSubmit)="saveQuiz()" class="quiz-form">
+    
+    <!-- Quiz Metadata -->
+    <div class="form-row quiz-meta-row">
+      <div class="form-group flex-2">
+        <label class="form-label">Quiz Title <span class="required-star">*</span></label>
+        <input 
+          type="text" 
+          formControlName="title" 
+          class="form-control" 
+          placeholder="e.g. End of Section 1 Quiz" 
+          [class.is-invalid]="quizForm.get('title')?.touched && quizForm.get('title')?.invalid"
+        />
+      </div>
+      <div class="form-group flex-1">
+        <label class="form-label">Passing Score (%) <span class="required-star">*</span></label>
+        <input 
+          type="number" 
+          formControlName="passScore" 
+          class="form-control" 
+          min="1" max="100"
+          [class.is-invalid]="quizForm.get('passScore')?.touched && quizForm.get('passScore')?.invalid"
+        />
+      </div>
+    </div>
+
+    <div class="questions-divider">
+      <h4>Quiz Questions</h4>
+      <p class="text-sm text-muted">Add multiple choice questions. Mark one option as the correct answer.</p>
+    </div>
+
+    <!-- Questions Array -->
+    <div formArrayName="questions" class="questions-list">
+      @for (q of questions.controls; track q; let i = $index) {
+        <div [formGroupName]="i" class="question-card glass-card">
+          
+          <div class="question-header">
+            <span class="question-number">Question {{ i + 1 }}</span>
+            <button type="button" class="btn btn-ghost btn-xs text-danger" (click)="removeQuestion(i)" title="Remove Question">
+              <i class="bi bi-trash3" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <div class="form-group">
+            <input 
+              type="text" 
+              formControlName="questionText" 
+              class="form-control question-input" 
+              placeholder="Enter your question here..." 
+            />
+          </div>
+
+          <!-- Options Array -->
+          <div formArrayName="options" class="options-list">
+            @for (opt of getOptions(i).controls; track opt; let j = $index) {
+              <div [formGroupName]="j" class="option-row">
+                <label class="custom-radio-container">
+                  <input type="radio" [name]="'correctOption_' + i" [checked]="opt.get('isCorrect')?.value" (change)="setCorrectOption(i, j)" />
+                  <span class="custom-radio-mark"></span>
+                </label>
+                
+                <input 
+                  type="text" 
+                  formControlName="optionText" 
+                  class="form-control option-input" 
+                  [placeholder]="'Option ' + (j + 1)" 
+                  [class.is-correct]="opt.get('isCorrect')?.value"
+                />
+
+                <button type="button" class="btn btn-ghost btn-xs text-danger btn-remove-option" (click)="removeOption(i, j)" *ngIf="getOptions(i).length > 2" title="Delete Option">
+                  <i class="bi bi-trash3" aria-hidden="true"></i>
+                </button>
+              </div>
+            }
+          </div>
+
+          <button type="button" class="btn btn-secondary btn-sm btn-add-option" (click)="addOption(i)" *ngIf="getOptions(i).length < 5">
+            <i class="bi bi-plus" aria-hidden="true"></i> Add Option
+          </button>
+
+        </div>
+      }
+    </div>
+
+    <div class="add-question-actions">
+      <button type="button" class="btn btn-secondary btn-block-add-question" (click)="addQuestion()">
+        <i class="bi bi-plus-circle" aria-hidden="true"></i> Add Another Question
+      </button>
+    </div>
+
+    <div class="quiz-footer-actions">
+      <button type="submit" class="btn btn-primary btn-lg submit-quiz-btn" [disabled]="quizForm.invalid || isSaving">
+        @if (isSaving) {
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...
+        } @else {
+          <i class="bi bi-check-circle" aria-hidden="true"></i> {{ quizId ? 'Update Quiz' : 'Save Quiz' }}
+        }
+      </button>
+    </div>
+  </form>
+</div>

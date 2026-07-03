@@ -76,6 +76,10 @@
                   </div>
 
                   <div class="lecture-right">
+                    <button type="button" class="btn btn-ghost btn-xs text-info" (click)="openQuizModal(sec.id, lec)">
+                      <i class="bi" [class.bi-question-circle]="!lec.quizId" [class.bi-question-circle-fill]="lec.quizId" aria-hidden="true"></i>
+                      {{ lec.quizId ? 'Quiz' : 'Add Quiz' }}
+                    </button>
                     <button type="button" class="btn btn-ghost btn-xs text-primary" (click)="openEditLectureModal(sec.id, lec)">
                       <i class="bi bi-pencil-fill" aria-hidden="true"></i> Edit
                     </button>
@@ -124,16 +128,28 @@
   <!-- --- Lecture Modal Overlay Overlay Window --- -->
   @if (isLectureModalOpen()) {
     <div class="modal-overlay">
-      <div class="modal-content-card glass-card">
+      <div class="modal-content-card glass-card" [class.wide-modal]="activeModalTab() === 'quiz'">
         <div class="modal-header">
           <h4 class="modal-title">
-            {{ editingLectureId() ? 'Edit Lecture Metadata' : 'Add New Lecture' }}
+            {{ editingLectureId() ? 'Edit Lecture' : 'Add New Lecture' }}
           </h4>
           <button type="button" class="btn-close-modal" (click)="closeLectureModal()" aria-label="Close modal dialog">
             <i class="bi bi-x-lg" aria-hidden="true"></i>
           </button>
         </div>
 
+        @if (editingLectureId()) {
+          <div class="modal-tabs">
+            <button type="button" class="tab-btn" [class.active]="activeModalTab() === 'content'" (click)="activeModalTab.set('content')">
+              <i class="bi bi-file-earmark-text" aria-hidden="true"></i> Content
+            </button>
+            <button type="button" class="tab-btn" [class.active]="activeModalTab() === 'quiz'" (click)="activeModalTab.set('quiz')">
+              <i class="bi bi-question-circle" aria-hidden="true"></i> Quiz
+            </button>
+          </div>
+        }
+
+        @if (activeModalTab() === 'content') {
         <form [formGroup]="lectureForm" (submit)="saveLecture()" class="modal-form-body">
           <!-- Lecture Title -->
           <div class="form-group">
@@ -229,29 +245,60 @@
                 }
               </div>
             } @else {
-              <!-- URL text field for PPT, External Links, Text -->
-              <input 
-                type="text" 
-                formControlName="contentUrl" 
-                placeholder="Enter resource URL or content link..." 
-                class="form-control"
-                [class.is-invalid]="lectureForm.get('contentUrl')?.touched && lectureForm.get('contentUrl')?.invalid"
-              />
+              <!-- Textarea for Text, URL for PPT, External Links -->
+              @if (lectureForm.get('contentType')?.value === 'Text') {
+                <textarea 
+                  formControlName="contentUrl" 
+                  placeholder="Enter your article or text content here..." 
+                  class="form-control text-content-area"
+                  rows="8"
+                  [class.is-invalid]="lectureForm.get('contentUrl')?.touched && lectureForm.get('contentUrl')?.invalid"
+                ></textarea>
+              } @else {
+                <input 
+                  type="text" 
+                  formControlName="contentUrl" 
+                  placeholder="Enter resource URL or content link..." 
+                  class="form-control"
+                  [class.is-invalid]="lectureForm.get('contentUrl')?.touched && lectureForm.get('contentUrl')?.invalid"
+                />
+              }
             }
           </div>
 
           <!-- Actions Footer -->
           <div class="modal-footer-actions">
-            <button type="button" class="btn btn-ghost btn-md" (click)="closeLectureModal()">Cancel</button>
-            <button 
-              type="submit" 
-              class="btn btn-primary btn-md submit-lecture-btn"
-              [disabled]="lectureForm.invalid || isUploadingFile()"
-            >
-              {{ editingLectureId() ? 'Save Changes' : 'Add Lecture' }}
-            </button>
+            <div class="auto-save-indicator" *ngIf="editingLectureId()">
+              @if (autoSaveStatus() === 'Saving...') {
+                <span class="text-warning"><i class="bi bi-arrow-repeat spin"></i> Saving...</span>
+              } @else if (autoSaveStatus() === 'Saved') {
+                <span class="text-success"><i class="bi bi-check2-circle"></i> Saved</span>
+              } @else {
+                <span class="text-muted"><i class="bi bi-file-earmark"></i> Draft</span>
+              }
+            </div>
+            <div class="footer-buttons">
+              <button type="button" class="btn btn-ghost btn-md" (click)="closeLectureModal()">Cancel</button>
+              <button 
+                type="submit" 
+                class="btn btn-primary btn-md submit-lecture-btn"
+                [disabled]="lectureForm.invalid || isUploadingFile()"
+              >
+                {{ editingLectureId() ? 'Save & Close' : 'Create Lecture' }}
+              </button>
+            </div>
           </div>
         </form>
+        } @else {
+          <div class="modal-form-body quiz-tab-body">
+            <!-- Show Quiz Builder if a lecture exists -->
+            <app-instructor-quiz-builder 
+              [lectureId]="editingLectureId()!" 
+              [quizId]="currentEditingLecture()?.quizId"
+              (quizSaved)="onQuizSaved()"
+            ></app-instructor-quiz-builder>
+          </div>
+        }
       </div>
     </div>
   }

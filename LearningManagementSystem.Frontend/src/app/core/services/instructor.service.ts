@@ -90,4 +90,21 @@ export class InstructorService {
       observe: 'events'
     });
   }
+
+  // Quizzes
+  getQuiz(quizId: number): Observable<any> {
+    return this.api.get<any>(`quizzes/${quizId}`);
+  }
+
+  createQuiz(lectureId: number, data: any): Observable<any> {
+    return this.api.post<any>(`lectures/${lectureId}/quiz`, data);
+  }
+
+  updateQuiz(quizId: number, data: any): Observable<any> {
+    return this.api.put<any>(`quizzes/${quizId}`, data);
+  }
+
+  deleteQuiz(quizId: number): Observable<any> {
+    return this.api.delete<any>(`quizzes/${quizId}`);
+  }
 }

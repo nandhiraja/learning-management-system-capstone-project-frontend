@@ -1,21 +1,24 @@
-import { Component, Input, Output, EventEmitter, inject, signal, HostListener, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, signal, HostListener, ChangeDetectionStrategy, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CourseResponse, CourseSectionResponse, LectureResponse } from '../../../../../../models/course.model';
 import { InstructorService } from '../../../../../../core/services/instructor.service';
 import { NotificationService } from '../../../../../../shared/services/notification.service';
 import { BadgeChipComponent } from '../../../../../../shared/components/badge-chip/badge-chip.component';
+import { InstructorQuizBuilder } from '../instructor-quiz-builder/instructor-quiz-builder';
 import { HttpEventType } from '@angular/common/http';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-course-curriculum',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, BadgeChipComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, BadgeChipComponent, InstructorQuizBuilder],
   templateUrl: './course-curriculum.component.html',
   styleUrl: './course-curriculum.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CourseCurriculumComponent {
+export class CourseCurriculumComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private instructorService = inject(InstructorService);
   private notification = inject(NotificationService);
@@ -43,8 +46,23 @@ export class CourseCurriculumComponent {
   protected fileUploadProgress = signal<number>(0);
   protected uploadedFileUrl = signal<string | null>(null);
 
+  // Auto-Save and Quiz Modal State
+  protected activeModalTab = signal<'content' | 'quiz'>('content');
+  protected autoSaveStatus = signal<'Saved' | 'Saving...' | 'Draft'>('Draft');
+  private formSub?: Subscription;
+
+  // Track the full lecture object for quiz editing
+  protected currentEditingLecture = signal<LectureResponse | null>(null);
+
   constructor() {
+  }
+
+  ngOnInit() {
     this.initLectureForm();
+  }
+
+  ngOnDestroy() {
+    if (this.formSub) this.formSub.unsubscribe();
   }
 
   // --- Accordion Controls ---
@@ -140,11 +158,58 @@ export class CourseCurriculumComponent {
       this.uploadedFileUrl.set(null);
       this.lectureForm.get('contentUrl')?.setValue('');
     });
+
+    // Auto-save logic
+    this.formSub = this.lectureForm.valueChanges
+      .pipe(
+        debounceTime(1500),
+        distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
+      )
+      .subscribe(() => {
+        if (this.isLectureModalOpen() && this.lectureForm.valid) {
+          this.performAutoSave();
+        }
+      });
+  }
+
+  private performAutoSave() {
+    this.autoSaveStatus.set('Saving...');
+    const payload = this.lectureForm.value;
+    const lectureId = this.editingLectureId();
+    const sectionId = this.targetSectionId();
+
+    if (lectureId) {
+      this.instructorService.updateLecture(lectureId, payload).subscribe({
+        next: () => {
+          this.autoSaveStatus.set('Saved');
+          this.refresh.emit(); // Silently refresh the list in the background
+        },
+        error: () => this.autoSaveStatus.set('Draft')
+      });
+    } else if (sectionId) {
+      this.instructorService.createLecture(sectionId, payload).subscribe({
+        next: (res) => {
+          // It's created for the first time, set the editing ID
+          // res should contain the newly created lecture ID
+          if (res && res.id) {
+             this.editingLectureId.set(res.id);
+             this.currentEditingLecture.set(res);
+          }
+          this.autoSaveStatus.set('Saved');
+          this.refresh.emit();
+        },
+        error: () => this.autoSaveStatus.set('Draft')
+      });
+    }
   }
 
   protected openAddLectureModal(sectionId: number) {
     this.targetSectionId.set(sectionId);
     this.editingLectureId.set(null);
+    this.currentEditingLecture.set(null);
+    this.autoSaveStatus.set('Draft');
+    this.activeModalTab.set('content');
+    
     this.lectureForm.reset({
       title: '',
       contentType: 'Video',
@@ -158,12 +223,33 @@ export class CourseCurriculumComponent {
   protected openEditLectureModal(sectionId: number, lecture: LectureResponse) {
     this.targetSectionId.set(sectionId);
     this.editingLectureId.set(lecture.id);
+    this.currentEditingLecture.set(lecture);
+    this.autoSaveStatus.set('Saved');
+    this.activeModalTab.set('content');
+
     this.lectureForm.patchValue({
       title: lecture.title,
       contentType: lecture.contentType,
       durationInMinutes: lecture.durationInMinutes,
       contentUrl: lecture.contentUrl
-    });
+    }, { emitEvent: false }); // Prevent triggering auto-save on open
+    this.uploadedFileUrl.set(lecture.contentUrl);
+    this.isLectureModalOpen.set(true);
+  }
+
+  protected openQuizModal(sectionId: number, lecture: LectureResponse) {
+    this.targetSectionId.set(sectionId);
+    this.editingLectureId.set(lecture.id);
+    this.currentEditingLecture.set(lecture);
+    this.autoSaveStatus.set('Saved');
+    this.activeModalTab.set('quiz'); // directly open the quiz tab!
+
+    this.lectureForm.patchValue({
+      title: lecture.title,
+      contentType: lecture.contentType,
+      durationInMinutes: lecture.durationInMinutes,
+      contentUrl: lecture.contentUrl
+    }, { emitEvent: false }); // Prevent triggering auto-save on open
     this.uploadedFileUrl.set(lecture.contentUrl);
     this.isLectureModalOpen.set(true);
   }
@@ -172,6 +258,7 @@ export class CourseCurriculumComponent {
     this.isLectureModalOpen.set(false);
     this.targetSectionId.set(null);
     this.editingLectureId.set(null);
+    this.currentEditingLecture.set(null);
   }
 
   // --- Lecture File Upload Handlers ---
@@ -222,6 +309,10 @@ export class CourseCurriculumComponent {
             this.uploadedFileUrl.set(body.url);
             this.lectureForm.get('contentUrl')?.setValue(body.url);
             this.notification.success('Resource file uploaded successfully!');
+            // Trigger auto-save immediately after upload
+            if (this.lectureForm.valid) {
+              this.performAutoSave();
+            }
           }
           this.isUploadingFile.set(false);
         }
@@ -240,31 +331,14 @@ export class CourseCurriculumComponent {
       return;
     }
 
-    const payload = this.lectureForm.value;
-    const lectureId = this.editingLectureId();
-    const sectionId = this.targetSectionId();
+    // Force an immediate save when clicking the explicit save button
+    this.performAutoSave();
+    this.closeLectureModal();
+    this.notification.success('Lecture changes saved.');
+  }
 
-    if (lectureId) {
-      // Edit mode
-      this.instructorService.updateLecture(lectureId, payload).subscribe({
-        next: () => {
-          this.notification.success('Lecture updated successfully.');
-          this.closeLectureModal();
-          this.refresh.emit();
-        },
-        error: (err) => this.notification.error(err.error || 'Failed to update lecture.')
-      });
-    } else if (sectionId) {
-      // Create mode
-      this.instructorService.createLecture(sectionId, payload).subscribe({
-        next: () => {
-          this.notification.success('Lecture added successfully.');
-          this.closeLectureModal();
-          this.refresh.emit();
-        },
-        error: (err) => this.notification.error(err.error || 'Failed to add lecture.')
-      });
-    }
+  protected onQuizSaved() {
+    this.refresh.emit();
   }
 
   protected deleteLecture(lectureId: number) {
