@@ -26,10 +26,10 @@
         <thead>
           <tr>
             <th>Course Title</th>
-            <th>Language</th>
-            <th>Price</th>
+            <th class="col-language">Language</th>
+            <th class="col-price">Price</th>
             <th>Students Enrolled</th>
-            <th>Avg Rating</th>
+            <th class="col-rating">Avg Rating</th>
             <th>Status</th>
             <th class="actions-header">Actions</th>
           </tr>
@@ -52,8 +52,8 @@
                   </div>
                 </div>
               </td>
-              <td>{{ course.language }}</td>
-              <td class="price-cell">
+              <td class="col-language">{{ course.language }}</td>
+              <td class="price-cell col-price">
                 @if (course.price === 0) {
                   <span class="free-text">Free</span>
                 } @else {
@@ -61,7 +61,7 @@
                 }
               </td>
               <td class="numeric-cell">{{ course.studentsCount }}</td>
-              <td class="rating-cell">
+              <td class="rating-cell col-rating">
                 <div class="rating-wrapper">
                   <i class="bi bi-star-fill text-warning" aria-hidden="true"></i>
                   <span>{{ course.rating | number:'1.1-2' }}</span>

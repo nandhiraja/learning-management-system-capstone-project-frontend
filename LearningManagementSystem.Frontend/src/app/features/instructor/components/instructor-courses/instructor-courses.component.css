@@ -219,3 +219,35 @@ table td:first-child {
   border-color: rgba(139, 92, 246, 0.3) !important;
   transform: translateY(-1px);
 }
+
+@media (max-width: 768px) {
+  .courses-table th:first-child,
+  .courses-table td:first-child {
+    width: 60%;
+  }
+
+  .col-language,
+  .col-price,
+  .col-rating {
+    display: none;
+  }
+
+  .courses-table th,
+  .courses-table td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .course-thumbnail-placeholder {
+    width: 36px;
+    height: 28px;
+  }
+
+  .courses-manager-container {
+    padding: 12px;
+  }
+
+  .actions-cell {
+    min-width: auto;
+  }
+}

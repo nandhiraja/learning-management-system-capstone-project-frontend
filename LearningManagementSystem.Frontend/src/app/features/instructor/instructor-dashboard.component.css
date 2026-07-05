@@ -175,7 +175,7 @@
   .instructor-dashboard-wrapper {
     grid-template-columns: 1fr;
     gap: 24px;
-    padding-top: 20px;
+    padding: 24px 16px;
   }
   
   .instructor-sidebar {
@@ -185,6 +185,7 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 16px;
+    padding: 16px;
   }
   
   .sidebar-nav {
@@ -202,5 +203,29 @@
 
   .badge-alert {
     margin-left: 6px;
+  }
+}
+
+@media (max-width: 576px) {
+  .instructor-branding {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  .nav-tab-btn {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .nav-tab-btn .tab-btn-text {
+    display: none;
+  }
+
+  .badge-alert {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    margin: 0;
   }
 }

@@ -461,4 +461,40 @@
   .discussion-content-pane.visible-on-mobile {
     display: flex;
   }
+
+  /* Compact responsive chat view */
+  .thread-messages-scroll {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .message-card {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .reply-card, 
+  .instructor-reply-card {
+    width: 95%;
+  }
+
+  .instructor-reply-form {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .reply-input-textarea {
+    min-height: 60px;
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .thread-detail-header {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .thread-main-title {
+    font-size: 15px;
+  }
 }

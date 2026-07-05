@@ -199,4 +199,30 @@
     align-items: stretch;
     gap: 16px;
   }
+
+  .col-instructor,
+  .col-language {
+    display: none;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .thumbnail-sm {
+    width: 36px;
+    height: 24px;
+  }
+
+  .thumbnail-placeholder-sm {
+    width: 36px;
+    height: 24px;
+    font-size: 12px;
+  }
+
+  .courses-list-card {
+    padding: 12px;
+  }
 }

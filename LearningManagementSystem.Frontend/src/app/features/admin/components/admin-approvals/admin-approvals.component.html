@@ -10,8 +10,8 @@
           <thead>
             <tr>
               <th>Applicant</th>
-              <th>Email</th>
-              <th>Phone</th>
+              <th class="col-email">Email</th>
+              <th class="col-phone">Phone</th>
               <th class="actions-header">Actions</th>
             </tr>
           </thead>
@@ -28,29 +28,31 @@
                     <span class="user-name">{{ inst.firstName }} {{ inst.lastName }}</span>
                   </div>
                 </td>
-                <td>{{ inst.email }}</td>
-                <td>{{ inst.phoneNo || 'N/A' }}</td>
+                <td class="col-email">{{ inst.email }}</td>
+                <td class="col-phone">{{ inst.phoneNo || 'N/A' }}</td>
                 <td class="action-cell">
                   <div class="action-buttons-wrapper">
                     <button 
                       type="button" 
-                      class="btn btn-approve btn-sm" 
+                      class="btn btn-approve btn-sm btn-icon-only" 
                       [disabled]="processingId !== null"
                       (click)="onApproveInstructor(inst.externalId)"
+                      title="Approve upgrade request"
                     >
                       @if (processingId === inst.externalId) {
                         <span class="btn-spinner"></span>
                       } @else {
-                        <i class="bi bi-person-check-fill" aria-hidden="true"></i> Approve
+                        <i class="bi bi-check-lg" aria-hidden="true"></i>
                       }
                     </button>
                     <button 
                       type="button" 
-                      class="btn btn-reject btn-sm" 
+                      class="btn btn-reject btn-sm btn-icon-only" 
                       [disabled]="processingId !== null"
                       (click)="onRejectInstructor(inst.externalId)"
+                      title="Reject upgrade request"
                     >
-                      <i class="bi bi-person-x-fill" aria-hidden="true"></i> Reject
+                      <i class="bi bi-x-lg" aria-hidden="true"></i>
                     </button>
                   </div>
                 </td>
@@ -95,31 +97,33 @@
               <div class="course-header-actions">
                 <button 
                   type="button" 
-                  class="btn btn-ghost btn-sm"
+                  class="btn btn-ghost btn-sm btn-icon-only"
                   (click)="toggleExpand(course.externalId)"
+                  [title]="expandedCourseId() === course.externalId ? 'Hide Syllabus' : 'View Syllabus'"
                 >
-                  <i [class]="expandedCourseId() === course.externalId ? 'bi bi-chevron-up' : 'bi bi-chevron-down'" aria-hidden="true"></i>
-                  {{ expandedCourseId() === course.externalId ? 'Hide Syllabus' : 'View Syllabus' }}
+                  <i [class]="expandedCourseId() === course.externalId ? 'bi bi-journal-minus' : 'bi bi-journal-plus'" aria-hidden="true"></i>
                 </button>
                 <button 
                   type="button" 
-                  class="btn btn-approve btn-sm" 
+                  class="btn btn-approve btn-sm btn-icon-only" 
                   [disabled]="processingId !== null"
                   (click)="onApproveCourse(course.externalId)"
+                  title="Approve and Publish course"
                 >
                   @if (processingId === course.externalId) {
-                    <span class="btn-spinner"></span> Publishing...
+                    <span class="btn-spinner"></span>
                   } @else {
-                    <i class="bi bi-check2-circle" aria-hidden="true"></i> Approve
+                    <i class="bi bi-check-lg" aria-hidden="true"></i>
                   }
                 </button>
                 <button 
                   type="button" 
-                  class="btn btn-reject btn-sm" 
+                  class="btn btn-reject btn-sm btn-icon-only" 
                   [disabled]="processingId !== null"
                   (click)="triggerRejectCourse(course.externalId)"
+                  title="Reject course"
                 >
-                  <i class="bi bi-slash-circle" aria-hidden="true"></i> Reject
+                  <i class="bi bi-x-lg" aria-hidden="true"></i>
                 </button>
               </div>
             </div>

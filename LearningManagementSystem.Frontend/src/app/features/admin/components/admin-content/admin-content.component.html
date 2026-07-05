@@ -39,18 +39,20 @@
               @if (!cat.isApproved) {
                 <button 
                   type="button" 
-                  class="btn btn-approve btn-xs"
+                  class="btn btn-approve btn-xs btn-icon-only"
                   (click)="onApproveCategory(cat.id, cat.name)"
+                  title="Approve category"
                 >
-                  Approve
+                  <i class="bi bi-check-lg" aria-hidden="true"></i>
                 </button>
               }
               <button 
                 type="button" 
-                class="btn btn-reject btn-xs"
+                class="btn btn-reject btn-xs btn-icon-only"
                 (click)="onDeleteCategory(cat.id, cat.name)"
+                title="Delete category"
               >
-                Delete
+                <i class="bi bi-trash" aria-hidden="true"></i>
               </button>
             </div>
           </div>
@@ -103,18 +105,20 @@
               @if (!lang.isApproved) {
                 <button 
                   type="button" 
-                  class="btn btn-approve btn-xs"
+                  class="btn btn-approve btn-xs btn-icon-only"
                   (click)="onApproveLanguage(lang.id, lang.name)"
+                  title="Approve language"
                 >
-                  Approve
+                  <i class="bi bi-check-lg" aria-hidden="true"></i>
                 </button>
               }
               <button 
                 type="button" 
-                class="btn btn-reject btn-xs"
+                class="btn btn-reject btn-xs btn-icon-only"
                 (click)="onDeleteLanguage(lang.id, lang.name)"
+                title="Delete language"
               >
-                Delete
+                <i class="bi bi-trash" aria-hidden="true"></i>
               </button>
             </div>
           </div>

@@ -1,52 +1,51 @@
 .footer {
-  margin-top: auto;
-  background-color: var(--surface);
-  border-top: 1px solid var(--surface-border);
-  padding: 3rem 1.5rem 1.5rem;
-  color: var(--text-secondary);
+  margin-top: 60px;
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border-2);
+  padding: 4rem 1.5rem 2rem;
+  color: var(--color-text-2);
+  transition: background-color var(--transition-normal), border-color var(--transition-normal);
 }
 
 .footer-container {
   max-width: 1200px;
   margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 2rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid var(--surface-border);
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 4rem;
+  padding-bottom: 3rem;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .footer-info {
-  max-width: 320px;
+  max-width: 360px;
 }
 
 .footer-info h3 {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, hsl(var(--primary-hue), 85%, 65%), var(--secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-primary); /* Solid primary brand color - NO gradients! */
+  font-weight: 800;
+  letter-spacing: -0.5px;
 }
 
 .footer-info p {
   font-size: 0.9rem;
   line-height: 1.6;
+  color: var(--color-text-2);
 }
 
 .footer-links {
-  display: flex;
-  gap: 4rem;
-  flex-wrap: wrap;
+  display: contents; /* Allows nested link groups to align directly into the grid columns! */
 }
 
 .links-group h4 {
-  color: var(--text-primary);
-  font-size: 1rem;
-  margin-bottom: 1rem;
+  color: var(--color-text);
+  font-size: 12px;
+  margin-bottom: 1.25rem;
   text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 .links-group ul {
@@ -59,12 +58,13 @@
 }
 
 .links-group a {
-  color: var(--text-muted);
-  font-size: 0.9rem;
+  color: var(--color-text-2);
+  font-size: 13px;
+  transition: color var(--transition-fast);
 }
 
 .links-group a:hover {
-  color: var(--text-primary);
+  color: var(--color-accent);
 }
 
 .footer-bottom {
@@ -72,5 +72,16 @@
   margin: 1.5rem auto 0;
   text-align: center;
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: var(--color-text-3);
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-bottom: 2rem;
+  }
+  .footer-info {
+    max-width: 100%;
+  }
 }

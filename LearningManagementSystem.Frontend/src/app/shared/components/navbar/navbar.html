@@ -1,8 +1,9 @@
 <nav class="navbar">
   <div class="navbar-container">
     <div class="navbar-left">
-      <a routerLink="/" class="navbar-brand">
-        <span class="brand-gradient">LearnHub</span>
+      <a routerLink="/" class="navbar-brand" (click)="closeMobileMenu()">
+        <!-- Logo Text - Solid White Color (No gradient) -->
+        <span class="brand-solid">LearnHub</span>
       </a>
 
       <!-- Search bar (Only show if not on admin) -->
@@ -16,62 +17,146 @@
       }
     </div>
 
-    <!-- Desktop Navigation -->
+    <!-- Desktop Navigation & Mobile Side Drawer -->
     <div class="navbar-right" [class.open]="isMobileMenuOpen">
+      
+      <!-- Mobile Profile Header Card (Only visible on mobile/tablet) -->
+      @if (auth.currentUser(); as user) {
+        <div class="mobile-profile-card">
+          <div class="mobile-profile-header">
+            @if (user.profilePictureUrl) {
+              <img [src]="user.profilePictureUrl" alt="Profile" class="mobile-avatar" />
+            } @else {
+              <div class="mobile-avatar-placeholder">
+                {{ user.firstName[0] }}{{ user.lastName[0] }}
+              </div>
+            }
+            <div class="mobile-user-details">
+              <span class="mobile-user-name">{{ user.firstName }} {{ user.lastName }}</span>
+              <span class="mobile-user-email">{{ user.email }}</span>
+              <span class="mobile-user-role">{{ user.role }}</span>
+            </div>
+          </div>
+        </div>
+      }
+
       <!-- Shared Nav Links -->
-      <a routerLink="/courses" routerLinkActive="active" class="nav-link">
+      <a routerLink="/courses" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
         <i class="bi bi-compass" aria-hidden="true"></i> Explore
       </a>
 
       @if (auth.currentUser(); as user) {
         <!-- Student Role Links -->
         @if (user.role === 'Student') {
-          <a routerLink="/learning/dashboard" routerLinkActive="active" class="nav-link">
+          <a routerLink="/learning/dashboard" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
             <i class="bi bi-book" aria-hidden="true"></i> My Learning
           </a>
-          <a routerLink="/cart" routerLinkActive="active" class="nav-link cart-link">
+          <!-- Mobile-only My Certificates Shortcut -->
+          <a routerLink="/learning/dashboard" [queryParams]="{tab: 'certificates'}" routerLinkActive="active" class="nav-link mobile-only-link" (click)="closeMobileMenu()">
+            <i class="bi bi-patch-check" aria-hidden="true"></i> My Certificates
+          </a>
+          <a routerLink="/cart" routerLinkActive="active" class="nav-link cart-link" (click)="closeMobileMenu()">
             <i class="bi bi-cart" aria-hidden="true"></i> Cart
           </a>
         }
 
         <!-- Instructor Role Links -->
         @if (user.role === 'Instructor') {
-          <a routerLink="/instructor/dashboard" routerLinkActive="active" class="nav-link">
+          <a routerLink="/instructor/dashboard" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
             <i class="bi bi-people" aria-hidden="true"></i> Instructor Portal
           </a>
         }
 
         <!-- Admin Role Links -->
         @if (user.role === 'Admin') {
-          <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link">
+          <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
             <i class="bi bi-shield-lock" aria-hidden="true"></i> Admin Panel
           </a>
         }
 
-        <!-- Profile Link -->
-        <a routerLink="/profile" routerLinkActive="active" class="profile-nav-item">
-          @if (user.profilePictureUrl!=null && user.profilePictureUrl != '') {
-            <img [src]="user.profilePictureUrl" alt="Profile" class="navbar-avatar" />
-          } @else {
-            <div class="navbar-avatar-placeholder">
-              {{ user.firstName[0] }}{{ user.lastName[0] }}
-            </div>
-          }
-          <span class="profile-name">{{ user.firstName }}</span>
+        <!-- Mobile-only Profile Settings Shortcut -->
+        <a routerLink="/profile" routerLinkActive="active" class="nav-link mobile-only-link" (click)="closeMobileMenu()">
+          <i class="bi bi-person-gear" aria-hidden="true"></i> My Profile
         </a>
 
-        <button (click)="logout()" class="btn-logout" aria-label="Logout">
-          <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Logout
+        <!-- Desktop-only Profile Dropdown Menu -->
+        <div class="profile-dropdown-container desktop-only">
+          <button 
+            type="button" 
+            class="profile-nav-trigger" 
+            (click)="toggleProfileDropdown($event)"
+            [class.active]="isProfileDropdownOpen"
+            aria-haspopup="true"
+            [attr.aria-expanded]="isProfileDropdownOpen"
+          >
+            @if (user.profilePictureUrl) {
+              <img [src]="user.profilePictureUrl" alt="Profile" class="navbar-avatar" />
+            } @else {
+              <div class="navbar-avatar-placeholder">
+                {{ user.firstName[0] }}{{ user.lastName[0] }}
+              </div>
+            }
+            <span class="profile-name">{{ user.firstName }}</span>
+            <i class="bi bi-chevron-down dropdown-arrow" aria-hidden="true"></i>
+          </button>
+
+          @if (isProfileDropdownOpen) {
+            <div class="profile-dropdown-card">
+              <div class="dropdown-user-info">
+                <p class="user-fullname">{{ user.firstName }} {{ user.lastName }}</p>
+                <p class="user-email-text">{{ user.email }}</p>
+                <span class="user-role-badge" [class]="user.role.toLowerCase()">{{ user.role }}</span>
+              </div>
+              <div class="dropdown-divider"></div>
+              <ul class="dropdown-links">
+                <li>
+                  <a routerLink="/profile" (click)="closeProfileDropdown()"><i class="bi bi-person-gear" aria-hidden="true"></i> My Profile</a>
+                </li>
+                @if (user.role === 'Student') {
+                  <li>
+                    <a routerLink="/learning/dashboard" [queryParams]="{tab: 'courses'}" (click)="closeProfileDropdown()"><i class="bi bi-journal-bookmark" aria-hidden="true"></i> My Learning</a>
+                  </li>
+                  <li>
+                    <a routerLink="/learning/dashboard" [queryParams]="{tab: 'certificates'}" (click)="closeProfileDropdown()"><i class="bi bi-patch-check" aria-hidden="true"></i> My Certificates</a>
+                  </li>
+                }
+                @if (user.role === 'Instructor') {
+                  <li>
+                    <a routerLink="/instructor/dashboard" (click)="closeProfileDropdown()"><i class="bi bi-speedometer2" aria-hidden="true"></i> Instructor Portal</a>
+                  </li>
+                }
+                @if (user.role === 'Admin') {
+                  <li>
+                    <a routerLink="/admin/dashboard" (click)="closeProfileDropdown()"><i class="bi bi-shield-lock" aria-hidden="true"></i> Admin Panel</a>
+                  </li>
+                }
+                <li>
+                  <a href="javascript:void(0)" (click)="theme.toggle(); closeProfileDropdown(); $event.preventDefault()"><i [class]="theme.isDark() ? 'bi bi-sun' : 'bi bi-moon'" aria-hidden="true"></i> Toggle Theme</a>
+                </li>
+              </ul>
+              <div class="dropdown-divider"></div>
+              <button (click)="logout(); closeProfileDropdown()" class="dropdown-logout-btn">
+                <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sign Out
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Mobile-only Sign Out Button -->
+        <button (click)="logout(); closeMobileMenu()" class="nav-link mobile-only-logout-btn">
+          <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sign Out
         </button>
+
       } @else {
         <!-- Guest Links -->
-        <a routerLink="/auth/login" routerLinkActive="active" class="nav-link btn-login-nav">Login</a>
-        <a routerLink="/auth/register" routerLinkActive="active" class="btn btn-primary register-nav-btn">Sign Up</a>
+        <a routerLink="/auth/login" routerLinkActive="active" class="nav-link btn-login-nav" (click)="closeMobileMenu()">Login</a>
+        <a routerLink="/auth/register" routerLinkActive="active" class="btn btn-primary register-nav-btn" (click)="closeMobileMenu()">Sign Up</a>
       }
 
       <!-- Theme Toggle -->
-      <button class="theme-toggle" (click)="theme.toggle()" [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'">
+      <button class="theme-toggle guest-only-desktop" (click)="theme.toggle(); closeMobileMenu()" [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'">
         <i [class]="theme.isDark() ? 'bi bi-moon' : 'bi bi-sun'" aria-hidden="true"></i>
+        <span class="theme-toggle-text">Theme Mode</span>
       </button>
     </div>
 

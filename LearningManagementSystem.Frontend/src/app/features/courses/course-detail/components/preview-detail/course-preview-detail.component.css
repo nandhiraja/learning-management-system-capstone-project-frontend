@@ -48,10 +48,16 @@
 @media (max-width: 991px) {
   .grid-content {
     grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 16px 48px 16px;
+    gap: 20px;
   }
   .right-sidebar-col {
     position: static;
-    margin-top: 20px;
+    margin-top: 0;
+    margin-bottom: 12px;
+    order: -1;
   }
 }
 

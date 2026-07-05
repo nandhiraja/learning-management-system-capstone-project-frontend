@@ -112,6 +112,17 @@
 }
 
 /* Buttons */
+.btn-icon-only {
+  width: 32px;
+  height: 32px;
+  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50% !important;
+  font-size: 14px !important;
+}
+
 .btn-approve {
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.15));
   color: #10b981;
@@ -445,4 +456,40 @@
   background: rgba(16, 185, 129, 0.2);
   padding: 1px 4px;
   border-radius: 3px;
+}
+
+@media (max-width: 768px) {
+  .col-email, .col-phone {
+    display: none;
+  }
+
+  .btn-text-responsive {
+    display: none;
+  }
+
+  .admin-table th, .admin-table td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .course-queue-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .course-header-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .course-header-actions button {
+    flex: 1;
+    min-width: 110px;
+  }
+
+  .approvals-section {
+    padding: 16px 12px;
+  }
 }

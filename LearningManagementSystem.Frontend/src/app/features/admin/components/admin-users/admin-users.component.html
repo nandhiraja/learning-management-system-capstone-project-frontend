@@ -85,7 +85,7 @@
                         (click)="onToggleActive(user.externalId, user.isActive)"
                       >
                         <i [class]="user.isActive ? 'bi bi-slash-circle-fill' : 'bi bi-check-circle-fill'" aria-hidden="true"></i>
-                        {{ user.isActive ? 'Block' : 'Unblock' }}
+                        <span class="btn-text-responsive">{{ user.isActive ? 'Block' : 'Unblock' }}</span>
                       </button>
                     }
 
@@ -97,7 +97,8 @@
                         (click)="onDemote(user.externalId)"
                         title="Demote back to standard student role"
                       >
-                        <i class="bi bi-arrow-down-circle-fill" aria-hidden="true"></i> Demote
+                        <i class="bi bi-arrow-down-circle-fill" aria-hidden="true"></i>
+                        <span class="btn-text-responsive">Demote</span>
                       </button>
                     }
                   </div>

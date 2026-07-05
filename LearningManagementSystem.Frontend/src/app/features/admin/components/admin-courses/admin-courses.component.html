@@ -41,8 +41,8 @@
           <thead>
             <tr>
               <th>Course Title</th>
-              <th>Instructor</th>
-              <th>Language</th>
+              <th class="col-instructor">Instructor</th>
+              <th class="col-language">Language</th>
               <th>Price</th>
               <th>Status</th>
             </tr>
@@ -62,8 +62,8 @@
                     <span class="course-name">{{ c.title }}</span>
                   </div>
                 </td>
-                <td>{{ c.instructor ? (c.instructor.firstName + ' ' + c.instructor.lastName) : 'Instructor' }}</td>
-                <td>{{ c.language || 'English' }}</td>
+                <td class="col-instructor">{{ c.instructor ? (c.instructor.firstName + ' ' + c.instructor.lastName) : 'Instructor' }}</td>
+                <td class="col-language">{{ c.language || 'English' }}</td>
                 <td class="pricing-cell">
                   @if (c.price === 0) {
                     <span class="free-label">Free</span>

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
@@ -31,6 +31,7 @@ export class DashboardComponent implements OnInit {
   protected auth = inject(AuthService);
   private enrollmentService = inject(EnrollmentService);
   private notification = inject(NotificationService);
+  private route = inject(ActivatedRoute);
 
   // Name correction form state
   certNameForm = new FormGroup({
@@ -105,6 +106,12 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchDashboardData();
+    this.route.queryParams.subscribe(params => {
+      const tab = params['tab'];
+      if (tab === 'courses' || tab === 'certificates') {
+        this.activeTab.set(tab);
+      }
+    });
   }
 
   fetchDashboardData(): void {
