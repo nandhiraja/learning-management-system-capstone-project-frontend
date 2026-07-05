@@ -158,6 +158,53 @@
     <!-- Certificates Tab Panel -->
     @if (activeTab() === 'certificates') {
       <div id="certificates-tab-panel" role="tabpanel" aria-labelledby="tab-certificates" class="tab-panel">
+        <!-- Certificate Settings Panel (Compact Inline Version) -->
+        @if (auth.currentUser(); as user) {
+          <div class="cert-settings-inline glass-card mb-3">
+            <div class="cert-inline-content">
+              <i class="bi bi-person-badge-fill text-accent" aria-hidden="true" style="font-size: 16px; color: var(--color-accent);"></i>
+              
+              @if (!isEditingCertName) {
+                <span class="cert-inline-text">
+                  Certificates will be issued to: <strong class="cert-inline-name">{{ user.certificateName }}</strong>
+                </span>
+                @if (user.certificateNameChangesCount < 2) {
+                  <button type="button" class="btn btn-ghost btn-xs btn-inline-edit" (click)="startEditingCertName()" style="padding: 2px 6px; font-size: 11px; height: 22px; margin-left: 4px;">
+                    <i class="bi bi-pencil" aria-hidden="true"></i> Correct spelling
+                  </button>
+                } @else {
+                  <span class="cert-inline-limit-badge" style="font-size: 11px; color: var(--color-text-3); margin-left: 8px;"><i class="bi bi-lock-fill" aria-hidden="true"></i> Edit limit reached (2/2)</span>
+                }
+              } @else {
+                <form [formGroup]="certNameForm" (submit)="onSubmitCertName()" class="cert-inline-form">
+                  <span class="cert-inline-text-edit">Correct name:</span>
+                  <input 
+                    type="text" 
+                    formControlName="certificateName" 
+                    class="cert-inline-input" 
+                    placeholder="Enter full name..."
+                    [disabled]="isSavingCertName()"
+                  />
+                  <button type="submit" class="btn btn-primary btn-xs" style="padding: 4px 10px; font-size: 11px; height: 26px; border-radius: var(--radius-sm);" [disabled]="certNameForm.invalid || isSavingCertName()">
+                    @if (isSavingCertName()) {
+                      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    } @else {
+                      Save
+                    }
+                  </button>
+                  <button type="button" class="btn btn-ghost btn-xs text-secondary" style="padding: 4px 10px; font-size: 11px; height: 26px; border-radius: var(--radius-sm);" (click)="cancelEditingCertName()" [disabled]="isSavingCertName()">
+                    Cancel
+                  </button>
+                </form>
+              }
+              
+              @if (user.certificateNameChangesCount < 2 && !isEditingCertName) {
+                <span class="cert-inline-hint" style="font-size: 11px; color: var(--color-text-3); margin-left: auto;">({{ 2 - user.certificateNameChangesCount }} modifications left)</span>
+              }
+            </div>
+          </div>
+        }
+
         @if (certificates().length === 0) {
           <!-- Empty State Certificates -->
           <div class="empty-state glass-card">

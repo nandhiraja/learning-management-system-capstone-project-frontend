@@ -1,6 +1,7 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { EnrollmentService } from '../../../core/services/enrollment.service';
@@ -9,6 +10,7 @@ import { ProgressBarComponent } from '../../../shared/components/progress-bar/pr
 import { BadgeChipComponent } from '../../../shared/components/badge-chip/badge-chip.component';
 import { CertificatePreview } from '../../../shared/components/certificate-preview/certificate-preview';
 import { EnrollmentResponse, CertificateResponse } from '../../../models/enrollment.model';
+import { NotificationService } from '../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-student-dashboard',
@@ -16,6 +18,7 @@ import { EnrollmentResponse, CertificateResponse } from '../../../models/enrollm
   imports: [
     CommonModule,
     RouterLink,
+    ReactiveFormsModule,
     StatCardComponent,
     ProgressBarComponent,
     BadgeChipComponent,
@@ -27,6 +30,25 @@ import { EnrollmentResponse, CertificateResponse } from '../../../models/enrollm
 export class DashboardComponent implements OnInit {
   protected auth = inject(AuthService);
   private enrollmentService = inject(EnrollmentService);
+  private notification = inject(NotificationService);
+
+  // Name correction form state
+  certNameForm = new FormGroup({
+    certificateName: new FormControl('', [Validators.required, Validators.minLength(2)])
+  });
+  isSavingCertName = signal(false);
+  isEditingCertName = false;
+
+  constructor() {
+    effect(() => {
+      const user = this.auth.currentUser();
+      if (user) {
+        this.certNameForm.patchValue({
+          certificateName: user.certificateName
+        });
+      }
+    });
+  }
 
   // Signals for state
   protected enrollments = signal<EnrollmentResponse[]>([]);
@@ -116,5 +138,49 @@ export class DashboardComponent implements OnInit {
 
   closeCertificate() {
     this.selectedCertificate.set(null);
+  }
+
+  startEditingCertName() {
+    const user = this.auth.currentUser();
+    if (user) {
+      this.certNameForm.patchValue({
+        certificateName: user.certificateName
+      });
+      this.isEditingCertName = true;
+    }
+  }
+
+  cancelEditingCertName() {
+    this.isEditingCertName = false;
+  }
+
+  onSubmitCertName() {
+    if (this.certNameForm.invalid) {
+      this.certNameForm.markAllAsTouched();
+      return;
+    }
+
+    const user = this.auth.currentUser();
+    if (user && user.certificateNameChangesCount >= 2) {
+      this.notification.error('You have reached the maximum number of allowed certificate name corrections.');
+      return;
+    }
+
+    this.isSavingCertName.set(true);
+    const newName = this.certNameForm.value.certificateName || '';
+
+    this.auth.updateCertificateName(newName).subscribe({
+      next: () => {
+        this.notification.success('Certificate name updated successfully!');
+        this.isSavingCertName.set(false);
+        this.isEditingCertName = false;
+        this.fetchDashboardData();
+      },
+      error: (err) => {
+        const errorMsg = err.error?.message || 'Failed to update certificate name.';
+        this.notification.error(errorMsg);
+        this.isSavingCertName.set(false);
+      }
+    });
   }
 }

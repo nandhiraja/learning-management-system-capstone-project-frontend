@@ -76,6 +76,18 @@ export class AuthService {
     );
   }
 
+  updateCertificateName(newName: string): Observable<any> {
+    return this.api.post<any>('users/me/certificate-name', { newName }).pipe(
+      tap(() => {
+        this.fetchProfile().subscribe({
+          next: (profile) => {
+            this.currentUserSignal.set(profile);
+          }
+        });
+      })
+    );
+  }
+
   // Become Instructor request
   becomeInstructor(): Observable<any> {
     return this.api.post<any>('users/become-instructor', {}).pipe(

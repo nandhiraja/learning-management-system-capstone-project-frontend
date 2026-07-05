@@ -9,6 +9,8 @@ export interface UserProfile {
   role: string;
   isActive: boolean;
   instructorRequestPending: boolean;
+  certificateNameChangesCount: number;
+  certificateName: string;
 }
 
 export interface LoginResponse {
