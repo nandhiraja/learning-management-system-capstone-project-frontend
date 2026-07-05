@@ -1,22 +1,31 @@
 <div class="profile-container">
   @if (auth.currentUser(); as user) {
+    <!-- Profile Page Title Header -->
     <div class="profile-header glass-card">
       <div class="profile-meta">
-        <h2>My account profile</h2>
+        <h2>My Account Profile</h2>
         <p>Manage your account settings, personal details, and roles</p>
       </div>
-      <div class="role-badge badge badge-primary">
+      <div class="role-badge badge" [class]="user.role.toLowerCase()">
         Role: {{ user.role }}
       </div>
     </div>
 
+    <!-- Main Workspace Grid -->
     <div class="profile-grid">
+      
       <!-- Left Column: Picture and Role Request -->
       <div class="profile-left-col">
-        <!-- Picture card -->
+        <!-- Picture Card -->
         <div class="glass-card picture-card">
-          <h3>Profile picture</h3>
-          <div class="avatar-preview-container">
+          <div class="picture-card-header">
+            <h3>Profile Picture</h3>
+            @if (isEditing) {
+              <span class="edit-badge">Editing</span>
+            }
+          </div>
+          
+          <div class="avatar-preview-container" [class.editable-avatar]="isEditing">
             @if (uploadedPictureUrl) {
               <img [src]="uploadedPictureUrl" alt="Avatar" class="avatar-preview" />
             } @else {
@@ -32,21 +41,26 @@
             }
           </div>
 
-          <div class="profile-photo-actions" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; justify-content: center; width: 100%;">
-            <label class="btn btn-secondary upload-btn" style="flex: 1; margin: 0; min-width: 120px;">
-              Choose photo
-              <input type="file" (change)="onFileSelected($event)" accept="image/*" class="file-input" />
-            </label>
-            @if (uploadedPictureUrl && uploadedPictureUrl !== '') {
-              <button type="button" class="btn btn-ghost remove-photo-btn" (click)="removePhoto()" style="flex: 1; min-width: 120px; color: var(--color-danger); border-color: var(--color-danger);">
-                <i class="bi bi-trash" aria-hidden="true"></i> Remove
-              </button>
-            }
-          </div>
-          <p class="upload-hint" style="margin-top: 8px;">JPG, PNG, or WEBP. Max 5MB.</p>
+          <!-- Upload Actions: Only show in Edit Mode -->
+          @if (isEditing) {
+            <div class="profile-photo-actions">
+              <label class="btn btn-secondary upload-btn">
+                <i class="bi bi-camera" aria-hidden="true"></i> Choose photo
+                <input type="file" (change)="onFileSelected($event)" accept="image/*" class="file-input" />
+              </label>
+              @if (uploadedPictureUrl && uploadedPictureUrl !== '') {
+                <button type="button" class="btn btn-ghost remove-photo-btn" (click)="removePhoto()">
+                  <i class="bi bi-trash" aria-hidden="true"></i> Remove
+                </button>
+              }
+            </div>
+            <p class="upload-hint">JPG, PNG, or WEBP. Max 5MB.</p>
+          } @else {
+            <p class="upload-hint-readonly">Click the Edit icon on the right to modify your details or change photo.</p>
+          }
         </div>
 
-        <!-- Instructor role request card -->
+        <!-- Instructor Role Request Card -->
         @if (user.role === 'Student') {
           <div class="glass-card role-request-card">
             <h3>Teach on LearnHub</h3>
@@ -57,90 +71,157 @@
               [disabled]="isRequestingRole"
             >
               @if (isRequestingRole) {
-                <div class="spinner"></div>
-                Sending request...
+                <span class="btn-spinner"></span> Sending request...
               } @else {
-                Apply as instructor
+                <i class="bi bi-patch-plus" aria-hidden="true"></i> Apply as instructor
               }
             </button>
           </div>
         }
       </div>
 
-      <!-- Right Column: Personal Info Form -->
+      <!-- Right Column: Personal Info Form / Info Grid -->
       <div class="glass-card details-card">
-        <h3>Personal details</h3>
-        <form [formGroup]="profileForm" (submit)="onSubmit()">
-          <!-- Email (Read Only) -->
-          <div class="form-group">
-            <label class="form-label">Email address (cannot change)</label>
-            <input 
-              type="text" 
-              [value]="user.email" 
-              class="form-control read-only-input" 
-              disabled 
-            />
-          </div>
+        <div class="details-card-header">
+          <h3>Personal Details</h3>
+          
+          <!-- Edit Toggle Controls at the Top -->
+          @if (!isEditing) {
+            <button type="button" class="btn-edit-toggle" (click)="toggleEdit()" title="Edit profile details">
+              <i class="bi bi-pencil-square"></i> Edit Profile
+            </button>
+          } @else {
+            <button type="button" class="btn-cancel-toggle" (click)="cancelEdit()" title="Cancel editing">
+              <i class="bi bi-x-circle"></i> Cancel
+            </button>
+          }
+        </div>
 
-          <!-- Name fields -->
-          <div class="form-row">
-            <div class="form-group flex-1">
-              <label for="firstName" class="form-label">First name</label>
+        <!-- View Mode: Read-Only Info Grid -->
+        @if (!isEditing) {
+          <div class="profile-info-grid">
+            <div class="info-row">
+              <div class="info-icon-wrapper">
+                <i class="bi bi-person" aria-hidden="true"></i>
+              </div>
+              <div class="info-content">
+                <span class="info-label">First Name</span>
+                <span class="info-value">{{ user.firstName }}</span>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-icon-wrapper">
+                <i class="bi bi-person" aria-hidden="true"></i>
+              </div>
+              <div class="info-content">
+                <span class="info-label">Last Name</span>
+                <span class="info-value">{{ user.lastName }}</span>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-icon-wrapper">
+                <i class="bi bi-envelope" aria-hidden="true"></i>
+              </div>
+              <div class="info-content">
+                <span class="info-label">Email Address</span>
+                <span class="info-value">{{ user.email }}</span>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-icon-wrapper">
+                <i class="bi bi-telephone" aria-hidden="true"></i>
+              </div>
+              <div class="info-content">
+                <span class="info-label">Phone Number</span>
+                <span class="info-value">{{ user.phoneNo || 'Not provided' }}</span>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Edit Mode: Interactive Form -->
+        @if (isEditing) {
+          <form [formGroup]="profileForm" (submit)="onSubmit()" class="profile-edit-form">
+            <!-- Email (Read Only) -->
+            <div class="form-group">
+              <label class="form-label">Email address (cannot change)</label>
               <input 
-                id="firstName" 
                 type="text" 
-                formControlName="firstName" 
-                class="form-control" 
-                [class.is-invalid]="profileForm.get('firstName')?.touched && profileForm.get('firstName')?.invalid"
+                [value]="user.email" 
+                class="form-control read-only-input" 
+                disabled 
               />
-              @if (profileForm.get('firstName')?.touched && profileForm.get('firstName')?.invalid) {
-                <div class="form-error">Required.</div>
+            </div>
+
+            <!-- Name Fields -->
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="firstName" class="form-label">First name</label>
+                <input 
+                  id="firstName" 
+                  type="text" 
+                  formControlName="firstName" 
+                  class="form-control" 
+                  [class.is-invalid]="profileForm.get('firstName')?.touched && profileForm.get('firstName')?.invalid"
+                />
+                @if (profileForm.get('firstName')?.touched && profileForm.get('firstName')?.invalid) {
+                  <div class="form-error">Required (min 2 chars).</div>
+                }
+              </div>
+
+              <div class="form-group flex-1">
+                <label for="lastName" class="form-label">Last name</label>
+                <input 
+                  id="lastName" 
+                  type="text" 
+                  formControlName="lastName" 
+                  class="form-control" 
+                  [class.is-invalid]="profileForm.get('lastName')?.touched && profileForm.get('lastName')?.invalid"
+                />
+                @if (profileForm.get('lastName')?.touched && profileForm.get('lastName')?.invalid) {
+                  <div class="form-error">Required.</div>
+                }
+              </div>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="form-group">
+              <label for="phoneNo" class="form-label">Phone number</label>
+              <input 
+                id="phoneNo" 
+                type="text" 
+                formControlName="phoneNo" 
+                class="form-control" 
+                [class.is-invalid]="profileForm.get('phoneNo')?.touched && profileForm.get('phoneNo')?.invalid"
+              />
+              @if (profileForm.get('phoneNo')?.touched && profileForm.get('phoneNo')?.invalid) {
+                <div class="form-error">Please enter a valid phone number.</div>
               }
             </div>
 
-            <div class="form-group flex-1">
-              <label for="lastName" class="form-label">Last name</label>
-              <input 
-                id="lastName" 
-                type="text" 
-                formControlName="lastName" 
-                class="form-control" 
-                [class.is-invalid]="profileForm.get('lastName')?.touched && profileForm.get('lastName')?.invalid"
-              />
-              @if (profileForm.get('lastName')?.touched && profileForm.get('lastName')?.invalid) {
-                <div class="form-error">Required.</div>
-              }
+            <!-- Action buttons -->
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" (click)="cancelEdit()" [disabled]="isSaving">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="isSaving || profileForm.invalid">
+                @if (isSaving) {
+                  <span class="btn-spinner"></span> Saving...
+                } @else {
+                  <i class="bi bi-check-lg" aria-hidden="true"></i> Save Changes
+                }
+              </button>
             </div>
-          </div>
-
-          <!-- Phone number -->
-          <div class="form-group">
-            <label for="phoneNo" class="form-label">Phone number</label>
-            <input 
-              id="phoneNo" 
-              type="text" 
-              formControlName="phoneNo" 
-              class="form-control" 
-              [class.is-invalid]="profileForm.get('phoneNo')?.touched && profileForm.get('phoneNo')?.invalid"
-            />
-            @if (profileForm.get('phoneNo')?.touched && profileForm.get('phoneNo')?.invalid) {
-              <div class="form-error">Please enter a valid phone number.</div>
-            }
-          </div>
-
-          <button type="submit" class="btn btn-primary save-btn" [disabled]="isSaving">
-            @if (isSaving) {
-              <div class="spinner"></div>
-              Saving changes...
-            } @else {
-              Save profile
-            }
-          </button>
-        </form>
+          </form>
+        }
       </div>
+
     </div>
   } @else {
-    <!-- Loading placeholder -->
+    <!-- Loading Placeholder -->
     <div class="profile-loading">
       <div class="spinner"></div>
       <p>Loading profile details...</p>

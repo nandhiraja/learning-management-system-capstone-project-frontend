@@ -26,6 +26,7 @@ export class ProfileComponent {
   isUploading = false;
   isSaving = false;
   isRequestingRole = false;
+  isEditing = false; // By default read-only view mode
 
   constructor() {
     // Dynamically populate form once user details are loaded from session
@@ -42,7 +43,27 @@ export class ProfileComponent {
     });
   }
 
+  toggleEdit() {
+    this.isEditing = !this.isEditing;
+  }
+
+  cancelEdit() {
+    this.isEditing = false;
+    // Reset form to latest saved values
+    const user = this.auth.currentUser();
+    if (user) {
+      this.profileForm.patchValue({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phoneNo: user.phoneNo
+      });
+      this.uploadedPictureUrl = user.profilePictureUrl;
+    }
+  }
+
   onFileSelected(event: Event) {
+    if (!this.isEditing) return; // Prevent photo selection when not in edit mode
+    
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
@@ -64,6 +85,7 @@ export class ProfileComponent {
   }
 
   removePhoto() {
+    if (!this.isEditing) return;
     this.uploadedPictureUrl = null;
     this.notification.success('Profile picture removed! Click "Save profile" to save changes.');
   }
@@ -87,6 +109,7 @@ export class ProfileComponent {
       next: () => {
         this.notification.success('Profile updated successfully!');
         this.isSaving = false;
+        this.isEditing = false; // Close edit mode back to read-only view
       },
       error: (err) => {
         const errorMsg = err.error?.message || 'Failed to update profile details.';
