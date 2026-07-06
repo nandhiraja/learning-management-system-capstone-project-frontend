@@ -201,7 +201,7 @@
             <label class="form-label">Lecture Resource Content <span class="required-star">*</span></label>
 
             <!-- File Upload Zone for Video, PDF, and PPT -->
-            @if (lectureForm.get('contentType')?.value !== 'Text') {
+            @if (lectureForm.get('contentType')?.value !== 'Text' && lectureForm.get('contentType')?.value !== 'ExternalLink') {
               <div class="lecture-resource-uploader">
                 @if (uploadedFileUrl(); as url) {
                   <div class="upload-success-state">
@@ -244,6 +244,15 @@
                   </div>
                 }
               </div>
+            } @else if (lectureForm.get('contentType')?.value === 'ExternalLink') {
+              <!-- URL Input for External Link -->
+              <input 
+                type="url"
+                formControlName="contentUrl" 
+                placeholder="https://example.com/resource" 
+                class="form-control"
+                [class.is-invalid]="lectureForm.get('contentUrl')?.touched && lectureForm.get('contentUrl')?.invalid"
+              />
             } @else {
               <!-- Textarea for Text -->
               <textarea 
