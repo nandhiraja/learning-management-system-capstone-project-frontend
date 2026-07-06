@@ -1,20 +1,47 @@
 <section class="syllabus-section" aria-labelledby="curriculum-heading">
   <h2 id="curriculum-heading" class="section-title">Course curriculum</h2>
   <p class="syllabus-summary">
-    Curriculum overview containing course sections and lectures
+    {{ totalSections }} sections • {{ totalLectures }} lectures • {{ formatDuration(totalDurationMinutes) }} total length
   </p>
 
   <div class="accordion-list">
     @for (section of course.sections; track section.id; let idx = $index) {
       <div class="accordion-item glass-card">
-        <div 
+        <button 
           class="accordion-trigger" 
-          style="cursor: default; pointer-events: none; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; width: 100%; border: none; background: transparent;"
+          (click)="toggleSection(idx)"
+          [attr.aria-expanded]="openSectionIndex() === idx"
         >
-          <div class="trigger-left" style="display: flex; align-items: center; gap: 4px;">
-            <span class="section-name" style="font-weight: 600; font-size: 14px; color: var(--color-text);">{{ section.title }}</span>
+          <div class="trigger-left">
+            <i class="bi" [ngClass]="openSectionIndex() === idx ? 'bi-chevron-up' : 'bi-chevron-down'" aria-hidden="true" style="margin-right: 8px;"></i>
+            <span class="section-name">{{ section.title }}</span>
           </div>
-        </div>
+          <div class="trigger-right">
+            <span class="lectures-count">{{ section.lectures?.length || 0 }} lectures</span>
+          </div>
+        </button>
+
+        @if (openSectionIndex() === idx) {
+          <div class="accordion-panel">
+            @if (section.lectures && section.lectures.length > 0) {
+              <ul class="lectures-list">
+                @for (lecture of section.lectures; track lecture.id) {
+                  <li class="lecture-item">
+                    <div class="lecture-left">
+                      <i class="bi bi-play-circle" aria-hidden="true" style="margin-right: 12px; color: var(--color-text-3);"></i>
+                      <span class="lecture-title-text">{{ lecture.title }}</span>
+                    </div>
+                    <div class="lecture-right">
+                      <span class="lecture-duration">{{ formatDuration(lecture.durationInMinutes || 0) }}</span>
+                    </div>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <div class="no-lectures">No lectures published in this section yet.</div>
+            }
+          </div>
+        }
       </div>
     }
   </div>

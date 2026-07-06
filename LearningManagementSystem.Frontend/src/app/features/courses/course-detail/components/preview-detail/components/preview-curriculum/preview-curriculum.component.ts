@@ -15,6 +15,32 @@ export class CoursePreviewCurriculumComponent {
 
   protected openSectionIndex = signal<number | null>(0); // open first section by default
 
+  get totalSections(): number {
+    return this.course?.sections?.length || 0;
+  }
+
+  get totalLectures(): number {
+    if (!this.course?.sections) return 0;
+    return this.course.sections.reduce((acc, section) => acc + (section.lectures?.length || 0), 0);
+  }
+
+  get totalDurationMinutes(): number {
+    if (!this.course?.sections) return 0;
+    return this.course.sections.reduce((acc, section) => {
+      const sectionTime = section.lectures?.reduce((secAcc, lecture) => secAcc + (lecture.durationInMinutes || 0), 0) || 0;
+      return acc + sectionTime;
+    }, 0);
+  }
+
+  formatDuration(minutes: number): string {
+    if (!minutes) return '0m';
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    if (h > 0 && m > 0) return `${h}h ${m}m`;
+    if (h > 0) return `${h}h`;
+    return `${m}m`;
+  }
+
   toggleSection(index: number) {
     if (this.openSectionIndex() === index) {
       this.openSectionIndex.set(null);
