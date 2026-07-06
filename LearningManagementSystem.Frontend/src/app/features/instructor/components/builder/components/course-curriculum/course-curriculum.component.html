@@ -200,8 +200,8 @@
           <div class="form-group">
             <label class="form-label">Lecture Resource Content <span class="required-star">*</span></label>
 
-            <!-- File Upload Zone for Video and PDF -->
-            @if (lectureForm.get('contentType')?.value === 'Video' || lectureForm.get('contentType')?.value === 'pdf') {
+            <!-- File Upload Zone for Video, PDF, and PPT -->
+            @if (lectureForm.get('contentType')?.value !== 'Text') {
               <div class="lecture-resource-uploader">
                 @if (uploadedFileUrl(); as url) {
                   <div class="upload-success-state">
@@ -219,7 +219,7 @@
                     <input 
                       #lecFileInput
                       type="file" 
-                      [accept]="lectureForm.get('contentType')?.value === 'Video' ? 'video/*' : 'application/pdf'" 
+                      [accept]="lectureForm.get('contentType')?.value === 'Video' ? 'video/*' : lectureForm.get('contentType')?.value === 'pdf' ? 'application/pdf' : '.ppt,.pptx,.doc,.docx,.xls,.xlsx'" 
                       class="hidden-file-input"
                       (change)="onLectureFileSelected($event)"
                     />
@@ -235,7 +235,7 @@
                     } @else {
                       <i class="bi bi-cloud-arrow-up uploader-icon" aria-hidden="true"></i>
                       <span class="uploader-prompt">
-                        Choose {{ lectureForm.get('contentType')?.value === 'Video' ? 'Video (.mp4, .mov)' : 'PDF document (.pdf)' }}
+                        Choose {{ lectureForm.get('contentType')?.value === 'Video' ? 'Video (.mp4, .mov)' : lectureForm.get('contentType')?.value === 'pdf' ? 'PDF document (.pdf)' : 'Office Document' }}
                       </span>
                       <span class="uploader-limit">
                         Max Size: {{ lectureForm.get('contentType')?.value === 'Video' ? '200MB' : '20MB' }}
@@ -245,24 +245,14 @@
                 }
               </div>
             } @else {
-              <!-- Textarea for Text, URL for PPT, External Links -->
-              @if (lectureForm.get('contentType')?.value === 'Text') {
-                <textarea 
-                  formControlName="contentUrl" 
-                  placeholder="Enter your article or text content here..." 
-                  class="form-control text-content-area"
-                  rows="8"
-                  [class.is-invalid]="lectureForm.get('contentUrl')?.touched && lectureForm.get('contentUrl')?.invalid"
-                ></textarea>
-              } @else {
-                <input 
-                  type="text" 
-                  formControlName="contentUrl" 
-                  placeholder="Enter resource URL or content link..." 
-                  class="form-control"
-                  [class.is-invalid]="lectureForm.get('contentUrl')?.touched && lectureForm.get('contentUrl')?.invalid"
-                />
-              }
+              <!-- Textarea for Text -->
+              <textarea 
+                formControlName="contentUrl" 
+                placeholder="Enter your Markdown or text content here... (It will be automatically saved as a .md file)" 
+                class="form-control text-content-area"
+                rows="8"
+                [class.is-invalid]="lectureForm.get('contentUrl')?.touched && lectureForm.get('contentUrl')?.invalid"
+              ></textarea>
             }
           </div>
 

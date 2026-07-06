@@ -269,7 +269,7 @@ export class CourseCurriculumComponent implements OnInit, OnDestroy {
     const file = input.files[0];
     const type = this.lectureForm.get('contentType')?.value;
 
-    let uploadType: 'video' | 'pdf' | null = null;
+    let uploadType: 'video' | 'pdf' | 'document' | null = null;
     if (type === 'Video') {
       if (!file.type.startsWith('video/')) {
         this.notification.error('Please upload a valid video file (.mp4, .mov, etc.).');
@@ -292,6 +292,14 @@ export class CourseCurriculumComponent implements OnInit, OnDestroy {
         return;
       }
       uploadType = 'pdf';
+    } else {
+      // Document like PPT, DOC, etc.
+      // 20MB document limit
+      if (file.size > 20 * 1024 * 1024) {
+        this.notification.error('Document file size exceeds 20MB limit.');
+        return;
+      }
+      uploadType = 'document';
     }
 
     if (!uploadType) return;

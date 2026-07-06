@@ -48,4 +48,14 @@ export class CoursePreviewCurriculumComponent {
       this.openSectionIndex.set(index);
     }
   }
+
+  getLectureIcon(contentType: string): string {
+    const type = contentType?.toLowerCase() || '';
+    if (type.includes('video')) return 'bi-play-circle';
+    if (type.includes('pdf')) return 'bi-file-earmark-pdf';
+    if (type.includes('text')) return 'bi-file-text';
+    if (type.includes('ppt')) return 'bi-file-earmark-slides';
+    if (type.includes('external')) return 'bi-link-45deg';
+    return 'bi-file-earmark';
+  }
 }

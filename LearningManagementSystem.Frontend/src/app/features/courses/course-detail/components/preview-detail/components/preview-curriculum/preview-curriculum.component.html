@@ -17,7 +17,7 @@
             <span class="section-name">{{ section.title }}</span>
           </div>
           <div class="trigger-right">
-            <span class="lectures-count">{{ section.lectures?.length || 0 }} lectures</span>
+            <span class="lectures-count">{{ section.lectures.length }} lectures</span>
           </div>
         </button>
 
@@ -28,7 +28,7 @@
                 @for (lecture of section.lectures; track lecture.id) {
                   <li class="lecture-item">
                     <div class="lecture-left">
-                      <i class="bi bi-play-circle" aria-hidden="true" style="margin-right: 12px; color: var(--color-text-3);"></i>
+                      <i class="bi" [ngClass]="getLectureIcon(lecture.contentType)" aria-hidden="true" style="margin-right: 12px; color: var(--color-text-3);"></i>
                       <span class="lecture-title-text">{{ lecture.title }}</span>
                     </div>
                     <div class="lecture-right">

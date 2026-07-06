@@ -17,6 +17,7 @@ export class ClassroomSidebarComponent {
   @Input({ required: true }) completedLectureIds: number[] = [];
   @Input({ required: true }) progressPercent = 0;
   @Input({ required: true }) totalLectures = 0;
+  @Input() isCourseCompleted: boolean = false;
 
   @Output() lectureSelected = new EventEmitter<LectureResponse>();
   @Output() progressToggled = new EventEmitter<{ lectureId: number; event: Event }>();

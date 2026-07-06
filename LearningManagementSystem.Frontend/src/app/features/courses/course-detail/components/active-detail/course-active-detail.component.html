@@ -16,7 +16,7 @@
           class="btn btn-primary btn-sm cert-btn" 
           (click)="openCertificateModal()"
         >
-          <i class="bi bi-award-fill" aria-hidden="true"></i> View Certificate
+          <i class="bi bi-patch-check-fill" aria-hidden="true"></i> View Certificate
         </button>
       }
       <button 
@@ -96,6 +96,7 @@
             <app-classroom-player 
               [lecture]="lecture" 
               [isCompleted]="isCompleted(lecture.id)"
+              [isCourseCompleted]="progressPercent() === 100"
               (videoEnded)="toggleProgress(lecture.id)"
               (updateProgress)="handleUpdateProgress($event, lecture.id)"
               (markComplete)="toggleProgress(lecture.id)"
@@ -146,6 +147,7 @@
         [completedLectureIds]="completedLectureIds()"
         [progressPercent]="progressPercent()"
         [totalLectures]="totalLectures()"
+        [isCourseCompleted]="progressPercent() === 100"
         (lectureSelected)="selectLecture($event)"
         (progressToggled)="toggleProgress($event.lectureId, $event.event)"
       ></app-classroom-sidebar>

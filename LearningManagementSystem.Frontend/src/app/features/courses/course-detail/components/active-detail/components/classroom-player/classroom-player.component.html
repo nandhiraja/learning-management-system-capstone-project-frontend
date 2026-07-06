@@ -29,8 +29,7 @@
               <h3>{{ lecture.title }}</h3>
               <p class="text-muted">Reading material &bull; Complete it to check it off your progress list</p>
               <hr class="content-divider" />
-              <div class="actual-text-body">
-                {{ fetchedTextContent() }}
+              <div class="actual-text-body markdown-body" [innerHTML]="renderedMarkdownContent()">
               </div>
             </div>
           }
@@ -51,13 +50,16 @@
       @else if (isOfficeDocument) {
         @if (isLocalhost) {
           <!-- Local Development Fallback Helper -->
-          <div class="office-local-fallback glass-card">
-            <i class="bi bi-file-earmark-slides-fill document-large-icon" aria-hidden="true"></i>
+          <div class="office-local-fallback glass-card" style="padding: 40px; text-align: center;">
+            <i class="bi bi-file-earmark-slides-fill document-large-icon" aria-hidden="true" style="font-size: 64px; color: var(--color-warning);"></i>
             <h3 class="fallback-title">{{ lecture.title }}</h3>
             <p class="fallback-desc">
               This lecture is an Office document. Since the server is running on <strong>localhost</strong>, external viewers like Google Docs Viewer cannot access the file.
             </p>
-            <p class="fallback-note">Once deployed to a live server, this slide presentation will load automatically inline.</p>
+            <a [href]="mediaDocumentUrl" target="_blank" download class="btn btn-primary mt-3">
+              <i class="bi bi-download" aria-hidden="true"></i> Download File
+            </a>
+            <p class="fallback-note mt-3 text-muted" style="font-size: 12px;">Once deployed to a live server, this slide presentation will load automatically inline.</p>
           </div>
         } @else {
           <!-- Live Embedded Office Document -->
@@ -91,7 +93,8 @@
         class="btn" 
         [class.btn-success]="isCompleted"
         [class.btn-primary]="!isCompleted"
-        [disabled]="!canMarkComplete && !isCompleted"
+        [disabled]="(!canMarkComplete && !isCompleted) || (isCourseCompleted && isCompleted)"
+        [title]="(isCourseCompleted && isCompleted) ? 'Course already completed' : ''"
         (click)="handleMarkComplete()"
       >
         @if (isCompleted) {

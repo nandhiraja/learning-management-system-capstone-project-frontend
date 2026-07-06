@@ -1,8 +1,9 @@
 import { Component, Input, Output, EventEmitter, inject, OnChanges, SimpleChanges, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-browser';
 import { LectureResponse } from '../../../../../../../models/course.model';
+import { marked } from 'marked';
 
 @Component({
   selector: 'app-classroom-player',
@@ -12,8 +13,9 @@ import { LectureResponse } from '../../../../../../../models/course.model';
   styleUrl: './classroom-player.component.css'
 })
 export class ClassroomPlayerComponent implements OnChanges {
-  @Input({ required: true }) lecture: LectureResponse | null = null;
-  @Input() isCompleted = false;
+  @Input({ required: true }) lecture!: LectureResponse;
+  @Input() isCompleted: boolean = false;
+  @Input() isCourseCompleted: boolean = false;
 
   @Output() videoEnded = new EventEmitter<void>();
   @Output() markComplete = new EventEmitter<void>();
@@ -24,12 +26,14 @@ export class ClassroomPlayerComponent implements OnChanges {
 
   // States
   protected fetchedTextContent = signal<string | null>(null);
+  protected renderedMarkdownContent = signal<SafeHtml | null>(null);
   protected isFetchingText = signal<boolean>(false);
   protected externalLinkClicked = signal<boolean>(false);
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['lecture'] && this.lecture) {
       this.fetchedTextContent.set(null);
+      this.renderedMarkdownContent.set(null);
       this.externalLinkClicked.set(false);
       if (this.isTextOrMarkdown) {
         this.fetchTextContent();
@@ -86,8 +90,12 @@ export class ClassroomPlayerComponent implements OnChanges {
 
   get isOfficeDocument(): boolean {
     if (!this.lecture) return false;
+    const type = this.lecture.contentType.toLowerCase();
     const url = this.lecture.contentUrl.toLowerCase();
-    return url.endsWith('.ppt') || url.endsWith('.pptx') || url.endsWith('.doc') || url.endsWith('.docx') || url.endsWith('.xls') || url.endsWith('.xlsx');
+    return type.includes('ppt') || type.includes('powerpoint') || 
+           url.endsWith('.ppt') || url.endsWith('.pptx') || 
+           url.endsWith('.doc') || url.endsWith('.docx') || 
+           url.endsWith('.xls') || url.endsWith('.xlsx');
   }
 
   get googleDocsViewerUrl(): SafeResourceUrl | null {
@@ -98,21 +106,40 @@ export class ClassroomPlayerComponent implements OnChanges {
   }
 
   fetchTextContent() {
-    const url = this.absoluteUrl;
-    if (!url) return;
+    const rawContent = this.lecture?.contentUrl;
+    if (!rawContent) return;
 
-    this.isFetchingText.set(true);
-    this.http.get(url, { responseType: 'text' }).subscribe({
-      next: (content) => {
-        this.fetchedTextContent.set(content);
-        this.isFetchingText.set(false);
-      },
-      error: (err) => {
-        console.error('Failed to fetch text content from server', err);
-        this.fetchedTextContent.set('Unable to load reading content. Please download the file or try again later.');
-        this.isFetchingText.set(false);
+    // Check if it's a file path or raw text
+    if (rawContent.startsWith('/uploads/') || rawContent.startsWith('http') || rawContent.endsWith('.md') || rawContent.endsWith('.txt')) {
+      const url = this.mediaDocumentUrl;
+      this.isFetchingText.set(true);
+      this.http.get(url, { responseType: 'text' }).subscribe({
+        next: async (content) => {
+          this.fetchedTextContent.set(content);
+          try {
+            const parsedHtml = await marked.parse(content);
+            this.renderedMarkdownContent.set(this.sanitizer.bypassSecurityTrustHtml(parsedHtml));
+          } catch (e) {
+            this.renderedMarkdownContent.set(this.sanitizer.bypassSecurityTrustHtml(content));
+          }
+          this.isFetchingText.set(false);
+        },
+        error: (err) => {
+          console.error('Failed to fetch text content from server', err);
+          this.renderedMarkdownContent.set(this.sanitizer.bypassSecurityTrustHtml('Unable to load reading content. Please download the file or try again later.'));
+          this.isFetchingText.set(false);
+        }
+      });
+    } else {
+      // It's raw markdown text stored directly in the DB
+      this.fetchedTextContent.set(rawContent);
+      try {
+        const parsedHtml = marked.parse(rawContent) as string;
+        this.renderedMarkdownContent.set(this.sanitizer.bypassSecurityTrustHtml(parsedHtml));
+      } catch (e) {
+        this.renderedMarkdownContent.set(this.sanitizer.bypassSecurityTrustHtml(rawContent));
       }
-    });
+    }
   }
 
   onVideoEnded() {

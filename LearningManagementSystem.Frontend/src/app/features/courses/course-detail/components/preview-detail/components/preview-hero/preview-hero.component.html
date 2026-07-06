@@ -6,7 +6,7 @@
       </a>
     </div>
     <h1 class="course-title">{{ course.title }}</h1>
-    <p class="course-subtitle">{{ course.description }}</p>
+    <p class="course-subtitle">{{ course.description.length > 150 ? (course.description | slice:0:150) + '...' : course.description }}</p>
     
     <div class="course-meta-row">
       <div class="rating-badge">

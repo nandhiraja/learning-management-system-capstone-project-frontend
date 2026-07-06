@@ -82,10 +82,14 @@ export class InstructorService {
   }
 
   // File uploader with progress tracking
-  uploadFile(file: File, type: 'image' | 'video' | 'pdf'): Observable<HttpEvent<any>> {
+  uploadFile(file: File, type: 'image' | 'video' | 'pdf' | 'document'): Observable<HttpEvent<any>> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post(`http://localhost:5159/api/upload/${type}`, formData, {
+    
+    let url = `http://localhost:5159/api/upload/${type}`;
+    if (type === 'document') url = `http://localhost:5159/api/upload/document`;
+
+    return this.http.post(url, formData, {
       reportProgress: true,
       observe: 'events'
     });

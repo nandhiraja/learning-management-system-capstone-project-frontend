@@ -343,3 +343,75 @@
     display: none !important;
   }
 }
+
+@media (max-width: 768px) {
+  .classroom-top-bar {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+    padding: 10px 12px;
+    flex-wrap: wrap; /* allow wrapping if really tight */
+    gap: 8px;
+  }
+  
+  .top-bar-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* Make buttons act as icon-only on mobile to save space */
+  .cert-btn {
+    padding: 6px 12px;
+    font-size: 0; /* Hide text */
+  }
+  
+  .cert-btn i {
+    font-size: 16px;
+    margin: 0;
+  }
+  
+  .sidebar-toggle-btn {
+    padding: 6px 12px;
+    font-size: 0; /* Hide text */
+  }
+  
+  .sidebar-toggle-btn i {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .classroom-main-grid {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .course-nav-title {
+    max-width: none;
+    font-size: 13px;
+  }
+
+  /* Wrap tabs instead of horizontal scroll for better UX */
+  .classroom-tabs-row {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 4px;
+    margin-bottom: 12px;
+    gap: 6px;
+    justify-content: center;
+  }
+  
+  .classroom-tab {
+    padding: 6px 10px;
+    font-size: 11px;
+    flex: 1 1 auto;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .active-lecture-title {
+    font-size: 16px;
+  }
+}
+

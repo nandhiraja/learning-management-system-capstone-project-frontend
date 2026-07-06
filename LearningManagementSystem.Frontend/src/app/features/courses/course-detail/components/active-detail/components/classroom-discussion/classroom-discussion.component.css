@@ -580,3 +580,28 @@
   font-size: 11px;
   color: var(--color-text-3);
 }
+
+/* Mobile specific discussion scaling */
+@media (max-width: 768px) {
+  .discussion-item, .reply-item {
+    padding: 12px;
+  }
+  .discussion-author {
+    font-size: 13px;
+  }
+  .discussion-time {
+    font-size: 11px;
+  }
+  .discussion-title {
+    font-size: 15px;
+  }
+  .discussion-body {
+    font-size: 13.5px;
+  }
+  .create-box h3 {
+    font-size: 16px;
+  }
+  input, textarea {
+    font-size: 13.5px !important;
+  }
+}

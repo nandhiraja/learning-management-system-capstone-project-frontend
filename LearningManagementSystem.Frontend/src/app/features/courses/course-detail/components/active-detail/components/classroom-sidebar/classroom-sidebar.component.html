@@ -26,7 +26,9 @@
               <button 
                 class="lec-checkbox-btn" 
                 (click)="toggleProgress(lec.id, $event)"
+                [disabled]="isCourseCompleted && isCompleted(lec.id)"
                 [attr.aria-label]="isCompleted(lec.id) ? 'Mark lecture incomplete' : 'Mark lecture complete'"
+                [title]="(isCourseCompleted && isCompleted(lec.id)) ? 'Course already completed' : ''"
               >
                 <i 
                   class="bi" 
