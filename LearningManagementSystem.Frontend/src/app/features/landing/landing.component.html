@@ -19,7 +19,7 @@
         <a routerLink="/courses" class="btn btn-secondary">Browse all courses</a>
         @if (!auth.currentUser()) {
           <a routerLink="/auth/register" class="btn btn-primary">Join for free</a>
-        }
+        } 
       </div>
     </div>
 
@@ -47,17 +47,45 @@
   <section class="stats-section">
     <div class="stats-grid">
       <div class="stat-item glass-card">
-        <h3 class="stat-value">50K+</h3>
+        <h3 class="stat-value">{{ stats()?.totalActiveStudents || 0 }}+</h3>
         <p>Active students</p>
       </div>
       <div class="stat-item glass-card">
-        <h3 class="stat-value">200+</h3>
+        <h3 class="stat-value">{{ stats()?.totalExpertInstructors || 0 }}+</h3>
         <p>Expert instructors</p>
       </div>
       <div class="stat-item glass-card">
-        <h3 class="stat-value">1.2K+</h3>
+        <h3 class="stat-value">{{ stats()?.totalPremiumCourses || 0 }}+</h3>
         <p>Premium courses</p>
       </div>
+    </div>
+  </section>
+
+  <!-- Trending Courses -->
+  <section class="trending-section" *ngIf="topCourses().length > 0">
+    <div class="section-header">
+      <h2>Top Trending Courses</h2>
+      <p>Discover what our students are learning right now.</p>
+    </div>
+    <div class="courses-grid">
+      <app-course-card *ngFor="let course of topCourses()" [course]="course"></app-course-card>
+    </div>
+    <div style="text-align: center; margin-top: 2rem;">
+      <a routerLink="/courses" class="btn btn-secondary">View all courses <i class="bi bi-arrow-right"></i></a>
+    </div>
+  </section>
+
+  <!-- Explore Categories -->
+  <section class="categories-section" *ngIf="categories().length > 0">
+    <div class="section-header">
+      <h2>Explore by Category</h2>
+      <p>Find the perfect course in your favorite topics.</p>
+    </div>
+    <div class="categories-grid">
+      <a *ngFor="let cat of categories()" [routerLink]="['/courses']" [queryParams]="{category: cat.id}" class="category-card glass-card">
+        <i class="bi {{ getCategoryIcon(cat.name) }} category-icon"></i>
+        <h3>{{ cat.name }}</h3>
+      </a>
     </div>
   </section>
 
@@ -70,24 +98,24 @@
 
     <div class="features-grid">
       <!-- Student card -->
-      <div class="feature-card glass-card">
-        <div class="feature-icon">
+      <div class="feature-card glass-card border-accent">
+        <div class="feature-icon bg-accent-soft">
           <i class="bi bi-mortarboard" aria-hidden="true"></i>
         </div>
-        <h3 class="card-title">Learn anywhere</h3>
-        <p>Access high-quality lectures, submit interactive quizzes, and earn course certificates. Learn at your own pace.</p>
+        <h3 class="card-title">Learn at your pace</h3>
+        <p>Access high-quality lectures, submit interactive quizzes, and track your progress in real-time. Learn on your schedule.</p>
         <a routerLink="/courses" class="feature-link">
           Explore courses <i class="bi bi-arrow-right-short" aria-hidden="true"></i>
         </a>
       </div>
 
       <!-- Instructor card -->
-      <div class="feature-card glass-card">
-        <div class="feature-icon">
+      <div class="feature-card glass-card border-success">
+        <div class="feature-icon bg-success-soft">
           <i class="bi bi-people" aria-hidden="true"></i>
         </div>
-        <h3 class="card-title">Teach globally</h3>
-        <p>Build your courses, upload videos, attach PDFs, design quizzes, and manage reviews from a powerful portal.</p>
+        <h3 class="card-title">Share your knowledge</h3>
+        <p>Build your courses, upload lectures, attach PDFs, design quizzes, and manage reviews from a powerful creator portal.</p>
         @if (auth.currentUser()?.role === 'Instructor') {
           <a routerLink="/instructor/dashboard" class="feature-link">
             Go to instructor portal <i class="bi bi-arrow-right-short" aria-hidden="true"></i>
@@ -99,19 +127,50 @@
         }
       </div>
 
-      <!-- Admin card -->
-      <div class="feature-card glass-card">
-        <div class="feature-icon">
-          <i class="bi bi-shield-lock" aria-hidden="true"></i>
+      <!-- Certificates card -->
+      <div class="feature-card glass-card border-purple">
+        <div class="feature-icon bg-purple-soft">
+          <i class="bi bi-patch-check" aria-hidden="true"></i>
         </div>
-        <h3 class="card-title">Platform control</h3>
-        <p>Enforce quality guidelines, review pending courses, moderate platform users, and adjust taxonomic categories.</p>
-        @if (auth.currentUser()?.role === 'Admin') {
-          <a routerLink="/admin/dashboard" class="feature-link">
-            Manage platform <i class="bi bi-arrow-right-short" aria-hidden="true"></i>
-          </a>
+        <h3 class="card-title">Earn credentials</h3>
+        <p>Complete course milestones to earn verified certificates. Showcase your credentials and share them directly with employers.</p>
+        <a routerLink="/courses" class="feature-link">
+          Browse certified courses <i class="bi bi-arrow-right-short" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top Instructors -->
+  <section class="instructors-section" *ngIf="topInstructors().length > 0">
+    <div class="section-header">
+      <h2>Learn from the Best</h2>
+      <p>Our top instructors are industry experts ready to share their knowledge.</p>
+    </div>
+    <div class="instructors-grid">
+      <div *ngFor="let inst of topInstructors()" class="instructor-card glass-card">
+        <img [src]="inst.profilePictureUrl || 'https://ui-avatars.com/api/?name=' + inst.fullName + '&background=2563eb&color=ffffff'" alt="Instructor" class="instructor-avatar" />
+        <h3 class="instructor-name">{{ inst.fullName }}</h3>
+        <div class="instructor-stats">
+          <span><i class="bi bi-journal-check"></i> {{ inst.courseCount }} Courses</span>
+          <span><i class="bi bi-people"></i> {{ inst.totalStudents }} Students</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Banner -->
+  <section class="cta-banner">
+    <div class="cta-content">
+      <h2>Ready to Start Your Learning Journey?</h2>
+      <p>Join thousands of students and achieve your goals with LearnHub.</p>
+      <div class="cta-actions">
+        @if (!auth.currentUser()) {
+          <a routerLink="/auth/register" class="btn btn-primary btn-lg">Get Started for Free</a>
+          <a routerLink="/courses" class="btn btn-secondary btn-lg">Explore Courses</a>
+
         } @else {
-          <span class="feature-link muted">Administrators only</span>
+          <a routerLink="/courses" class="btn btn-primary btn-lg">Explore Courses</a>
         }
       </div>
     </div>

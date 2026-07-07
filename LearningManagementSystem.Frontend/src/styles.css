@@ -26,10 +26,10 @@
   --color-border-2:      rgba(0, 0, 0, 0.13);
 
   /* ── Navigation */
-  --color-nav-bg:              #1a3d6e;
+  --color-nav-bg:              #063372;
   --color-sidebar-bg:          #0f2647;
   --color-sidebar-border:      rgba(255, 255, 255, 0.07);
-  --color-sidebar-text:        rgba(255, 255, 255, 0.60);
+  --color-sidebar-text:        rgba(255, 255, 255, 0.671);
   --color-sidebar-active-bg:   rgba(255, 255, 255, 0.12);
   --color-sidebar-active-text: #ffffff;
 
@@ -147,11 +147,14 @@ a:hover {
   color: var(--color-accent-hover);
 }
 
+input, textarea, select, button {
+  font-family: inherit;
+}
+
 button {
   cursor: pointer;
   border: none;
   outline: none;
-  font-family: inherit;
   transition: all var(--transition-fast);
 }
 
@@ -215,38 +218,41 @@ button {
 
 .btn-primary {
   background-color: var(--color-accent);
-  color: #ffffff;
+  color: #ffffff !important;
 }
 
 .btn-primary:hover:not(:disabled) {
   background-color: var(--color-accent-hover);
+  color: #ffffff !important;
   box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  color: #ffffff !important;
 }
 
 .btn-secondary {
   background-color: var(--color-surface-2);
-  color: var(--color-text);
+  color: var(--color-text) !important;
   border: 1px solid var(--color-border-2);
 }
 
 .btn-secondary:hover {
   background-color: var(--color-border);
+  color: var(--color-text) !important;
 }
 
 .btn-ghost {
   background: transparent;
-  color: var(--color-text-2);
+  color: var(--color-text-2) !important;
   border: 1px solid var(--color-border-2);
 }
 
 .btn-ghost:hover {
   background: var(--color-surface-2);
-  color: var(--color-text);
+  color: var(--color-text) !important;
 }
 
 /* Cards */
@@ -280,3 +286,92 @@ button {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ── Custom Styled Dropdowns (System-Wide Selector Blend) */
+.custom-dropdown-container {
+  position: relative;
+}
+
+.custom-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select-trigger {
+  width: 100%;
+  padding: 10px 14px;
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border-2);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: 13.5px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.custom-select-trigger:hover {
+  border-color: var(--color-accent);
+  background-color: var(--color-surface);
+}
+
+.custom-select-wrapper.is-invalid .custom-select-trigger {
+  border-color: #f43f5e;
+}
+
+.custom-dropdown-options {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 1000;
+  list-style: none;
+  padding: 6px 0;
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(12px);
+  animation: dropdown-fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropdown-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-dropdown-options li {
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--color-text-2);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.custom-dropdown-options li:hover {
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+/* Custom bold styling for Bootstrap Icon arrows to look premium and readable */
+.bi-arrow-left-short, .bi-arrow-right-short {
+  font-size: 1.35em !important;
+  font-weight: bold !important;
+  -webkit-text-stroke: 0.8px currentColor;
+  vertical-align: middle;
+  line-height: 1;
+}
+
