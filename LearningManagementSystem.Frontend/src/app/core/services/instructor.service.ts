@@ -51,6 +51,11 @@ export class InstructorService {
     return this.api.post<any>(`courses/${courseGuid}/submit`, {});
   }
 
+  // Archive / unpublish course
+  archiveCourse(courseGuid: string, reason: string): Observable<any> {
+    return this.api.post<any>(`courses/${courseGuid}/archive`, { reason });
+  }
+
   // Create section inside course
   createSection(courseGuid: string, payload: { title: string; order: number }): Observable<any> {
     return this.api.post<any>(`courses/${courseGuid}/sections`, payload);

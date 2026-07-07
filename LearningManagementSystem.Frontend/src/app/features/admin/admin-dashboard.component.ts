@@ -366,4 +366,17 @@ export class AdminDashboardComponent implements OnInit {
       }
     });
   }
+
+  protected handleArchiveCourse(event: { courseId: string; reason: string }) {
+    this.adminService.archiveCourse(event.courseId, event.reason).subscribe({
+      next: () => {
+        this.notification.success('Course successfully archived.');
+        this.loadTabData('courses');
+        this.loadStats();
+      },
+      error: () => {
+        this.notification.error('Failed to archive the course.');
+      }
+    });
+  }
 }

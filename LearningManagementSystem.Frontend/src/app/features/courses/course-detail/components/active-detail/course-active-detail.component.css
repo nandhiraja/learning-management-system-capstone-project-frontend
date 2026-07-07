@@ -81,6 +81,11 @@
   grid-template-columns: 1fr;
 }
 
+.btn-secondary:hover{
+  background-color: #0c41d1 !important;
+  color: #ffffff !important;
+}
+
 .classroom-main-grid.sidebar-closed .classroom-curriculum-column {
   display: none;
 }

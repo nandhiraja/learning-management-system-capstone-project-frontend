@@ -74,12 +74,17 @@
               </td>
               <td class="actions-cell">
                 <div class="action-buttons-wrapper">
-                  <a [routerLink]="['/courses', course.externalId]" class="btn btn-ghost btn-sm view-details-link">
+                  <a [routerLink]="['/courses', course.externalId]" class="btn btn-ghost btn-sm view-details-link" title="View Course">
                     <i class="bi bi-eye" aria-hidden="true"></i> 
                   </a>
-                  <a [routerLink]="['/instructor/courses/builder', course.externalId]" class="btn btn-ghost btn-sm edit-details-link">
+                  <a [routerLink]="['/instructor/courses/builder', course.externalId]" class="btn btn-ghost btn-sm edit-details-link" title="Edit Course">
                     <i class="bi bi-pencil" aria-hidden="true"></i> 
                   </a>
+                  @if (course.status.toLowerCase() === 'published') {
+                    <button (click)="onArchive(course.externalId)" class="btn btn-ghost btn-sm text-danger" title="Unpublish / Archive Course">
+                      <i class="bi bi-archive" aria-hidden="true"></i>
+                    </button>
+                  }
                 </div>
               </td>
             </tr>
@@ -89,3 +94,43 @@
     </div>
   }
 </div>
+
+<!-- Premium Archive Reason Input Modal -->
+@if (isArchiveModalOpen()) {
+  <div class="archive-modal-overlay" (click)="closeArchiveModal()">
+    <div class="archive-modal-card glass-card" (click)="$event.stopPropagation()">
+      <div class="archive-modal-header">
+        <h4 class="archive-modal-title">Archive Course</h4>
+        <button class="btn-close-modal" aria-label="Close Modal" (click)="closeArchiveModal()">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="archive-modal-body">
+        <div class="archive-warning-banner">
+          <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+          <p><strong>Warning:</strong> Archiving will unpublish this course immediately. New students won't be able to purchase or enroll. Existing students retain full access.</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="archive-reason">Reason for Archiving:</label>
+          <textarea
+            id="archive-reason"
+            class="form-control text-area-input"
+            placeholder="Please detail the reason for unpublishing this course (required)..."
+            [(ngModel)]="archiveReason"
+            rows="4"
+          ></textarea>
+        </div>
+      </div>
+      <div class="archive-modal-footer">
+        <button class="btn btn-secondary btn-sm" (click)="closeArchiveModal()">Cancel</button>
+        <button
+          class="btn btn-danger btn-sm"
+          [disabled]="!archiveReason.trim()"
+          (click)="submitArchive()"
+        >
+          Confirm Archive
+        </button>
+      </div>
+    </div>
+  </div>
+}

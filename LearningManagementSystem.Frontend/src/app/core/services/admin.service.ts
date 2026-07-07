@@ -31,6 +31,11 @@ export class AdminService {
     return this.api.post<any>(`admin/courses/${courseId}/review`, { status, reason });
   }
 
+  // Archive / unpublish course
+  archiveCourse(courseId: string, reason: string): Observable<any> {
+    return this.api.post<any>(`admin/courses/${courseId}/archive`, { reason });
+  }
+
   // Get all users in system
   getUsers(): Observable<UserProfile[]> {
     return this.api.get<UserProfile[]>('admin/users');

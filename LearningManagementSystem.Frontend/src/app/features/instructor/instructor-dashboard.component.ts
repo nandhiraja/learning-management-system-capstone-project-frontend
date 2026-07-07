@@ -83,4 +83,16 @@ export class InstructorDashboardComponent implements OnInit {
   protected handleCreateCourse() {
     this.router.navigate(['/instructor/courses/builder/new']);
   }
+
+  protected handleArchiveCourse(event: { courseGuid: string; reason: string }) {
+    this.instructorService.archiveCourse(event.courseGuid, event.reason).subscribe({
+      next: () => {
+        this.notification.success('Course unpublished/archived successfully.');
+        this.loadCourses();
+      },
+      error: () => {
+        this.notification.error('Failed to unpublish/archive the course.');
+      }
+    });
+  }
 }

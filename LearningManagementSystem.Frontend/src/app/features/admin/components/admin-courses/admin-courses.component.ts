@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy, signal, computed, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, signal, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CourseResponse } from '../../../../models/course.model';
@@ -13,6 +13,28 @@ import { CourseResponse } from '../../../../models/course.model';
 })
 export class AdminCoursesComponent {
   @Input({ required: true }) courses: CourseResponse[] = [];
+  @Output() archiveCourse = new EventEmitter<{ courseId: string; reason: string }>();
+
+  protected isArchiveModalOpen = signal<boolean>(false);
+  protected archiveReason = '';
+  protected activeCourseId = '';
+
+  protected onArchive(courseId: string) {
+    this.activeCourseId = courseId;
+    this.archiveReason = '';
+    this.isArchiveModalOpen.set(true);
+  }
+
+  protected closeArchiveModal() {
+    this.isArchiveModalOpen.set(false);
+  }
+
+  protected submitArchive() {
+    if (this.archiveReason.trim()) {
+      this.archiveCourse.emit({ courseId: this.activeCourseId, reason: this.archiveReason.trim() });
+      this.isArchiveModalOpen.set(false);
+    }
+  }
 
   // Filter signals
   protected searchTerm = signal<string>('');

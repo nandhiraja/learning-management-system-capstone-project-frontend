@@ -85,6 +85,7 @@
           <app-instructor-courses
             [courses]="courses()"
             (createCourse)="handleCreateCourse()"
+            (archiveCourse)="handleArchiveCourse($event)"
           ></app-instructor-courses>
         }
       }

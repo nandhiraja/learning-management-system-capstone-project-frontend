@@ -158,6 +158,7 @@
         } @else {
           <app-admin-courses
             [courses]="courses()"
+            (archiveCourse)="handleArchiveCourse($event)"
           ></app-admin-courses>
         }
       }
