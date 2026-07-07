@@ -94,6 +94,15 @@
         <div class="overview-welcome-card glass-card">
           <h2 class="welcome-heading">Welcome to the Administration Console</h2>
           <p class="welcome-text">Use the left menu panels to approve pending course curriculums, promote students to instructors, activate/deactivate user accounts, or approve tag parameters (categories & languages).</p>
+          
+          <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
+            <h3 style="font-size: 1.1rem; color: white; margin-bottom: 0.5rem;">System Tools</h3>
+            <button class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;" (click)="regenerateCertificates()" [disabled]="isRegeneratingCerts()">
+              <i class="bi bi-arrow-repeat" style="margin-right: 0.5rem;"></i> 
+              {{ isRegeneratingCerts() ? 'Regenerating...' : 'Regenerate All Certificates' }}
+            </button>
+            <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">Use this to force-update all existing user certificates to the latest PDF design.</p>
+          </div>
         </div>
       }
 

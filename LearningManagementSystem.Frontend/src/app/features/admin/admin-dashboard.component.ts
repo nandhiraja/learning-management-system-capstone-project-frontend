@@ -52,12 +52,28 @@ export class AdminDashboardComponent implements OnInit {
   protected categories = signal<AdminCategoryResponse[]>([]);
   protected languages = signal<AdminLanguageResponse[]>([]);
   protected pendingContentCount = signal<number>(0);
+  protected isRegeneratingCerts = signal<boolean>(false);
 
   ngOnInit() {
     this.loadStats();
     // Default load corresponding to tab
     this.loadTabData('overview');
     this.refreshPendingContentCount();
+  }
+
+  // --- Certificate Tools ---
+  protected regenerateCertificates() {
+    this.isRegeneratingCerts.set(true);
+    this.adminService.regenerateAllCertificates().subscribe({
+      next: (res) => {
+        this.notification.success(res.message);
+        this.isRegeneratingCerts.set(false);
+      },
+      error: () => {
+        this.notification.error('Failed to regenerate certificates.');
+        this.isRegeneratingCerts.set(false);
+      }
+    });
   }
 
   private refreshPendingContentCount() {

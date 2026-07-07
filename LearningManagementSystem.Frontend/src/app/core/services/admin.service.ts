@@ -90,4 +90,9 @@ export class AdminService {
   createLanguage(name: string): Observable<any> {
     return this.api.post<any>('languages', { name });
   }
+
+  // Regenerate all user certificates with the latest design
+  regenerateAllCertificates(): Observable<{ message: string }> {
+    return this.api.post<{ message: string }>('admin/certificates/regenerate-all', {});
+  }
 }
