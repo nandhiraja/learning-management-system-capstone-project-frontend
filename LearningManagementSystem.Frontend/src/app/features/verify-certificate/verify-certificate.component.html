@@ -1,0 +1,77 @@
+<div class="verify-container">
+  <div class="verify-card glass">
+    <!-- Branding Header -->
+    <div class="verify-header">
+      <div class="logo">LearningHub</div>
+      <div class="subtitle">Public Verification Portal</div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- Loading State -->
+    <div *ngIf="loading()" class="state-container animate-pulse">
+      <div class="spinner-ring"></div>
+      <p class="status-text">Verifying certificate authenticity...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!loading() && error()" class="state-container error-state animate-fade-in">
+      <div class="error-icon">
+        <i class="bi bi-x-circle-fill"></i>
+      </div>
+      <h2 class="state-title">Verification Failed</h2>
+      <p class="state-description">{{ error() }}</p>
+      <p class="error-tip">Please ensure the verification link or ID is typed correctly and has not been modified.</p>
+      <a routerLink="/" class="btn btn-secondary">Go to Home</a>
+    </div>
+
+    <!-- Verified State -->
+    <div *ngIf="!loading() && certificate()" class="state-container verified-state animate-fade-in">
+      <div class="success-icon-wrapper">
+        <div class="success-circle">
+          <i class="bi bi-patch-check-fill success-icon"></i>
+        </div>
+      </div>
+      
+      <h2 class="state-title text-success">Official Certificate Verified</h2>
+      <p class="state-description text-muted">
+        This document is an authentic certificate issued by <strong>LearningHub</strong>.
+      </p>
+
+      <div class="details-grid">
+        <div class="detail-item">
+          <div class="detail-label">Recipient</div>
+          <div class="detail-value highlight">{{ certificate()?.userFullName }}</div>
+          <div class="detail-subtext">{{ certificate()?.userEmail }}</div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-label">Course Title</div>
+          <div class="detail-value">{{ certificate()?.courseTitle }}</div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-label">Instructor</div>
+          <div class="detail-value">{{ certificate()?.instructorName }}</div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-label">Issue Date</div>
+          <div class="detail-value">{{ certificate()?.issuedDate | date:'longDate' }}</div>
+        </div>
+
+        <div class="detail-item full-width">
+          <div class="detail-label">Verification ID</div>
+          <div class="detail-value code">{{ certificate()?.verificationId }}</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a [href]="certificate()?.certificateUrl" target="_blank" class="btn btn-primary">
+          <i class="bi bi-file-earmark-pdf-fill"></i> View PDF Certificate
+        </a>
+        <a routerLink="/" class="btn btn-secondary">Return to Home</a>
+      </div>
+    </div>
+  </div>
+</div>

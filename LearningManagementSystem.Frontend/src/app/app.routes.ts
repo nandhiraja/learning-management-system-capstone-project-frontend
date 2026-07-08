@@ -12,6 +12,10 @@ export const routes: Routes = [
     path: 'auth',
     loadChildren: () => import('./features/auth/auth.routes').then((m) => m.authRoutes)
   },
+  {
+    path: 'verify-certificate/:verificationId',
+    loadComponent: () => import('./features/verify-certificate/verify-certificate.component').then((m) => m.VerifyCertificateComponent)
+  },
     {
     path: 'profile',
     loadComponent: () => import('./features/profile/profile.component').then((m) => m.ProfileComponent),
