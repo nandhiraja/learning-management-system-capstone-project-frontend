@@ -61,6 +61,12 @@
   }
 }
 
+@media (max-width: 768px) {
+  .preview-layout-container {
+    padding-bottom: 80px; /* Space for the sticky bottom bar */
+  }
+}
+
 /* Instructor Details Card */
 .instructor-body-card {
   padding: 24px;

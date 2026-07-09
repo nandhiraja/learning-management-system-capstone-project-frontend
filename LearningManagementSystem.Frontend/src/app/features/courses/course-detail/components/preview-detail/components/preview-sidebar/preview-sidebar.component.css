@@ -98,3 +98,128 @@
 .margin-top-sm {
   margin-top: 8px;
 }
+
+/* Mobile Responsive Sticky Bottom Bar */
+@media (max-width: 768px) {
+  .purchase-card {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0;
+    border: none;
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
+  }
+
+  :host-context(.dark-mode) .purchase-card {
+    background: rgba(18, 18, 18, 0.92);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+  }
+
+  .preview-media-wrapper {
+    display: none; /* Hide thumbnail on mobile */
+  }
+
+  .purchase-card-body {
+    padding: 0.65rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .price-row {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .price-row::after {
+    content: "Lifetime access";
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--color-text-3, #64748b);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 1px;
+  }
+
+  .price-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-primary, #4f46e5);
+    line-height: 1.1;
+  }
+
+  .cta-actions {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: row !important;
+    gap: 0.5rem;
+    flex-grow: 1;
+    justify-content: flex-end;
+  }
+
+  .btn-full {
+    width: auto;
+  }
+
+  .cta-actions button {
+    margin-top: 0 !important;
+    padding: 0 1rem;
+    font-size: 10px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 38px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+
+  /* Specific premium styles for Buy Now button */
+  .cta-actions button.btn-primary {
+    background: linear-gradient(135deg, var(--color-primary, #4f46e5) 0%, #3730a3 100%);
+    border: none;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+    flex-grow: 1.5;
+    max-width: 140px;
+  }
+
+  .cta-actions button.btn-primary:active {
+    transform: scale(0.97);
+  }
+
+  /* Specific styles for Add to Cart button */
+  .cta-actions button.btn-secondary {
+    background-color: var(--color-surface-2, #f1f5f9);
+    border: 1px solid var(--color-border, #e2e8f0);
+    color: var(--color-text, #1e293b);
+    flex-grow: 1;
+    max-width: 120px;
+  }
+
+  :host-context(.dark-mode) .cta-actions button.btn-secondary {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+  }
+
+  .cta-actions button.btn-secondary:active {
+    transform: scale(0.97);
+  }
+
+  .course-includes {
+    display: none; /* Hide includes list on mobile */
+  }
+}

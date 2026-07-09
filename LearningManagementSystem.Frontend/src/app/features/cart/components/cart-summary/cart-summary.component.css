@@ -137,3 +137,51 @@
 .checkout-actions {
   margin-top: 10px;
 }
+
+/* Mobile Responsive Cart Summary Card */
+@media (max-width: 576px) {
+  .summary-card {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .summary-title {
+    font-size: 14px;
+  }
+
+  .pricing-details {
+    gap: 8px;
+  }
+
+  .pricing-row {
+    font-size: 11px;
+  }
+
+  .total-val {
+    font-size: 16px;
+  }
+
+  .method-options {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .method-btn {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 11px;
+    gap: 6px;
+    justify-content: center;
+    border-radius: 6px;
+  }
+
+  .paypal-icon, .credit-icon {
+    font-size: 14px;
+  }
+
+  .checkout-actions button {
+    height: 44px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+}

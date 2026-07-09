@@ -81,3 +81,21 @@
     position: static;
   }
 }
+
+@media (max-width: 768px) {
+  .cart-page-wrapper {
+    padding: 20px 16px;
+  }
+
+  .cart-title {
+    font-size: 24px;
+  }
+
+  .cart-subtitle {
+    font-size: 12px;
+  }
+
+  .cart-header {
+    margin-bottom: 20px;
+  }
+}
