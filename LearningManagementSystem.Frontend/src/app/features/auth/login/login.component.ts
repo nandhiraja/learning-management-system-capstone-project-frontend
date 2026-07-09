@@ -40,7 +40,9 @@ export class LoginComponent {
       },
       error: (err) => {
         const errorMsg = err.error?.message || 'Invalid email or password.';
-        this.notification.error(errorMsg);
+        if (err.status !== 0 && err.status !== 500) {
+          this.notification.error(errorMsg);
+        }
         this.isLoading = false;
       }
     });

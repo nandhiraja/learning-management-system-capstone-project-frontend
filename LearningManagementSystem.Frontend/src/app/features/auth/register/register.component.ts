@@ -44,7 +44,9 @@ export class RegisterComponent {
       },
       error: (err) => {
         const errorMsg = err.error?.message || err.error || 'Registration failed. Please check your inputs.';
-        this.notification.error(errorMsg);
+        if (err.status !== 0 && err.status !== 500) {
+          this.notification.error(errorMsg);
+        }
         this.isLoading = false;
       }
     });
