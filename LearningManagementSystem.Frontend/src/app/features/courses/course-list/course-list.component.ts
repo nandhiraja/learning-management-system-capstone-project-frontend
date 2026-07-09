@@ -43,6 +43,7 @@ export class CourseListComponent implements OnInit {
   sortBy = signal<string>('newest');
   page = signal<number>(1);
   pageSize = signal<number>(6);
+  isMobileFilterOpen = signal<boolean>(false);
 
   // Pagination helper computed states
   totalPages = computed(() => Math.ceil(this.totalCount() / this.pageSize()));
@@ -85,6 +86,14 @@ export class CourseListComponent implements OnInit {
 
   fetchCourses() {
     this.isLoading.set(true);
+    
+    // Smooth scroll to the top of the explorer section when loading new data
+    if (typeof document !== 'undefined') {
+      const container = document.querySelector('.courses-page-container');
+      if (container) {
+        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
 
     // Map frontend price type to min/max price arguments
     let minPrice: number | null = null;
@@ -129,6 +138,7 @@ export class CourseListComponent implements OnInit {
       this.selectedCategoryId.set(catId);
     }
     this.page.set(1);
+    this.isMobileFilterOpen.set(false);
   }
 
   onLanguageToggle(langName: string) {
@@ -138,21 +148,25 @@ export class CourseListComponent implements OnInit {
       this.selectedLanguageName.set(langName);
     }
     this.page.set(1);
+    this.isMobileFilterOpen.set(false);
   }
 
   onPriceTypeChange(type: 'all' | 'free' | 'paid') {
     this.priceType.set(type);
     this.page.set(1);
+    this.isMobileFilterOpen.set(false);
   }
 
   onSortChange(val: string) {
     this.sortBy.set(val);
     this.page.set(1);
+    this.isMobileFilterOpen.set(false);
   }
 
   onSearch(val: string) {
     this.searchQuery.set(val.trim());
     this.page.set(1);
+    this.isMobileFilterOpen.set(false);
   }
 
   clearAllFilters() {
@@ -162,6 +176,7 @@ export class CourseListComponent implements OnInit {
     this.priceType.set('all');
     this.sortBy.set('newest');
     this.page.set(1);
+    this.isMobileFilterOpen.set(false);
   }
 
   setPage(pageNo: number) {

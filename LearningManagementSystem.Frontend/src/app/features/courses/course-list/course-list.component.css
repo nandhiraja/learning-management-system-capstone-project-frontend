@@ -24,15 +24,41 @@
   flex-direction: column;
   gap: 1.5rem;
   min-height: 400px;
+  position: relative; /* Essential to anchor the absolute loading overlay */
 }
 
-.catalog-loading {
+/* Loading Overlay */
+.catalog-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.004);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 5rem 0;
   gap: 1rem;
+  z-index: 10;
+  border-radius: 12px;
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Custom styled spinner for contrast on light background */
+.catalog-loading-overlay .spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid rgba(79, 70, 229, 0.15);
+  border-radius: 50%;
+  border-top-color: var(--color-primary, #4f46e5);
+  animation: spin 1s linear infinite;
+}
+
+.blur-content {
+  opacity: 0.45;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
 }
 
 .results-meta {
@@ -73,9 +99,143 @@
   margin-bottom: 0.5rem;
 }
 
+/* Mobile Actions Bar */
+.mobile-actions-bar {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  position: sticky;
+  top: 0rem;
+  z-index: 40;
+  backdrop-filter: blur(4px);
+  background-color: var(--color-surface);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.27);
+}
+
+.btn-filter-trigger {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  gap: 4px;
+}
+
+/* Mobile Drawer Overlay */
+.mobile-filter-drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.6); /* Darker backdrop */
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  backdrop-filter: blur(4px);
+}
+
+.mobile-filter-drawer {
+  width: 100%;
+  max-width: 540px;
+  max-height: 85vh;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-bottom: none;
+}
+
+.drawer-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-surface);
+}
+
+.btn-close-drawer {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-text-2);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  transition: all 0.2s ease;
+}
+
+.btn-close-drawer:hover {
+  background-color: var(--color-surface-3, rgba(0,0,0,0.05));
+  color: var(--color-text);
+}
+
+.drawer-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  background: var(--color-surface);
+}
+
+/* Override filters-sidebar styling inside the mobile drawer */
+::ng-deep .mobile-filter-drawer .filters-sidebar {
+  position: static !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  backdrop-filter: none !important;
+}
+
+/* Animations */
+.animate-slide-up {
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
 /* Responsiveness */
 @media (max-width: 992px) {
   .courses-layout-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .desktop-sidebar-container {
+    display: none; /* Hide desktop filters sidebar */
+  }
+
+  .mobile-actions-bar {
+    display: flex; /* Show mobile filter trigger bar */
+  }
+  
+  .courses-page-container {
+    padding: 1.5rem 1rem;
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .courses-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }

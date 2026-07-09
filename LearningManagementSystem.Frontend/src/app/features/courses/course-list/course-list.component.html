@@ -5,63 +5,103 @@
     (search)="onSearch($event)"
   ></app-course-search-header>
 
+  <!-- Mobile Sticky Actions Bar -->
+  <div class="mobile-actions-bar glass-card">
+    <span class="text-sm font-semibold">Showing {{ totalCount() }} courses</span>
+    <button (click)="isMobileFilterOpen.set(true)" class="btn btn-outline-primary btn-sm btn-filter-trigger">
+      <i class="bi bi-funnel" aria-hidden="true" style="margin-right: 4px;"></i> Filter & Sort
+    </button>
+  </div>
+
   <div class="courses-layout-grid">
-    <!-- Filters Sidebar -->
-    <app-course-filter-sidebar
-      [categories]="categories()"
-      [languages]="languages()"
-      [selectedCategoryId]="selectedCategoryId()"
-      [selectedLanguageName]="selectedLanguageName()"
-      [priceType]="priceType()"
-      [sortBy]="sortBy()"
-      (categoryToggle)="onCategoryToggle($event)"
-      (languageToggle)="onLanguageToggle($event)"
-      (priceTypeChange)="onPriceTypeChange($event)"
-      (sortByChange)="onSortChange($event)"
-      (clearFilters)="clearAllFilters()"
-    ></app-course-filter-sidebar>
+    <!-- Filters Sidebar (Desktop View) -->
+    <div class="desktop-sidebar-container">
+      <app-course-filter-sidebar
+        [categories]="categories()"
+        [languages]="languages()"
+        [selectedCategoryId]="selectedCategoryId()"
+        [selectedLanguageName]="selectedLanguageName()"
+        [priceType]="priceType()"
+        [sortBy]="sortBy()"
+        (categoryToggle)="onCategoryToggle($event)"
+        (languageToggle)="onLanguageToggle($event)"
+        (priceTypeChange)="onPriceTypeChange($event)"
+        (sortByChange)="onSortChange($event)"
+        (clearFilters)="clearAllFilters()"
+      ></app-course-filter-sidebar>
+    </div>
+
+    <!-- Mobile Filters Drawer Overlay -->
+    @if (isMobileFilterOpen()) {
+      <div class="mobile-filter-drawer-overlay" (click)="isMobileFilterOpen.set(false)">
+        <div class="mobile-filter-drawer glass-card animate-slide-up" (click)="$event.stopPropagation()">
+          <div class="drawer-header">
+            <h3 style="margin: 0; font-size: 16px; font-weight: 700;">Filters & Sorting</h3>
+            <button (click)="isMobileFilterOpen.set(false)" class="btn-close-drawer">
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="drawer-body">
+            <app-course-filter-sidebar
+              [categories]="categories()"
+              [languages]="languages()"
+              [selectedCategoryId]="selectedCategoryId()"
+              [selectedLanguageName]="selectedLanguageName()"
+              [priceType]="priceType()"
+              [sortBy]="sortBy()"
+              (categoryToggle)="onCategoryToggle($event)"
+              (languageToggle)="onLanguageToggle($event)"
+              (priceTypeChange)="onPriceTypeChange($event)"
+              (sortByChange)="onSortChange($event)"
+              (clearFilters)="clearAllFilters()"
+            ></app-course-filter-sidebar>
+          </div>
+        </div>
+      </div>
+    }
 
     <!-- Courses Grid Results -->
     <section class="results-container">
       @if (isLoading()) {
-        <div class="catalog-loading">
+        <div class="catalog-loading-overlay">
           <div class="spinner"></div>
           <p class="text-secondary">Loading courses...</p>
         </div>
-      } @else {
-        <!-- Active search terms summary -->
-        <div class="results-meta">
-          <p class="text-secondary text-sm">
-            Showing {{ courses().length }} of {{ totalCount() }} courses
-            @if (searchQuery()) {
-              for "{{ searchQuery() }}"
-            }
-          </p>
+      }
+
+      <!-- Active search terms summary -->
+      <div class="results-meta">
+        <p class="text-secondary text-sm">
+          Showing {{ courses().length }} of {{ totalCount() }} courses
+          @if (searchQuery()) {
+            for "{{ searchQuery() }}"
+          }
+        </p>
+      </div>
+
+      @if (courses().length > 0) {
+        <div class="courses-grid" [class.blur-content]="isLoading()">
+          @for (course of courses(); track course.id) {
+            <app-course-card [course]="course"></app-course-card>
+          }
         </div>
 
-        @if (courses().length > 0) {
-          <div class="courses-grid">
-            @for (course of courses(); track course.id) {
-              <app-course-card [course]="course"></app-course-card>
-            }
-          </div>
-
-          <!-- Pagination Footer -->
-          <app-course-pagination
-            [page]="page()"
-            [totalPages]="totalPages()"
-            [pages]="pages()"
-            (pageChange)="setPage($event)"
-          ></app-course-pagination>
-        } @else {
-          <!-- Empty State -->
-          <div class="empty-results glass-card">
-            <i class="bi bi-search empty-icon" aria-hidden="true"></i>
-            <h3>No courses found</h3>
-            <p class="text-secondary">We couldn't find any courses matching your search criteria. Try modifying your filters or clear them completely.</p>
-            <button (click)="clearAllFilters()" class="btn btn-primary">Reset all filters</button>
-          </div>
-        }
+        <!-- Pagination Footer -->
+        <app-course-pagination
+          [page]="page()"
+          [totalPages]="totalPages()"
+          [pages]="pages()"
+          (pageChange)="setPage($event)"
+          [class.blur-content]="isLoading()"
+        ></app-course-pagination>
+      } @else if (!isLoading()) {
+        <!-- Empty State -->
+        <div class="empty-results glass-card">
+          <i class="bi bi-search empty-icon" aria-hidden="true"></i>
+          <h3>No courses found</h3>
+          <p class="text-secondary">We couldn't find any courses matching your search criteria. Try modifying your filters or clear them completely.</p>
+          <button (click)="clearAllFilters()" class="btn btn-primary">Reset all filters</button>
+        </div>
       }
     </section>
   </div>
