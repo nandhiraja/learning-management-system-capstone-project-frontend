@@ -53,25 +53,32 @@ export class CourseListComponent implements OnInit {
   });
 
   constructor() {
-    // Whenever filter signals change, load matching courses automatically
+    // Whenever filter signals change, load matching courses automatically and save to storage
     effect(() => {
       this.fetchCourses();
+      this.saveFiltersToStorage();
     }, { allowSignalWrites: true });
   }
 
   ngOnInit() {
     this.loadFilterMetadata();
+    this.restoreFiltersFromStorage();
     
     // Subscribe to query parameters to sync navbar searches and category redirects
     this.route.queryParams.subscribe((params) => {
+      let queryChanged = false;
       if (params['q'] !== undefined) {
         this.searchQuery.set(params['q']);
+        queryChanged = true;
       }
       if (params['c'] !== undefined) {
         const catId = parseInt(params['c']);
         this.selectedCategoryId.set(isNaN(catId) ? null : catId);
+        queryChanged = true;
       }
-      this.page.set(1); // Reset to page 1 on query changes
+      if (queryChanged) {
+        this.page.set(1); // Reset to page 1 on active query changes
+      }
     });
   }
 
@@ -182,6 +189,41 @@ export class CourseListComponent implements OnInit {
   setPage(pageNo: number) {
     if (pageNo >= 1 && pageNo <= this.totalPages()) {
       this.page.set(pageNo);
+    }
+  }
+
+  private saveFiltersToStorage() {
+    if (typeof sessionStorage !== 'undefined') {
+      const filterState = {
+        q: this.searchQuery(),
+        c: this.selectedCategoryId(),
+        l: this.selectedLanguageName(),
+        p: this.priceType(),
+        s: this.sortBy(),
+        page: this.page(),
+        pageSize: this.pageSize()
+      };
+      sessionStorage.setItem('explorer_filters', JSON.stringify(filterState));
+    }
+  }
+
+  private restoreFiltersFromStorage() {
+    if (typeof sessionStorage !== 'undefined') {
+      const stored = sessionStorage.getItem('explorer_filters');
+      if (stored) {
+        try {
+          const state = JSON.parse(stored);
+          if (state.q !== undefined) this.searchQuery.set(state.q);
+          if (state.c !== undefined) this.selectedCategoryId.set(state.c);
+          if (state.l !== undefined) this.selectedLanguageName.set(state.l);
+          if (state.p !== undefined) this.priceType.set(state.p);
+          if (state.s !== undefined) this.sortBy.set(state.s);
+          if (state.page !== undefined) this.page.set(state.page);
+          if (state.pageSize !== undefined) this.pageSize.set(state.pageSize);
+        } catch (e) {
+          console.error('Failed to restore course filters from storage', e);
+        }
+      }
     }
   }
 }
