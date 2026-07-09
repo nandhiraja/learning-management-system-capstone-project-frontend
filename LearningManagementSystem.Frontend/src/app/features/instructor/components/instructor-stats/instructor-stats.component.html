@@ -71,3 +71,48 @@
     </div>
   </div>
 </div>
+
+<div class="charts-layout" *ngIf="stats">
+  <div class="double-charts">
+    <app-dashboard-chart 
+      *ngIf="stats.enrollmentTrendsChart?.labels?.length"
+      type="line" 
+      title="Enrollment Trends (Last 6 Months)" 
+      [dataDto]="stats.enrollmentTrendsChart"
+      labelName="New Enrollments">
+    </app-dashboard-chart>
+
+    <app-dashboard-chart 
+      *ngIf="stats.monthlyRevenueChart?.labels?.length"
+      type="line" 
+      title="Monthly Earnings Trend" 
+      [dataDto]="stats.monthlyRevenueChart"
+      labelName="Revenue"
+      [isCurrency]="true">
+    </app-dashboard-chart>
+  </div>
+
+  <div class="split-charts">
+    <div class="chart-col-large">
+      <app-dashboard-chart 
+        *ngIf="stats.revenuePerCourseChart?.labels?.length"
+        type="bar" 
+        [horizontal]="true"
+        title="Revenue Per Course" 
+        [dataDto]="stats.revenuePerCourseChart"
+        labelName="Revenue"
+        [isCurrency]="true">
+      </app-dashboard-chart>
+    </div>
+
+    <div class="chart-col-small">
+      <app-dashboard-chart 
+        *ngIf="stats.ratingsDistributionChart?.labels?.length"
+        type="doughnut" 
+        title="Course Ratings Distribution" 
+        [dataDto]="stats.ratingsDistributionChart"
+        labelName="Reviews">
+      </app-dashboard-chart>
+    </div>
+  </div>
+</div>

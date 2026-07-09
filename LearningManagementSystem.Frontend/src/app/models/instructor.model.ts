@@ -1,3 +1,5 @@
+import { ChartDataDto } from './admin.model';
+
 export interface InstructorDashboardResponse {
   totalCourses: number;
   totalStudents: number;
@@ -5,6 +7,10 @@ export interface InstructorDashboardResponse {
   averageCourseRating: number;
   totalReviewsCount: number;
   unansweredDiscussionsCount: number;
+  enrollmentTrendsChart?: ChartDataDto;
+  revenuePerCourseChart?: ChartDataDto;
+  ratingsDistributionChart?: ChartDataDto;
+  monthlyRevenueChart?: ChartDataDto;
 }
 
 export interface InstructorDiscussionResponse {

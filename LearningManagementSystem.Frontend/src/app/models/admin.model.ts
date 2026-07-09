@@ -1,6 +1,11 @@
 import { CourseResponse } from './course.model';
 import { UserProfile } from '../shared/models/user.model';
 
+export interface ChartDataDto {
+  labels: string[];
+  data: number[];
+}
+
 export interface AdminDashboardResponse {
   users: number;
   courses: number;
@@ -10,6 +15,10 @@ export interface AdminDashboardResponse {
   blockedUsersCount: number;
   instructorsCount: number;
   studentsCount: number;
+  platformGrowthChart?: ChartDataDto;
+  revenueByCategoryChart?: ChartDataDto;
+  courseStatusChart?: ChartDataDto;
+  monthlyRevenueChart?: ChartDataDto;
 }
 
 export interface PendingQueueResponse {

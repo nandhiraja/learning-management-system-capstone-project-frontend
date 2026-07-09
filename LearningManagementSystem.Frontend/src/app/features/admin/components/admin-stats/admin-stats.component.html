@@ -71,3 +71,47 @@
     </div>
   </div>
 </div>
+
+<div class="charts-layout" *ngIf="stats">
+  <div class="double-charts">
+    <app-dashboard-chart 
+      *ngIf="stats.platformGrowthChart?.labels?.length"
+      type="line" 
+      title="Platform Growth (New Users)" 
+      [dataDto]="stats.platformGrowthChart"
+      labelName="New Registrations">
+    </app-dashboard-chart>
+
+    <app-dashboard-chart 
+      *ngIf="stats.monthlyRevenueChart?.labels?.length"
+      type="line" 
+      title="Monthly Revenue Trend" 
+      [dataDto]="stats.monthlyRevenueChart"
+      labelName="Revenue"
+      [isCurrency]="true">
+    </app-dashboard-chart>
+  </div>
+
+  <div class="split-charts">
+    <div class="chart-col-large">
+      <app-dashboard-chart 
+        *ngIf="stats.revenueByCategoryChart?.labels?.length"
+        type="bar" 
+        title="Revenue by Course Category" 
+        [dataDto]="stats.revenueByCategoryChart"
+        labelName="Revenue"
+        [isCurrency]="true">
+      </app-dashboard-chart>
+    </div>
+
+    <div class="chart-col-small">
+      <app-dashboard-chart 
+        *ngIf="stats.courseStatusChart?.labels?.length"
+        type="pie" 
+        title="Course Status Distribution" 
+        [dataDto]="stats.courseStatusChart"
+        labelName="Courses">
+      </app-dashboard-chart>
+    </div>
+  </div>
+</div>
