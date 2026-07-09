@@ -488,3 +488,43 @@
     padding: 16px 12px;
   }
 }
+
+/* Processing States */
+.processing-spinner-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background-color: var(--color-surface-2, rgba(0,0,0,0.03));
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  height: 32px;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+.processing-text {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.btn-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid transparent;
+  border-top-color: var(--color-accent, #4f46e5);
+  border-radius: 50%;
+  animation: spinner-rotate 0.8s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
