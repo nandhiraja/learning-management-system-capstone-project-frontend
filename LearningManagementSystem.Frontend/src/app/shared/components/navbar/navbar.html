@@ -74,10 +74,131 @@
           </a>
         }
 
+        <!-- Mobile-only Notifications Shortcut -->
+        <div class="notifications-container mobile-only-link" style="margin-bottom: 0.5rem;">
+          <button 
+            type="button" 
+            class="nav-link" 
+            (click)="toggleNotifications($event)"
+            [class.active]="isNotificationsOpen"
+            style="background: transparent; border: none; width: 100%; text-align: left; cursor: pointer; padding: 0.5rem 0.75rem;"
+          >
+            <i class="bi bi-bell" aria-hidden="true"></i> Notifications
+            @if (notificationService.unreadCount() > 0) {
+              <span class="mobile-unread-badge">{{ notificationService.unreadCount() }}</span>
+            }
+          </button>
+          
+          @if (isNotificationsOpen) {
+            <div class="notifications-dropdown-card" style="position: static; width: 100%; max-height: 300px; margin-top: 0.5rem; box-shadow: none; border: 1px solid var(--color-border);">
+              <div class="notifications-header" style="padding: 0.5rem 1rem;">
+                <h3 style="font-size: 13px;">Recent Notifications</h3>
+                @if (notificationService.unreadCount() > 0) {
+                  <button (click)="notificationService.markAllAsRead()" role="button" class="mark-all-read-btn">Mark all read</button>
+                }
+              </div>
+              <div class="notifications-divider"></div>
+              <div class="notifications-list">
+                @if (notificationService.notifications().length === 0) {
+                  <div class="empty-notifications" style="padding: 1.5rem 1rem;">
+                    <p>No notifications yet</p>
+                  </div>
+                } @else {
+                  @for (notif of notificationService.notifications(); track notif.id) {
+                    <div class="notification-item" [class.unread]="!notif.isRead" style="padding: 0.75rem 1rem; display: flex; justify-content: space-between; gap: 0.5rem;">
+                      <div class="notification-content" style="flex: 1;">
+                        <p class="notification-title" style="font-size: 12px; margin: 0 0 0.25rem 0;">{{ notif.title }}</p>
+                        <p class="notification-message" style="font-size: 11px; margin: 0 0 0.25rem 0; line-height: 1.3;">{{ notif.message }}</p>
+                        <span class="notification-time" style="font-size: 9px; opacity: 0.6;">{{ notif.createdAt | date:'shortTime' }}</span>
+                      </div>
+                      <div class="notification-actions" style="display: flex; gap: 0.25rem; align-items: center;">
+                        @if (!notif.isRead) {
+                          <button (click)="notificationService.markAsRead(notif.id)" title="Mark as read" class="action-btn read-btn">
+                            <i class="bi bi-circle-fill"></i>
+                          </button>
+                        }
+                        <button (click)="notificationService.deleteNotification(notif.id)" title="Delete" class="action-btn delete-btn" style="opacity: 1;">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+          }
+        </div>
+
         <!-- Mobile-only Profile Settings Shortcut -->
         <a routerLink="/profile" routerLinkActive="active" class="nav-link mobile-only-link" (click)="closeMobileMenu()">
           <i class="bi bi-person-gear" aria-hidden="true"></i> My Profile
         </a>
+
+        <!-- Notifications Button & Popover -->
+        <div class="notifications-container desktop-only">
+          <button 
+            type="button" 
+            class="notifications-trigger" 
+            (click)="toggleNotifications($event)"
+            [class.active]="isNotificationsOpen"
+            aria-label="Notifications"
+          >
+            <i class="bi bi-bell" aria-hidden="true"></i>
+            @if (notificationService.unreadCount() > 0) {
+              <span class="unread-badge">{{ notificationService.unreadCount() }}</span>
+            }
+          </button>
+
+          @if (isNotificationsOpen) {
+            <div class="notifications-dropdown-card">
+              <div class="notifications-header">
+                <h3>Notifications</h3>
+                @if (notificationService.unreadCount() > 0) {
+                  <button (click)="notificationService.markAllAsRead()" role="button" class="mark-all-read-btn">Mark all read</button>
+                }
+              </div>
+              <div class="notifications-divider"></div>
+              <div class="notifications-list">
+                @if (notificationService.notifications().length === 0) {
+                  <div class="empty-notifications">
+                    <i class="bi bi-bell-slash"></i>
+                    <p>No notifications yet</p>
+                  </div>
+                } @else {
+                  @for (notif of notificationService.notifications(); track notif.id) {
+                    <div class="notification-item" [class.unread]="!notif.isRead">
+                      <div class="notification-icon" [class]="notif.type?.toLowerCase() || 'default'">
+                        @switch (notif.type) {
+                          @case ('Enrollment') { <i class="bi bi-person-plus"></i> }
+                          @case ('CourseApproval') { <i class="bi bi-shield-check"></i> }
+                          @case ('Discussion') { <i class="bi bi-chat-left-text"></i> }
+                          @case ('Quiz') { <i class="bi bi-check-circle"></i> }
+                          @case ('Certificate') { <i class="bi bi-patch-check"></i> }
+                          @default { <i class="bi bi-bell"></i> }
+                        }
+                      </div>
+                      <div class="notification-content">
+                        <p class="notification-title">{{ notif.title }}</p>
+                        <p class="notification-message">{{ notif.message }}</p>
+                        <span class="notification-time">{{ notif.createdAt | date:'shortTime' }}</span>
+                      </div>
+                      <div class="notification-actions">
+                        @if (!notif.isRead) {
+                          <button (click)="notificationService.markAsRead(notif.id)" title="Mark as read" class="action-btn read-btn">
+                            <i class="bi bi-circle-fill"></i>
+                          </button>
+                        }
+                        <button (click)="notificationService.deleteNotification(notif.id)" title="Delete" class="action-btn delete-btn">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+          }
+        </div>
 
         <!-- Desktop-only Profile Dropdown Menu -->
         <div class="profile-dropdown-container desktop-only">

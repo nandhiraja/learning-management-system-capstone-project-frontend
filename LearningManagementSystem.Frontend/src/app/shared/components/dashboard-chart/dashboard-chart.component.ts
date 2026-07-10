@@ -62,7 +62,7 @@ export class DashboardChartComponent implements OnChanges {
         cornerRadius: 8,
         displayColors: true,
         callbacks: {
-          label: (context) => {
+          label: (context: any) => {
             let label = context.dataset.label || '';
             if (label) {
               label += ': ';

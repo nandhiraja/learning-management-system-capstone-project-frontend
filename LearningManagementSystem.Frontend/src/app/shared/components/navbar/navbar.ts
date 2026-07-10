@@ -2,11 +2,13 @@ import { Component, inject, HostListener, ElementRef } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, CommonModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
@@ -14,15 +16,18 @@ export class NavbarComponent {
   auth = inject(AuthService);
   theme = inject(ThemeService);
   router = inject(Router);
+  notificationService = inject(NotificationService);
   elementRef = inject(ElementRef);
 
   isMobileMenuOpen = false;
   isProfileDropdownOpen = false;
+  isNotificationsOpen = false;
 
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
     if (this.isMobileMenuOpen) {
-      this.isProfileDropdownOpen = false; // Close desktop dropdown when opening mobile menu
+      this.isProfileDropdownOpen = false;
+      this.isNotificationsOpen = false;
     }
   }
 
@@ -33,6 +38,17 @@ export class NavbarComponent {
   toggleProfileDropdown(event: Event) {
     event.stopPropagation();
     this.isProfileDropdownOpen = !this.isProfileDropdownOpen;
+    if (this.isProfileDropdownOpen) {
+      this.isNotificationsOpen = false;
+    }
+  }
+
+  toggleNotifications(event: Event) {
+    event.stopPropagation();
+    this.isNotificationsOpen = !this.isNotificationsOpen;
+    if (this.isNotificationsOpen) {
+      this.isProfileDropdownOpen = false;
+    }
   }
 
   closeProfileDropdown() {
@@ -51,6 +67,7 @@ export class NavbarComponent {
   onDocumentClick(event: Event) {
     if (!this.elementRef.nativeElement.contains(event.target)) {
       this.isProfileDropdownOpen = false;
+      this.isNotificationsOpen = false;
     }
   }
 
