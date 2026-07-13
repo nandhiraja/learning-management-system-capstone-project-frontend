@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, inject, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { QuizService } from '../../../../../../../core/services/quiz.service';
 import { NotificationService } from '../../../../../../../shared/services/notification.service';
-import { QuizResponse, QuizSubmitResponse } from '../../../../../../../models/quiz.model';
+import { QuizProgressResponse, QuizResponse, QuizSubmitResponse } from '../../../../../../../models/quiz.model';
 import { LectureResponse } from '../../../../../../../models/course.model';
 
 @Component({
@@ -27,6 +27,7 @@ export class ClassroomQuizComponent implements OnChanges {
   protected quizAnswers = signal<Record<number, number>>({}); // questionId -> optionId
   protected quizResult = signal<QuizSubmitResponse | null>(null);
   protected isSubmittingQuiz = signal<boolean>(false);
+  protected quizProgress = signal<QuizProgressResponse | null>(null);
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['quizId'] && this.quizId) {
@@ -40,19 +41,40 @@ export class ClassroomQuizComponent implements OnChanges {
     this.quizAnswers.set({});
     this.quizResult.set(null);
     this.isSubmittingQuiz.set(false);
+    this.quizProgress.set(null);
   }
 
   loadQuiz(quizId: number) {
     this.isLoadingQuiz.set(true);
-    this.quizService.getQuiz(quizId).subscribe({
-      next: (data) => {
-        this.activeQuiz.set(data);
-        this.isLoadingQuiz.set(false);
-      },
-      error: (err) => {
-        console.error('Failed to load quiz details', err);
-        this.isLoadingQuiz.set(false);
-      }
+    
+    // Load progress and quiz in parallel
+    Promise.all([
+      new Promise<void>(resolve => {
+        this.quizService.getQuiz(quizId).subscribe({
+          next: (data) => {
+            this.activeQuiz.set(data);
+            resolve();
+          },
+          error: (err) => {
+            console.error('Failed to load quiz details', err);
+            resolve();
+          }
+        });
+      }),
+      new Promise<void>(resolve => {
+        this.quizService.getQuizProgress(quizId).subscribe({
+          next: (data) => {
+            this.quizProgress.set(data);
+            resolve();
+          },
+          error: (err) => {
+            console.error('Failed to load quiz progress', err);
+            resolve();
+          }
+        });
+      })
+    ]).finally(() => {
+      this.isLoadingQuiz.set(false);
     });
   }
 
@@ -92,10 +114,21 @@ export class ClassroomQuizComponent implements OnChanges {
         } else {
           this.notification.warning(`You scored ${result.score}%. Try again to meet the passing score of ${quiz.passScore}%.`);
         }
+        
+        // Reload progress to update attempts and status
+        this.loadProgressOnly(quiz.id);
       },
       error: (err) => {
         this.notification.error('Failed to submit quiz.');
         this.isSubmittingQuiz.set(false);
+      }
+    });
+  }
+
+  private loadProgressOnly(quizId: number) {
+    this.quizService.getQuizProgress(quizId).subscribe({
+      next: (data) => {
+        this.quizProgress.set(data);
       }
     });
   }

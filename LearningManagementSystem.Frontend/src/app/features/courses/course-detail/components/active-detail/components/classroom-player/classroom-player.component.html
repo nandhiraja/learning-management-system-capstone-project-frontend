@@ -5,6 +5,7 @@
       <!-- Video Player -->
       @if (isVideo) {
         <video 
+          #videoPlayer
           [src]="mediaStreamUrl" 
           controls 
           controlslist="nodownload"
@@ -36,14 +37,23 @@
         </div>
       }
       
-      <!-- PDF Native Viewer (Fully supports localhost viewing) -->
+      <!-- PDF Native Viewer (Secured via ng2-pdf-viewer) -->
       @else if (isPdf) {
-        <iframe 
-          [src]="safeUrl" 
-          class="document-iframe" 
-          title="PDF Document Viewer"
-          frameborder="0"
-        ></iframe>
+        @if (isFetchingPdf()) {
+          <div class="text-fetching-loader glass-card">
+            <div class="spinner"></div>
+            <p>Authorizing and decrypting PDF...</p>
+          </div>
+        } @else if (pdfBlobUrl()) {
+          <div class="pdf-viewer-container" (contextmenu)="false">
+            <pdf-viewer 
+              [src]="pdfBlobUrl()!" 
+              [render-text]="true" 
+              [original-size]="false"
+              style="width: 100%; height: 600px; display: block;"
+            ></pdf-viewer>
+          </div>
+        }
       }
       
       <!-- Office Document (PPT/Word/Excel) Viewer -->

@@ -52,6 +52,7 @@ export interface LectureResponse {
   durationInMinutes: number;
   contentType: string;
   quizId: number | null;
+  mediaAuthToken?: string;
 }
 
 export interface ReviewRequest {

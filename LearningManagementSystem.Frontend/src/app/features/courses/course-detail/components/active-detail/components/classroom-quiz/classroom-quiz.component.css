@@ -18,18 +18,43 @@
 }
 
 .quiz-header-bar h3 {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--color-text);
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.quiz-badges {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.quiz-pass-badge, .quiz-attempts-badge, .quiz-success-badge {
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 6px;
 }
 
 .quiz-pass-badge {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-warning);
-  background-color: var(--color-warning-soft);
-  padding: 3px 8px;
-  border-radius: 12px;
+  background: var(--primary-color-light, #e0e7ff);
+  color: var(--primary-color, #4338ca);
+}
+
+.quiz-attempts-badge {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.quiz-attempts-badge.danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.quiz-success-badge {
+  background: #dcfce7;
+  color: #15803d;
 }
 
 .quiz-result-card {

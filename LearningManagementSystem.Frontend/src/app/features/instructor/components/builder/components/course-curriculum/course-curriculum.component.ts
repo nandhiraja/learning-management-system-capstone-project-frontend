@@ -307,8 +307,8 @@ export class CourseCurriculumComponent implements OnInit, OnDestroy {
     this.isUploadingFile.set(true);
     this.fileUploadProgress.set(0);
 
-    this.instructorService.uploadFile(file, uploadType).subscribe({
-      next: (event) => {
+    this.instructorService.uploadMedia(file, uploadType as any).subscribe({
+      next: (event: any) => {
         if (event.type === HttpEventType.UploadProgress && event.total) {
           this.fileUploadProgress.set(Math.round((100 * event.loaded) / event.total));
         } else if (event.type === HttpEventType.Response) {
@@ -325,7 +325,7 @@ export class CourseCurriculumComponent implements OnInit, OnDestroy {
           this.isUploadingFile.set(false);
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         this.notification.error(err.error || 'Failed to upload resource file.');
         this.isUploadingFile.set(false);
       }

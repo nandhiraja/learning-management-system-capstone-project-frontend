@@ -30,3 +30,12 @@ export interface QuizSubmitResponse {
   score: number;
   passed: boolean;
 }
+
+export interface QuizProgressResponse {
+  quizId: number;
+  attemptsUsed: number;
+  maxAttempts: number;
+  highestScore: number;
+  passScore: number;
+  isPassed: boolean;
+}

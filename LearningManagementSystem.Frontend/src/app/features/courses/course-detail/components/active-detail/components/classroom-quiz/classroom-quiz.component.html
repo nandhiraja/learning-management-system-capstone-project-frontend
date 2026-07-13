@@ -7,7 +7,17 @@
   } @else if (activeQuiz(); as quiz) {
     <div class="quiz-header-bar">
       <h3>{{ quiz.title }}</h3>
-      <span class="quiz-pass-badge">Passing score: {{ quiz.passScore }}%</span>
+      <div class="quiz-badges">
+        <span class="quiz-pass-badge">Passing score: {{ quiz.passScore }}%</span>
+        @if (quizProgress(); as progress) {
+          <span class="quiz-attempts-badge" [class.danger]="progress.attemptsUsed >= progress.maxAttempts && !progress.isPassed">
+            Attempts: {{ progress.attemptsUsed }} / {{ progress.maxAttempts }}
+          </span>
+          @if (progress.isPassed) {
+            <span class="quiz-success-badge"><i class="bi bi-check-circle-fill" aria-hidden="true"></i> Passed</span>
+          }
+        }
+      </div>
     </div>
 
     @if (quizResult(); as result) {
@@ -21,7 +31,8 @@
         <p class="result-desc">
           {{ result.passed ? 'Great job! You have mastered this concept.' : 'Review the lectures and try again to improve your score.' }}
         </p>
-        <button class="btn btn-primary" (click)="resetQuiz()">
+        <button class="btn btn-primary" (click)="resetQuiz()" 
+          [disabled]="quizProgress()?.isPassed || (quizProgress()?.attemptsUsed || 0) >= (quizProgress()?.maxAttempts || 999)">
           <i class="bi bi-arrow-clockwise" aria-hidden="true"></i> Try again
         </button>
       </div>
@@ -52,10 +63,14 @@
         <button 
           (click)="submitQuiz()" 
           class="btn btn-primary"
-          [disabled]="isSubmittingQuiz()"
+          [disabled]="isSubmittingQuiz() || quizProgress()?.isPassed || (quizProgress()?.attemptsUsed || 0) >= (quizProgress()?.maxAttempts || 999)"
         >
           @if (isSubmittingQuiz()) {
             <div class="spinner"></div> Submitting...
+          } @else if (quizProgress()?.isPassed) {
+            Passed
+          } @else if ((quizProgress()?.attemptsUsed || 0) >= (quizProgress()?.maxAttempts || 999)) {
+            Attempts Exhausted
           } @else {
             Submit answers
           }

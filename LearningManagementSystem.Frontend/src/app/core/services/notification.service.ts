@@ -2,6 +2,7 @@ import { Injectable, signal, computed, effect, inject } from '@angular/core';
 import { ApiService } from './api.service';
 import { AuthService } from './auth.service';
 import * as signalR from '@microsoft/signalr';
+import { environment } from '../../../environments/environment';
 
 export interface NotificationItem {
   id: number;
@@ -58,7 +59,7 @@ export class NotificationService {
     if (!token) return;
 
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:5159/notificationHub', {
+      .withUrl(`${environment.backendUrl}/notificationHub`, {
         accessTokenFactory: () => localStorage.getItem('lms_access_token') || ''
       })
       .withAutomaticReconnect()

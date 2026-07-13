@@ -3,7 +3,7 @@
   <div class="progress-overview-area">
     <div class="progress-meta-details">
       <span class="prog-title">My course progress</span>
-      <span class="prog-nums">{{ completedLectureIds.length }} / {{ totalLectures }} complete</span>
+      <span class="prog-nums">{{ progressPercent }}% complete</span>
     </div>
     <app-progress-bar [percent]="progressPercent" color="var(--color-success)" [showLabel]="true"></app-progress-bar>
   </div>

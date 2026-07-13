@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiService } from './api.service';
 import { Observable } from 'rxjs';
-import { QuizResponse, QuizSubmitRequest, QuizSubmitResponse } from '../../models/quiz.model';
+import { QuizProgressResponse, QuizResponse, QuizSubmitRequest, QuizSubmitResponse } from '../../models/quiz.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,5 +15,9 @@ export class QuizService {
 
   submitQuiz(quizId: number, payload: QuizSubmitRequest): Observable<QuizSubmitResponse> {
     return this.api.post<QuizSubmitResponse>(`quizzes/${quizId}/submit`, payload);
+  }
+
+  getQuizProgress(quizId: number): Observable<QuizProgressResponse> {
+    return this.api.get<QuizProgressResponse>(`quizzes/${quizId}/progress`);
   }
 }

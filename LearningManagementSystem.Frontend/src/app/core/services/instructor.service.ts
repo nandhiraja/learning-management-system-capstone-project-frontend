@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { InstructorDashboardResponse, InstructorDiscussionResponse } from '../../models/instructor.model';
 import { CourseResponse } from '../../models/course.model';
 import { HttpClient, HttpEvent } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -87,12 +88,12 @@ export class InstructorService {
   }
 
   // File uploader with progress tracking
-  uploadFile(file: File, type: 'image' | 'video' | 'pdf' | 'document'): Observable<HttpEvent<any>> {
+  uploadMedia(file: File, type: 'video' | 'thumbnail' | 'document'): Observable<HttpEvent<any>> {
     const formData = new FormData();
     formData.append('file', file);
     
-    let url = `http://localhost:5159/api/upload/${type}`;
-    if (type === 'document') url = `http://localhost:5159/api/upload/document`;
+    let url = `${environment.apiUrl}/upload/${type}`;
+    if (type === 'document') url = `${environment.apiUrl}/upload/document`;
 
     return this.http.post(url, formData, {
       reportProgress: true,

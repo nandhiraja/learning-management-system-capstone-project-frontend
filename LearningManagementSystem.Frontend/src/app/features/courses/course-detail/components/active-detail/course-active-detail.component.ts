@@ -60,11 +60,7 @@ export class CourseActiveDetailComponent implements OnInit {
     return this.course?.instructor?.email === user?.email;
   });
 
-  protected progressPercent = computed(() => {
-    const total = this.totalLectures();
-    if (total === 0) return 0;
-    return Math.round((this.completedLectureIds().length / total) * 100);
-  });
+  protected progressPercent = signal<number>(0);
 
   ngOnInit() {
     this.initializeClassroom();
@@ -95,8 +91,13 @@ export class CourseActiveDetailComponent implements OnInit {
   fetchProgress(enrollId: number) {
     this.enrollmentService.getCourseProgress(enrollId).subscribe({
       next: (prog) => {
-        if (prog && prog.completedLectureIds) {
-          this.completedLectureIds.set(prog.completedLectureIds);
+        if (prog) {
+          if (prog.completedLectureIds) {
+            this.completedLectureIds.set(prog.completedLectureIds);
+          }
+          if (prog.percentage !== undefined) {
+            this.progressPercent.set(prog.percentage);
+          }
         }
         this.selectFirstLecture();
         this.isLoading.set(false);
@@ -106,6 +107,25 @@ export class CourseActiveDetailComponent implements OnInit {
         console.error('Failed to load progress state', err);
         this.selectFirstLecture();
         this.isLoading.set(false);
+      }
+    });
+  }
+
+  fetchProgressOnly(enrollId: number) {
+    this.enrollmentService.getCourseProgress(enrollId).subscribe({
+      next: (prog) => {
+        if (prog) {
+          if (prog.completedLectureIds) {
+            this.completedLectureIds.set(prog.completedLectureIds);
+          }
+          if (prog.percentage !== undefined) {
+            this.progressPercent.set(prog.percentage);
+          }
+          this.checkCertificateAward();
+        }
+      },
+      error: (err) => {
+        console.error('Failed to load progress state only', err);
       }
     });
   }
@@ -153,7 +173,7 @@ export class CourseActiveDetailComponent implements OnInit {
           this.completedLectureIds.update(ids => ids.filter(id => id !== lectureId));
           this.notification.info('Lecture marked as incomplete.');
         }
-        this.checkCertificateAward();
+        this.fetchProgressOnly(enrollId);
       },
       error: (err) => {
         this.notification.error('Failed to update progress status.');
@@ -163,9 +183,9 @@ export class CourseActiveDetailComponent implements OnInit {
   }
 
   onQuizPassed() {
-    const lec = this.activeLecture();
-    if (lec && !this.isCompleted(lec.id)) {
-      this.toggleProgress(lec.id);
+    const enrollId = this.enrollmentId();
+    if (enrollId) {
+      this.fetchProgressOnly(enrollId);
     }
   }
 

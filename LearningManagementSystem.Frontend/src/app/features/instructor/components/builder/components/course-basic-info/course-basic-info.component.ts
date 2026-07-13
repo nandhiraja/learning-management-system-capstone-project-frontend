@@ -181,8 +181,8 @@ export class CourseBasicInfoComponent implements OnInit, OnChanges {
     this.isUploading.set(true);
     this.uploadProgress.set(0);
 
-    this.instructorService.uploadFile(file, 'image').subscribe({
-      next: (event) => {
+    this.instructorService.uploadMedia(file, 'thumbnail').subscribe({
+      next: (event: any) => {
         if (event.type === HttpEventType.UploadProgress && event.total) {
           this.uploadProgress.set(Math.round((100 * event.loaded) / event.total));
         } else if (event.type === HttpEventType.Response) {
@@ -194,7 +194,7 @@ export class CourseBasicInfoComponent implements OnInit, OnChanges {
           this.isUploading.set(false);
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         this.notification.error(err.error || 'Failed to upload thumbnail image.');
         this.isUploading.set(false);
       }
