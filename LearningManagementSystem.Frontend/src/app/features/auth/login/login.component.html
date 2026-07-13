@@ -31,14 +31,24 @@
       <!-- Password Field -->
       <div class="form-group">
         <label for="password" class="form-label">Password</label>
-        <input 
-          id="password" 
-          type="password" 
-          formControlName="password" 
-          class="form-control" 
-          placeholder="••••••••"
-          [class.is-invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
-        />
+        <div class="password-input-container" style="position: relative;">
+          <input 
+            id="password" 
+            [type]="showPassword ? 'text' : 'password'" 
+            formControlName="password" 
+            class="form-control" 
+            placeholder="••••••••"
+            [class.is-invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+            style="padding-right: 40px;"
+          />
+          <button type="button" class="password-toggle-btn" (click)="togglePasswordVisibility()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #666; display: flex; align-items: center; justify-content: center; padding: 0;">
+            @if (showPassword) {
+              <i class="bi bi-eye-slash" style="font-size: 1.2rem;"></i>
+            } @else {
+              <i class="bi bi-eye" style="font-size: 1.2rem;"></i>
+            }
+          </button>
+        </div>
         @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
           <div class="form-error">
             @if (loginForm.get('password')?.errors?.['required']) {
