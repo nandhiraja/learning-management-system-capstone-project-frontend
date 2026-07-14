@@ -227,10 +227,11 @@ export class CourseBasicInfoComponent implements OnInit, OnChanges {
     if (this.course) {
       // Update Mode
       this.instructorService.updateCourse(this.course.externalId, payload).subscribe({
-        next: () => {
+        next: (res: any) => {
           this.isSubmitting.set(false);
           const updated: CourseResponse = {
             ...this.course!,
+            externalId: res?.updatedCourseGuid || this.course!.externalId,
             title: payload.title,
             description: payload.description,
             categoryId: payload.categoryId,

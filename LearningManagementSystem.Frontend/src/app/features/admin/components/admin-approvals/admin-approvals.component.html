@@ -96,8 +96,24 @@
                     <span class="pricing-old-text">(was: {{ course.originalCourseDetails?.price === 0 ? 'Free' : (course.originalCourseDetails?.price | currency:'USD') }})</span>
                   }
                 </span>
+                @if (isDraftUpdate(course)) {
+                  <span class="draft-update-banner">
+                    <i class="bi bi-pencil-square" aria-hidden="true"></i> Draft Update — changes to an existing live course
+                  </span>
+                }
               </div>
               <div class="course-header-actions">
+                <!-- View Live Course Details Page -->
+                <a
+                  [routerLink]="['/courses', course.originalCourseExternalId || course.externalId]"
+                  target="_blank"
+                  rel="noopener"
+                  class="btn btn-ghost btn-sm btn-icon-only"
+                  title="Open course details page in new tab"
+                >
+                  <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+                </a>
+                <!-- Expand/Collapse Syllabus -->
                 <button 
                   type="button" 
                   class="btn btn-ghost btn-sm btn-icon-only"

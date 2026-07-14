@@ -30,8 +30,27 @@ export class NotificationService {
     this.show(message, 'success');
   }
 
-  error(message: string) {
-    this.show(message, 'error');
+  error(message: any) {
+    let displayMessage = 'An error occurred';
+    if (message) {
+      if (typeof message === 'string') {
+        displayMessage = message;
+      } else if (message.error) {
+        if (typeof message.error === 'string') {
+          displayMessage = message.error;
+        } else if (message.error.message) {
+          displayMessage = message.error.message;
+        } else if (message.error.errors) {
+          const errors = Object.values(message.error.errors) as string[][];
+          if (errors.length > 0 && errors[0].length > 0) {
+            displayMessage = errors[0][0];
+          }
+        }
+      } else if (message.message) {
+        displayMessage = message.message;
+      }
+    }
+    this.show(displayMessage, 'error');
   }
 
   warning(message: string) {

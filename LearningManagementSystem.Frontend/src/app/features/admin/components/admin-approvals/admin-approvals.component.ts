@@ -1,13 +1,14 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { CourseResponse, CourseSectionResponse, LectureResponse } from '../../../../models/course.model';
 import { UserProfile } from '../../../../shared/models/user.model';
 
 @Component({
   selector: 'app-admin-approvals',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './admin-approvals.component.html',
   styleUrl: './admin-approvals.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
