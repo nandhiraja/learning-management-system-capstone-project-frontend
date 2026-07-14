@@ -173,10 +173,25 @@
             ></textarea>
           </div>
           <div class="reply-actions-bar">
+            @if (hasTranscript()) {
+              <button 
+                type="button" 
+                (click)="draftResponseWithAi()" 
+                class="btn btn-secondary draft-ai-btn"
+                [disabled]="isAiDrafting() || isPostingReply()"
+                title="Draft a response based on lecture transcript using AI"
+              >
+                @if (isAiDrafting()) {
+                  <div class="spinner"></div> drafting...
+                } @else {
+                  <i class="bi bi-magic" aria-hidden="true"></i> Draft with AI
+                }
+              </button>
+            }
             <button 
               (click)="postReply()" 
               class="btn btn-primary submit-reply-btn"
-              [disabled]="isPostingReply() || !replyContent().trim()"
+              [disabled]="isPostingReply() || isAiDrafting() || !replyContent().trim()"
             >
               @if (isPostingReply()) {
                 <div class="spinner"></div> Sending...

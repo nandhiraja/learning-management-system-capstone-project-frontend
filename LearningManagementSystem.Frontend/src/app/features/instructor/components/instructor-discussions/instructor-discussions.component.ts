@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InstructorService } from '../../../../core/services/instructor.service';
 import { DiscussionService } from '../../../../core/services/discussion.service';
+import { AiService } from '../../../../core/services/ai.service';
 import { InstructorDiscussionResponse } from '../../../../models/instructor.model';
 import { DiscussionDetailResponse } from '../../../../models/discussion.model';
 import { BadgeChipComponent } from '../../../../shared/components/badge-chip/badge-chip.component';
@@ -17,6 +18,7 @@ import { BadgeChipComponent } from '../../../../shared/components/badge-chip/bad
 export class InstructorDiscussionsComponent implements OnInit {
   private instructorService = inject(InstructorService);
   private discussionService = inject(DiscussionService);
+  private aiService = inject(AiService);
 
   // Discussion threads list
   protected discussions = signal<InstructorDiscussionResponse[]>([]);
@@ -30,6 +32,10 @@ export class InstructorDiscussionsComponent implements OnInit {
   protected isLoadingThread = signal<boolean>(false);
   protected isPostingReply = signal<boolean>(false);
   protected replyContent = signal<string>('');
+
+  // AI Assistance states
+  protected hasTranscript = signal<boolean>(false);
+  protected isAiDrafting = signal<boolean>(false);
 
   // Filtered discussions list based on search query
   protected filteredDiscussions = computed(() => {
@@ -54,7 +60,6 @@ export class InstructorDiscussionsComponent implements OnInit {
       next: (data) => {
         this.discussions.set(data);
         this.isLoadingList.set(false);
-        // If we have a selected thread, check if it's still in the list or needs refresh
       },
       error: (err) => {
         console.error('Failed to load instructor discussions', err);
@@ -72,15 +77,49 @@ export class InstructorDiscussionsComponent implements OnInit {
     this.selectedDiscussionId.set(guid);
     this.isLoadingThread.set(true);
     this.selectedThread.set(null);
+    this.hasTranscript.set(false);
 
     this.discussionService.getDiscussionDetails(guid).subscribe({
       next: (data) => {
         this.selectedThread.set(data);
         this.isLoadingThread.set(false);
+        if (data.lectureId) {
+          this.checkTranscript(data.lectureId);
+        }
       },
       error: (err) => {
         console.error('Failed to load discussion details', err);
         this.isLoadingThread.set(false);
+      }
+    });
+  }
+
+  checkTranscript(lectureId: number) {
+    this.aiService.checkTranscriptAvailability(lectureId).subscribe({
+      next: (res) => {
+        this.hasTranscript.set(res.hasTranscript);
+      },
+      error: () => {
+        this.hasTranscript.set(false);
+      }
+    });
+  }
+
+  draftResponseWithAi() {
+    const thread = this.selectedThread();
+    if (!thread) return;
+
+    this.isAiDrafting.set(true);
+    const question = `Title: ${thread.title}\n\nContent: ${thread.content}`;
+    
+    this.aiService.askInstructorQuestion(thread.lectureId, question).subscribe({
+      next: (res) => {
+        this.replyContent.set(res.answer);
+        this.isAiDrafting.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to draft AI response', err);
+        this.isAiDrafting.set(false);
       }
     });
   }

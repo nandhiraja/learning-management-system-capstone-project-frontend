@@ -163,37 +163,88 @@
         } @else {
           <!-- Expanded Post Creation Form -->
           <div class="forum-create-card glass-card">
-            <h4>Create a new Discussion Post</h4>
-            <div class="form-group">
-              <input 
-                #questionTitleInput 
-                type="text" 
-                placeholder="Post title (e.g. Question on section 2 quiz...)" 
-                class="form-control" 
-              />
-            </div>
-            <div class="form-group">
-              <textarea 
-                #questionContentInput 
-                placeholder="What details or code snippets would you like to share?" 
-                rows="4" 
-                class="form-control"
-              ></textarea>
-            </div>
-            <div class="form-actions-row">
-              <button 
-                (click)="postQuestion(questionTitleInput, questionContentInput)" 
-                class="btn btn-primary btn-sm"
-                [disabled]="isPostingQuestion()"
-              >
-                @if (isPostingQuestion()) {
-                  <div class="spinner"></div> Posting...
-                } @else {
-                  Post Thread
-                }
-              </button>
-              <button class="btn btn-secondary btn-sm" (click)="showNewQuestionForm.set(false)">Cancel</button>
-            </div>
+            @if (isAiLoading()) {
+              <div class="ai-loading-container">
+                <div class="ai-pulse-spinner"></div>
+                <h5>Analyzing Lecture Transcripts...</h5>
+                <p>Generating an instant solution to see if we can resolve your question right away!</p>
+              </div>
+            } @else if (aiSuggestion(); as suggestion) {
+              <div class="ai-suggestion-container">
+                <div class="ai-suggestion-header">
+                  <i class="bi bi-robot ai-robot-icon"></i>
+                  <div class="ai-header-meta">
+                    <span class="ai-badge-label">Instant AI Solution</span>
+                    <span class="ai-disclaimer">Grounded in lecture contents</span>
+                  </div>
+                </div>
+                <div class="ai-suggestion-body">
+                  {{ suggestion }}
+                </div>
+                <div class="ai-suggestion-prompt">
+                  <strong>Does this suggestion solve your question?</strong>
+                </div>
+                <div class="ai-suggestion-actions">
+                  <button 
+                    type="button" 
+                    class="btn btn-success btn-sm flex-1" 
+                    (click)="acceptAiSuggestion()"
+                  >
+                    <i class="bi bi-check-circle"></i> Yes, Solved!
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn btn-outline-danger btn-sm flex-1" 
+                    (click)="postQuestion(true)"
+                    [disabled]="isPostingQuestion()"
+                  >
+                    @if (isPostingQuestion()) {
+                      <span class="spinner"></span> Posting...
+                    } @else {
+                      <i class="bi bi-chat-dots"></i> No, Post to Forum
+                    }
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <h4>Create a new Discussion Post</h4>
+              <div class="form-group">
+                <input 
+                  type="text" 
+                  placeholder="Post title (e.g. Question on section 2 quiz...)" 
+                  class="form-control" 
+                  [ngModel]="questionTitle()"
+                  (ngModelChange)="questionTitle.set($event)"
+                />
+              </div>
+              <div class="form-group">
+                <textarea 
+                  placeholder="What details or code snippets would you like to share?" 
+                  rows="4" 
+                  class="form-control"
+                  [ngModel]="questionContent()"
+                  (ngModelChange)="questionContent.set($event)"
+                ></textarea>
+              </div>
+              <div class="form-actions-row">
+                <button 
+                  (click)="postQuestion()" 
+                  class="btn btn-primary btn-sm"
+                  [disabled]="isPostingQuestion()"
+                >
+                  @if (isPostingQuestion()) {
+                    <div class="spinner"></div> Posting...
+                  } @else {
+                    @if (hasTranscript()) {
+                      Post with AI Assistant
+                    } @else {
+                      Post Thread
+                    }
+                  }
+                </button>
+                <button class="btn btn-secondary btn-sm" (click)="showNewQuestionForm.set(false)">Cancel</button>
+              </div>
+            }
           </div>
         }
       }

@@ -1,14 +1,16 @@
 import { Component, Input, OnChanges, SimpleChanges, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { DiscussionService } from '../../../../../../../core/services/discussion.service';
 import { AuthService } from '../../../../../../../core/services/auth.service';
+import { AiService } from '../../../../../../../core/services/ai.service';
 import { NotificationService } from '../../../../../../../shared/services/notification.service';
 import { DiscussionResponse, DiscussionDetailResponse } from '../../../../../../../models/discussion.model';
 
 @Component({
   selector: 'app-classroom-discussion',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './classroom-discussion.component.html',
   styleUrl: './classroom-discussion.component.css'
 })
@@ -19,6 +21,7 @@ export class ClassroomDiscussionComponent implements OnChanges {
 
   private discussionService = inject(DiscussionService);
   private authService = inject(AuthService);
+  private aiService = inject(AiService);
   private notification = inject(NotificationService);
 
   // States
@@ -29,6 +32,15 @@ export class ClassroomDiscussionComponent implements OnChanges {
   protected isPostingReply = signal<boolean>(false);
   protected showNewQuestionForm = signal<boolean>(false);
 
+  // Input states (bound via ngModel)
+  protected questionTitle = signal<string>('');
+  protected questionContent = signal<string>('');
+
+  // AI Interceptor States
+  protected hasTranscript = signal<boolean>(false);
+  protected isAiLoading = signal<boolean>(false);
+  protected aiSuggestion = signal<string | null>(null);
+
   // Roles checking
   protected isAdmin = computed(() => {
     const user = this.authService.currentUser();
@@ -38,8 +50,24 @@ export class ClassroomDiscussionComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['courseExternalId'] || changes['lectureId']) && this.courseExternalId && this.lectureId) {
       this.selectedDiscussion.set(null);
+      this.aiSuggestion.set(null);
+      this.questionTitle.set('');
+      this.questionContent.set('');
       this.fetchDiscussions(this.lectureId);
+      this.checkTranscript();
     }
+  }
+
+  checkTranscript() {
+    this.hasTranscript.set(false);
+    this.aiService.checkTranscriptAvailability(this.lectureId).subscribe({
+      next: (res) => {
+        this.hasTranscript.set(res.hasTranscript);
+      },
+      error: () => {
+        this.hasTranscript.set(false);
+      }
+    });
   }
 
   fetchDiscussions(lectureId: number) {
@@ -56,15 +84,35 @@ export class ClassroomDiscussionComponent implements OnChanges {
     });
   }
 
-  postQuestion(titleInput: HTMLInputElement, contentInput: HTMLTextAreaElement) {
-    const title = titleInput.value.trim();
-    const content = contentInput.value.trim();
+  postQuestion(bypassAi = false) {
+    const title = this.questionTitle().trim();
+    const content = this.questionContent().trim();
     
     if (!title || !content) {
       this.notification.warning('Please fill in both a title and content for your question.');
       return;
     }
 
+    if (this.hasTranscript() && !bypassAi && !this.aiSuggestion()) {
+      this.isAiLoading.set(true);
+      this.aiService.askStudentQuestion(this.lectureId, content).subscribe({
+        next: (res) => {
+          this.aiSuggestion.set(res.answer);
+          this.isAiLoading.set(false);
+        },
+        error: (err) => {
+          // If AI fails, fallback and post to forum directly
+          this.isAiLoading.set(false);
+          this.submitQuestionToForum(title, content);
+        }
+      });
+      return;
+    }
+
+    this.submitQuestionToForum(title, content);
+  }
+
+  submitQuestionToForum(title: string, content: string) {
     this.isPostingQuestion.set(true);
     this.discussionService.createDiscussion(this.courseExternalId, {
       title,
@@ -73,17 +121,26 @@ export class ClassroomDiscussionComponent implements OnChanges {
     }).subscribe({
       next: () => {
         this.notification.success('Your question has been posted successfully!');
-        titleInput.value = '';
-        contentInput.value = '';
+        this.questionTitle.set('');
+        this.questionContent.set('');
         this.fetchDiscussions(this.lectureId);
         this.isPostingQuestion.set(false);
         this.showNewQuestionForm.set(false);
+        this.aiSuggestion.set(null);
       },
       error: (err) => {
         this.notification.error('Failed to post question.');
         this.isPostingQuestion.set(false);
       }
     });
+  }
+
+  acceptAiSuggestion() {
+    this.notification.success('Glad we could resolve your question instantly!');
+    this.questionTitle.set('');
+    this.questionContent.set('');
+    this.aiSuggestion.set(null);
+    this.showNewQuestionForm.set(false);
   }
 
   viewDiscussion(discussionExtId: string) {
