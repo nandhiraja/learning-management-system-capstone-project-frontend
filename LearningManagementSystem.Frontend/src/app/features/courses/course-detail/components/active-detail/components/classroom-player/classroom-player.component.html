@@ -1,6 +1,6 @@
 @if (lecture) {
   <div class="player-container">
-    <div class="media-viewport">
+    <div class="media-viewport" [class.video-mode]="isVideo">
       
       <!-- Video Player -->
       @if (isVideo) {

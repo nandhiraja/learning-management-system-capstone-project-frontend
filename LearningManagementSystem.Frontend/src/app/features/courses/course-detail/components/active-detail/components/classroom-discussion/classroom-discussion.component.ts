@@ -1,6 +1,8 @@
 import { Component, Input, OnChanges, SimpleChanges, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { marked } from 'marked';
 import { DiscussionService } from '../../../../../../../core/services/discussion.service';
 import { AuthService } from '../../../../../../../core/services/auth.service';
 import { AiService } from '../../../../../../../core/services/ai.service';
@@ -23,6 +25,7 @@ export class ClassroomDiscussionComponent implements OnChanges {
   private authService = inject(AuthService);
   private aiService = inject(AiService);
   private notification = inject(NotificationService);
+  private sanitizer = inject(DomSanitizer);
 
   // States
   protected discussions = signal<DiscussionResponse[]>([]);
@@ -40,6 +43,27 @@ export class ClassroomDiscussionComponent implements OnChanges {
   protected hasTranscript = signal<boolean>(false);
   protected isAiLoading = signal<boolean>(false);
   protected aiSuggestion = signal<string | null>(null);
+
+  protected renderedAiSuggestion = computed<SafeHtml | null>(() => {
+    const raw = this.aiSuggestion();
+    if (!raw) return null;
+    try {
+      const html = marked.parse(raw) as string;
+      return this.sanitizer.bypassSecurityTrustHtml(html);
+    } catch {
+      return this.sanitizer.bypassSecurityTrustHtml(raw);
+    }
+  });
+
+  renderMarkdown(text: string): SafeHtml {
+    if (!text) return '';
+    try {
+      const html = marked.parse(text) as string;
+      return this.sanitizer.bypassSecurityTrustHtml(html);
+    } catch {
+      return this.sanitizer.bypassSecurityTrustHtml(text);
+    }
+  }
 
   // Roles checking
   protected isAdmin = computed(() => {

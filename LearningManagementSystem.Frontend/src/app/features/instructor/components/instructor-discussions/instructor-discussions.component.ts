@@ -1,6 +1,8 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { marked } from 'marked';
 import { InstructorService } from '../../../../core/services/instructor.service';
 import { DiscussionService } from '../../../../core/services/discussion.service';
 import { AiService } from '../../../../core/services/ai.service';
@@ -19,6 +21,17 @@ export class InstructorDiscussionsComponent implements OnInit {
   private instructorService = inject(InstructorService);
   private discussionService = inject(DiscussionService);
   private aiService = inject(AiService);
+  private sanitizer = inject(DomSanitizer);
+
+  renderMarkdown(text: string): SafeHtml {
+    if (!text) return '';
+    try {
+      const html = marked.parse(text) as string;
+      return this.sanitizer.bypassSecurityTrustHtml(html);
+    } catch {
+      return this.sanitizer.bypassSecurityTrustHtml(text);
+    }
+  }
 
   // Discussion threads list
   protected discussions = signal<InstructorDiscussionResponse[]>([]);

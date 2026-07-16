@@ -23,7 +23,7 @@
 
         <div class="post-content-area">
           <h2 class="post-title">{{ thread.title }}</h2>
-          <p class="post-body-text">{{ thread.content }}</p>
+          <p class="post-body-text" [innerHTML]="renderMarkdown(thread.content)"></p>
         </div>
 
         <footer class="post-actions-bar">
@@ -67,8 +67,7 @@
                   </div>
                 </header>
 
-                <div class="comment-body">
-                  {{ rep.content }}
+                <div class="comment-body" [innerHTML]="renderMarkdown(rep.content)">
                 </div>
 
                 <footer class="comment-actions">
@@ -178,8 +177,7 @@
                     <span class="ai-disclaimer">Grounded in lecture contents</span>
                   </div>
                 </div>
-                <div class="ai-suggestion-body">
-                  {{ suggestion }}
+                <div class="ai-suggestion-body" [innerHTML]="renderedAiSuggestion()">
                 </div>
                 <div class="ai-suggestion-prompt">
                   <strong>Does this suggestion solve your question?</strong>
@@ -279,7 +277,7 @@
 
               <div class="feed-item-body">
                 <h4 class="feed-item-title">{{ disc.title }}</h4>
-                <p class="feed-item-excerpt">{{ disc.content }}</p>
+                <p class="feed-item-excerpt" [innerHTML]="renderMarkdown(disc.content)"></p>
               </div>
 
               <footer class="feed-item-footer">

@@ -125,8 +125,7 @@
                 <span class="author-label">Student</span>
               </div>
             </div>
-            <div class="message-card-body">
-              {{ thread.content }}
+            <div class="message-card-body" [innerHTML]="renderMarkdown(thread.content)">
             </div>
           </div>
 
@@ -152,8 +151,7 @@
                     <span class="reply-timestamp">&bull; {{ rep.createdAt | date:'short' }}</span>
                   </div>
                 </div>
-                <div class="message-card-body">
-                  {{ rep.content }}
+                <div class="message-card-body" [innerHTML]="renderMarkdown(rep.content)">
                 </div>
               </div>
             }

@@ -93,6 +93,7 @@ export class InstructorService {
     formData.append('file', file);
     
     let url = `${environment.apiUrl}/upload/${type}`;
+    if (type === 'thumbnail') url = `${environment.apiUrl}/upload/image`;
     if (type === 'document') url = `${environment.apiUrl}/upload/document`;
 
     return this.http.post(url, formData, {

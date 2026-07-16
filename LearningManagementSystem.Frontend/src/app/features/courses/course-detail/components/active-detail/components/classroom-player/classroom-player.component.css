@@ -14,10 +14,18 @@
   border: 1px solid var(--color-border);
 }
 
+.media-viewport.video-mode {
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .real-video-player {
   width: 100%;
+  height: 100%;
+  object-fit: contain;
   display: block;
-  max-height: 520px;
 }
 
 /* Chrome/Safari control bar overrides to guarantee download option is hidden */
