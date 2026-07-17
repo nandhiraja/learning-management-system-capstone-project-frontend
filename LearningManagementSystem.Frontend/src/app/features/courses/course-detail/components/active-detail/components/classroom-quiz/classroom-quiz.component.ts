@@ -1,7 +1,10 @@
-import { Component, Input, Output, EventEmitter, inject, OnChanges, SimpleChanges, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnChanges, SimpleChanges, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { marked } from 'marked';
 import { QuizService } from '../../../../../../../core/services/quiz.service';
 import { NotificationService } from '../../../../../../../shared/services/notification.service';
+import { AiService } from '../../../../../../../core/services/ai.service';
 import { QuizProgressResponse, QuizResponse, QuizSubmitResponse } from '../../../../../../../models/quiz.model';
 import { LectureResponse } from '../../../../../../../models/course.model';
 
@@ -20,6 +23,8 @@ export class ClassroomQuizComponent implements OnChanges {
 
   private quizService = inject(QuizService);
   private notification = inject(NotificationService);
+  private aiService = inject(AiService);
+  private sanitizer = inject(DomSanitizer);
 
   // States
   protected activeQuiz = signal<QuizResponse | null>(null);
@@ -28,6 +33,42 @@ export class ClassroomQuizComponent implements OnChanges {
   protected quizResult = signal<QuizSubmitResponse | null>(null);
   protected isSubmittingQuiz = signal<boolean>(false);
   protected quizProgress = signal<QuizProgressResponse | null>(null);
+  protected latestStudyPlan = signal<string | null>(null);
+  protected isGeneratingStudyPlan = signal<boolean>(false);
+
+  protected getCoachingMode = computed(() => {
+    const progress = this.quizProgress();
+    if (!progress) return { label: 'Coaching Mode', badgeClass: 'early', desc: 'Conceptual hints only' };
+    const remaining = progress.maxAttempts - progress.attemptsUsed;
+    if (remaining > 1) {
+      return { label: 'Hint Coach', badgeClass: 'early', desc: 'Conceptual hints only' };
+    } else if (remaining === 1) {
+      return { label: 'Deep Guide', badgeClass: 'middle', desc: 'Detailed guidance & analogies' };
+    } else {
+      return { label: 'Full Remediation', badgeClass: 'final', desc: 'Complete answers & explanations' };
+    }
+  });
+
+  protected renderedStudyPlan = computed<SafeHtml | null>(() => {
+    const raw = this.latestStudyPlan();
+    if (!raw) return null;
+    try {
+      console.log('[ClassroomQuiz] Raw study plan length:', raw.length);
+      const parsed = marked.parse(raw);
+      console.log('[ClassroomQuiz] Parsed result type:', typeof parsed, parsed instanceof Promise ? 'Promise' : 'String');
+      
+      // If it returned a Promise, we must handle it (should not happen synchronously)
+      if (parsed instanceof Promise) {
+        console.warn('[ClassroomQuiz] marked.parse returned a Promise!');
+        return this.sanitizer.bypassSecurityTrustHtml(raw);
+      }
+      
+      return this.sanitizer.bypassSecurityTrustHtml(parsed as string);
+    } catch (err) {
+      console.error('[ClassroomQuiz] Error parsing markdown with marked:', err);
+      return this.sanitizer.bypassSecurityTrustHtml(raw);
+    }
+  });
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['quizId'] && this.quizId) {
@@ -42,6 +83,8 @@ export class ClassroomQuizComponent implements OnChanges {
     this.quizResult.set(null);
     this.isSubmittingQuiz.set(false);
     this.quizProgress.set(null);
+    this.latestStudyPlan.set(null);
+    this.isGeneratingStudyPlan.set(false);
   }
 
   loadQuiz(quizId: number) {
@@ -65,6 +108,9 @@ export class ClassroomQuizComponent implements OnChanges {
         this.quizService.getQuizProgress(quizId).subscribe({
           next: (data) => {
             this.quizProgress.set(data);
+            if (data?.lastStudyPlan) {
+              this.latestStudyPlan.set(data.lastStudyPlan);
+            }
             resolve();
           },
           error: (err) => {
@@ -111,8 +157,22 @@ export class ClassroomQuizComponent implements OnChanges {
         if (result.passed) {
           this.notification.success(`Congratulations! You passed the quiz with a score of ${result.score}%!`);
           this.quizPassed.emit();
+          this.latestStudyPlan.set(null);
         } else {
           this.notification.warning(`You scored ${result.score}%. Try again to meet the passing score of ${quiz.passScore}%.`);
+          
+          // Trigger AI Study Plan generation
+          this.isGeneratingStudyPlan.set(true);
+          this.aiService.generateStudyPlan(quiz.id, answersList).subscribe({
+            next: (res) => {
+              this.latestStudyPlan.set(res.studyPlan);
+              this.isGeneratingStudyPlan.set(false);
+            },
+            error: (err) => {
+              console.error('Failed to generate study plan', err);
+              this.isGeneratingStudyPlan.set(false);
+            }
+          });
         }
         
         // Reload progress to update attempts and status
@@ -129,6 +189,9 @@ export class ClassroomQuizComponent implements OnChanges {
     this.quizService.getQuizProgress(quizId).subscribe({
       next: (data) => {
         this.quizProgress.set(data);
+        if (data?.lastStudyPlan) {
+          this.latestStudyPlan.set(data.lastStudyPlan);
+        }
       }
     });
   }

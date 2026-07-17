@@ -25,6 +25,90 @@
       </div>
     </div>
 
+    <!-- AI Quiz Generator Action -->
+    <div class="ai-generator-section glass-card">
+      <div class="ai-gen-header">
+        <div class="ai-gen-title">
+          <i class="bi bi-robot" aria-hidden="true"></i>
+          <h5> AI Quiz Generator</h5>
+        </div>
+        <p class="ai-gen-desc">Auto-generate high-quality multiple choice questions directly from the lecture transcript.</p>
+      </div>
+
+      <div class="ai-gen-actions" style="display: flex; gap: 16px; align-items: center; margin-top: 12px; flex-wrap: wrap;">
+        <div class="ai-gen-count-wrapper" style="display: flex; align-items: center; gap: 8px;">
+          <label class="form-label" style="margin: 0; font-size: 13px; font-weight: 600; color: var(--color-text-2);">Number of questions:</label>
+          <select 
+            [(ngModel)]="numQuestionsToGenerate" 
+            [ngModelOptions]="{standalone: true}" 
+            class="form-control" 
+            style="width: 80px; padding: 6px 12px; font-size: 13.5px; background: var(--color-surface-2); border-color: var(--color-border); border-radius: 4px;"
+            [disabled]="isGeneratingAI"
+          >
+            <option [value]="3">3</option>
+            <option [value]="5">5</option>
+            <option [value]="8">8</option>
+            <option [value]="10">10</option>
+          </select>
+        </div>
+
+        <button 
+          type="button" 
+          class="btn btn-primary ai-gen-btn" 
+          (click)="generateQuizWithAI()" 
+          [disabled]="isGeneratingAI"
+        >
+          @if (isGeneratingAI) {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Generating Questions with AI Agent...
+          } @else {
+            <i class="bi bi-magic" aria-hidden="true"></i> Generate Quiz with AI
+          }
+        </button>
+      </div>
+
+      @if (aiGeneratedQuestions.length > 0) {
+        <div class="ai-preview-container">
+          <div class="ai-preview-header">
+            <h6>AI Generated Questions Preview ({{ aiGeneratedQuestions.length }})</h6>
+            <button type="button" class="btn btn-secondary btn-xs" (click)="acceptAllAiQuestions()">
+              <i class="bi bi-check-all" aria-hidden="true"></i> Accept All
+            </button>
+          </div>
+
+          <div class="ai-questions-preview-list">
+            @for (q of aiGeneratedQuestions; track q; let idx = $index) {
+              <div class="ai-question-preview-card">
+                <div class="ai-q-preview-header">
+                  <span class="ai-q-num">Question {{ idx + 1 }}</span>
+                  <div class="ai-q-actions">
+                    <button type="button" class="btn btn-success btn-xs btn-accept" (click)="acceptAiQuestion(idx)" title="Accept Question">
+                      <i class="bi bi-check-lg" aria-hidden="true"></i> Add to Quiz
+                    </button>
+                    <button type="button" class="btn btn-ghost btn-xs text-danger" (click)="rejectAiQuestion(idx)" title="Dismiss">
+                      <i class="bi bi-x-lg" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <p class="ai-q-text"><strong>{{ q.questionText }}</strong></p>
+                <ul class="ai-options-preview">
+                  @for (o of q.options; track o) {
+                    <li [class.correct-option]="o.isCorrect">
+                      <span class="bullet"></span>
+                      {{ o.text }}
+                      @if (o.isCorrect) {
+                        <span class="correct-badge"><i class="bi bi-check-circle-fill"></i> Correct</span>
+                      }
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
     <div class="questions-divider">
       <h4>Quiz Questions</h4>
       <p class="text-sm text-muted">Add multiple choice questions. Mark one option as the correct answer.</p>

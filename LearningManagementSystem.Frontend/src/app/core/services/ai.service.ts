@@ -25,4 +25,12 @@ export class AiService {
       question
     });
   }
+
+  generateStudyPlan(quizId: number, answers: any[]): Observable<{ studyPlan: string }> {
+    return this.api.post<{ studyPlan: string }>(`ai/quizzes/${quizId}/study-plan`, { answers });
+  }
+
+  generateQuiz(lectureId: number, numQuestions: number = 5, existingQuestions: string[] = []): Observable<{ questions: Array<{ questionText: string; options: Array<{ text: string; isCorrect: boolean }> }> }> {
+    return this.api.post<{ questions: any[] }>(`ai/lectures/${lectureId}/generate-quiz`, { numQuestions, existingQuestions });
+  }
 }

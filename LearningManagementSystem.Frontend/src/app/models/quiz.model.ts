@@ -38,4 +38,5 @@ export interface QuizProgressResponse {
   highestScore: number;
   passScore: number;
   isPassed: boolean;
+  lastStudyPlan?: string;
 }

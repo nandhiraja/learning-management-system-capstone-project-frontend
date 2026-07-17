@@ -77,6 +77,30 @@
         </button>
       </div>
     }
+
+    <!-- AI Study Coach Remediation Widget -->
+    @if (isGeneratingStudyPlan() || renderedStudyPlan()) {
+      <div class="ai-study-coach-container glass-card">
+        <div class="ai-coach-header">
+          <div class="ai-coach-title-wrapper" style="display: flex; align-items: center; gap: 10px;">
+            <i class="bi bi-robot" aria-hidden="true"></i>
+            <h4>AI Study Coach: Your Personalized Remediation</h4>
+          </div>
+          <span class="coaching-badge" [ngClass]="getCoachingMode().badgeClass" [title]="getCoachingMode().desc">
+            {{ getCoachingMode().label }}
+          </span>
+        </div>
+        
+        @if (isGeneratingStudyPlan()) {
+          <div class="ai-coach-loading">
+            <div class="spinner"></div>
+            <p>Analyzing your answers and generating a custom study guide...</p>
+          </div>
+        } @else if (renderedStudyPlan()) {
+          <div class="ai-coach-content" [innerHTML]="renderedStudyPlan()"></div>
+        }
+      </div>
+    }
   } @else {
     <p class="no-quiz-found">Failed to load quiz details.</p>
   }
